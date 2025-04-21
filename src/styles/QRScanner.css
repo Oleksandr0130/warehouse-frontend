@@ -1,0 +1,30 @@
+.qr-scanner {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .qr-scanner h2 {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .qr-video {
+    width: 100%;
+    max-width: 400px;
+    border: 2px solid #007bff;
+    border-radius: 5px;
+  }
+  
+  @media (max-width: 600px) {
+    .qr-scanner {
+      padding: 15px;
+    }
+  
+    .qr-video {
+      max-width: 100%;
+    }
+  }
