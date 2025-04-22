@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from './api';
 import ItemList from './components/ItemList';
 import SoldItemsList from './components/SoldItemsList';
@@ -17,7 +17,7 @@ function App() {
   const [sortCriteria, setSortCriteria] = useState<string>('name');
 
   useEffect(() => {
-    fetchItems();
+    fetchItems().then(() => {});
   }, []);
 
   const fetchItems = async () => {
