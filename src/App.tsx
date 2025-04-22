@@ -132,7 +132,7 @@ function App() {
           <AddItemForm onAdd={handleAddItem} />
 
           <div className="sort-dropdown">
-            <label htmlFor="sort-menu">Сортировать по:</label>
+            <label htmlFor="sort-menu">Sorted by:</label>
             <select
                 id="sort-menu"
                 value={sortCriteria}
