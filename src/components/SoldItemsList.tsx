@@ -1,4 +1,3 @@
-
 import { Item } from '../types/Item';
 import '../styles/SoldItemsList.css';
 
@@ -20,7 +19,7 @@ function SoldItemsList({ items }: SoldItemsListProps) {
                 {soldItems.map((item) => (
                     <li key={item.id} className="sold-item">
                         <span className="item-name">{item.name}</span>
-                        <span className="item-sold"> Sold: {item.sold}</span>
+                        <span className="item-sold">Sold: {item.sold}</span>
                     </li>
                 ))}
             </ul>

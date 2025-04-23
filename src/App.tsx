@@ -1,107 +1,170 @@
 import React, { useState, useEffect } from 'react';
 import api from './api';
 import ItemList from './components/ItemList';
-import SoldItemsList from './components/SoldItemsList';
+import ReservedItemsList from './components/ReservedItemsList';
 import AddItemForm from './components/AddItemForm';
+import ReserveForm from './components/ReserveForm';
+import SoldItemsList from './components/SoldItemsList';
 import QRScanner from './components/QRScanner';
 import { Item } from './types/Item';
+import { ReservedItem } from './types/ReservedItem';
+import { ReservationData } from './types/ReservationData';
 import './styles/App.css';
 import './App.css';
+import {AxiosError} from "axios";
 
 function App() {
+  // Основные состояния
   const [items, setItems] = useState<Item[]>([]);
+  const [reservedItems, setReservedItems] = useState<ReservedItem[]>([]);
   const [showScanner, setShowScanner] = useState<boolean>(false);
   const [scannerAction, setScannerAction] = useState<'add' | 'remove' | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeMenu, setActiveMenu] = useState<string>('inventory');
-  const [sortCriteria, setSortCriteria] = useState<string>(''); // Критерий сортировки
+  const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold'>('inventory');
+  const [sortCriteria, setSortCriteria] = useState<string>('');
 
-  // Загрузка данных (учитывает сортировку)
+  // Загрузка данных при изменении сортировки
   useEffect(() => {
     fetchItems(sortCriteria);
+    fetchReservedItems();
   }, [sortCriteria]);
 
+  // Загрузка товаров
   const fetchItems = async (sortCriteria?: string) => {
     try {
       setLoading(true);
-
-      // Выбор эндпоинта: со сортировкой или без
       const endpoint = sortCriteria ? '/items/sorted' : '/items';
-
       const response = await api.get(endpoint, {
         params: sortCriteria ? { sortBy: sortCriteria } : {},
       });
-
-      if (Array.isArray(response.data)) {
-        setItems(response.data); // Устанавливаем полученные данные
-      } else {
-        console.error('Некорректный формат ответа:', response.data);
-        alert('Ошибка: некорректный ответ от сервера');
-      }
+      setItems(response.data || []);
     } catch (error) {
-      console.error('Ошибка при запросе данных:', error);
-      alert('Ошибка при загрузке данных: ' + (error as Error).message);
+      console.error('Ошибка загрузки товаров:', error);
+      setItems([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedCriteria = event.target.value;
-    setSortCriteria(selectedCriteria); // Установить критерий сортировки
+  // Загрузка зарезервированных товаров
+  const fetchReservedItems = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/reservations');
+      const data = response.data.map((item: ReservationData) => ({
+        id: item.id?.toString() || '',
+        name: item.itemName || '',
+        quantity: item.reservedQuantity || 0,
+        orderNumber: item.orderNumber || '',
+        week: item.reservationWeek || '',
+      }));
+      setReservedItems(data);
+    } catch (error) {
+      console.error('Ошибка загрузки зарезервированных товаров:', error);
+      setReservedItems([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // Добавление нового товара
   const handleAddItem = async (item: Item) => {
     try {
       setLoading(true);
       await api.post('/items', item);
-      await fetchItems(sortCriteria); // Обновляем список с учётом сортировки
+      fetchItems(sortCriteria);
     } catch (error) {
-      console.error('Ошибка при добавлении товара:', error);
-      alert('Не удалось добавить товар: ' + (error as Error).message);
+      console.error('Ошибка добавления товара:', error);
+      alert('Не удалось добавить товар.');
     } finally {
       setLoading(false);
     }
   };
 
+  // Обработка сканирования (добавление или удаление количества)
   const handleScan = async (id: string) => {
     setShowScanner(false);
-    const quantity = prompt(
-        `Enter quantity to ${scannerAction === 'add' ? 'add' : 'remove'}:`
+    if (!scannerAction) return;
+
+    const quantityStr = prompt(
+        `Введите количество для ${scannerAction === 'add' ? 'добавления' : 'удаления'}:`
     );
 
-    if (!quantity || isNaN(Number(quantity))) return;
-
-    const quantityNum = parseInt(quantity);
-    if (quantityNum <= 0) {
-      alert('Количество должно быть больше нуля');
+    if (!quantityStr || isNaN(Number(quantityStr))) return;
+    const quantity = parseInt(quantityStr);
+    if (quantity <= 0) {
+      alert('Количество должно быть больше 0.');
       return;
-    }
-
-    if (scannerAction === 'remove') {
-      const item = items.find(i => i.id === id);
-      if (item && quantityNum > item.quantity) {
-        alert(`Нельзя удалить больше, чем доступно (${item.quantity})`);
-        return;
-      }
-
-      if (!confirm(`Удалить ${quantityNum} товаров из инвентаря?`)) {
-        return;
-      }
     }
 
     try {
       setLoading(true);
       await api.put(`/items/${id}/${scannerAction}`, null, {
-        params: { quantity: quantityNum },
+        params: { quantity },
       });
-      await fetchItems(sortCriteria); // Обновляем с учетом сортировки
+      fetchItems(sortCriteria);
     } catch (error) {
       console.error('Ошибка при обновлении:', error);
-      alert('Ошибка: ' + (error as Error).message);
+      alert('Не удалось обновить товар.');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Сканирование QR-кода Reserved Items
+  const handleReservedItemScan = async (orderNumber: string) => {
+    try {
+      if (!orderNumber || orderNumber.trim() === '') {
+        alert('QR-код не содержит действительного номера заказа.');
+        return;
+      }
+
+      setLoading(true);
+
+      // Отправка orderNumber для завершения резервирования
+      await api.post('/reservations/scan', null, {
+        params: { orderNumber },
+      });
+
+      // Успешно завершено - обновляем состояние, удаляя элемент
+      setReservedItems((prevItems) => prevItems.filter(item => item.orderNumber !== orderNumber));
+
+      alert('Reservation processed successfully!');
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        console.error('Ошибка обработана Axios:', error.response?.data || error.message);
+        alert(`Ошибка: ${error.response?.data?.message || 'Не удалось обработать QR-код.'}`);
+      } else if (error instanceof Error) {
+        console.error('Ошибка обработки QR-кода для резервированных предметов:', error.message);
+        alert(`Ошибка: ${error.message}`);
+      } else {
+        console.error('Неизвестная ошибка:', error);
+        alert('Произошла неизвестная ошибка.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
+
+
+  // // Завершение резервации
+  // const handleReserveComplete = async (id: string) => {
+  //   try {
+  //     await api.post(`/reservations/${id}/complete`);
+  //     alert('Резервация завершена!');
+  //     fetchReservedItems();
+  //   } catch (error) {
+  //     console.error('Ошибка завершения резервации:', error);
+  //     alert('Не удалось завершить резервацию.');
+  //   }
+  // };
+
+  // Изменение сортировки
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortCriteria(event.target.value);
   };
 
   return (
@@ -116,60 +179,93 @@ function App() {
               Warehouse Inventory
             </li>
             <li
+                className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`}
+                onClick={() => setActiveMenu('reserve')}
+            >
+              Reserved Items
+            </li>
+            <li
                 className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`}
                 onClick={() => setActiveMenu('sold')}
             >
               Sold Items
             </li>
-            <li className="menu-item" onClick={() => alert('Print Reports Coming Soon!')}>
-              Print Reports
-            </li>
           </ul>
         </aside>
-
         <main className="app-main">
           {loading && <div className="loading-overlay">Загрузка...</div>}
-          <AddItemForm onAdd={handleAddItem} />
 
-          <div className="sort-dropdown">
-            <label htmlFor="sort-menu">Sorted by:</label>
-            <select
-                id="sort-menu"
-                value={sortCriteria}
-                onChange={handleSortChange}
-                className="sort-select"
-            >
-              <option value="">Default</option>
-              <option value="name">Name</option>
-              <option value="quantity">Quantity</option>
-              <option value="sold">Sold</option>
-            </select>
-          </div>
+          {activeMenu === 'inventory' && (
+              <>
+                <AddItemForm onAdd={handleAddItem} />
 
-          <div className="scanner-buttons">
-            <button
-                className="btn btn-add"
-                onClick={() => {
-                  setShowScanner(true);
-                  setScannerAction('add');
-                }}
-                disabled={loading}
-            >
-              Сканировать для добавления
-            </button>
-            <button
-                className="btn btn-remove"
-                onClick={() => {
-                  setShowScanner(true);
-                  setScannerAction('remove');
-                }}
-                disabled={loading}
-            >
-              Сканировать для удаления
-            </button>
-          </div>
-          {showScanner && <QRScanner onScan={handleScan} />}
-          {activeMenu === 'inventory' && <ItemList items={items} />}
+                <div className="scanner-buttons">
+                  <button
+                      className="btn btn-add"
+                      onClick={() => {
+                        setShowScanner(true);
+                        setScannerAction('add');
+                      }}
+                      disabled={loading}
+                  >
+                    Scan to Add
+                  </button>
+                  <button
+                      className="btn btn-remove"
+                      onClick={() => {
+                        setShowScanner(true);
+                        setScannerAction('remove');
+                      }}
+                      disabled={loading}
+                  >
+                    Scan to Remove
+                  </button>
+                </div>
+                {showScanner && (
+                    <QRScanner
+                        onScan={handleScan}
+                        onClose={() => setShowScanner(false)}
+                    />
+                )}
+
+                <div className="sort-dropdown">
+                  <label htmlFor="sort-menu">Сортировать по:</label>
+                  <select
+                      id="sort-menu"
+                      value={sortCriteria}
+                      onChange={handleSortChange}
+                      className="sort-select"
+                  >
+                    <option value="">Default</option>
+                    <option value="name">Name</option>
+                    <option value="quantity">Quantity</option>
+                    <option value="sold">Sold</option>
+                  </select>
+                </div>
+                <ItemList
+                    items={items}
+                    onScanAdd={() => {
+                      setShowScanner(true);
+                      setScannerAction('add');
+                    }}
+                    onScanRemove={() => {
+                      setShowScanner(true);
+                      setScannerAction('remove');
+                    }}
+                />
+              </>
+          )}
+
+          {activeMenu === 'reserve' && (
+              <>
+                <ReserveForm items={items} onReserveComplete={fetchReservedItems} />
+                <ReservedItemsList
+                    reservedItems={reservedItems}
+                    onScan={handleReservedItemScan}
+                />
+              </>
+          )}
+
           {activeMenu === 'sold' && <SoldItemsList items={items} />}
         </main>
       </div>
