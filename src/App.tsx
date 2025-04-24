@@ -273,7 +273,8 @@ function App() {
                 <ReservedItemsList
                     reservedItems={reservedItems}
                     onScan={handleReservedItemScan}
-                    onWeekFilter={fetchSortedReservedItemsByWeek} // Добавлено
+                    onWeekFilter={fetchSortedReservedItemsByWeek} // Метод для фильтрации
+                    onShowAll={fetchReservedItems} // Метод для отображения всех товаров
                 />
               </>
           )}

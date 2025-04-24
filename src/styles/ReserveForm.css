@@ -115,3 +115,19 @@
 .filter-form .btn-filter:hover {
     background-color: #0056b3;
 }
+
+.btn-check-all {
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 14px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-check-all:hover {
+    background-color: #218838;
+}

@@ -6,15 +6,21 @@ import QRScanner from './QRScanner'; // Подключаем QR-считател
 interface ReservedItemsListProps {
     reservedItems: ReservedItem[]; // Список зарезервированных предметов
     onScan: (orderNumber: string) => void; // Метод для завершения резервации
-    onWeekFilter: (week: string) => void; // Метод для фильтрации по неделе (новый проп)
+    onWeekFilter: (week: string) => void; // Метод для фильтрации по неделе
+    onShowAll: () => void; // Метод для отображения всех товаров
 }
 
-const ReservedItemsList: React.FC<ReservedItemsListProps> = ({ reservedItems, onScan, onWeekFilter }) => {
+const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
+                                                                 reservedItems,
+                                                                 onScan,
+                                                                 onWeekFilter,
+                                                                 onShowAll,
+                                                             }) => {
     const [showScanner, setShowScanner] = useState(false);
     const [filterWeek, setFilterWeek] = useState(''); // Поле для ввода недели фильтрации
 
     const handleScanClose = () => {
-        setShowScanner(false);
+        setShowScanner(false); // Закрыть сканер после завершения
     };
 
     const handleFilterSubmit = (event: React.FormEvent) => {
@@ -23,14 +29,19 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({ reservedItems, on
             alert('Введите корректное значение для недели.');
             return;
         }
-        onWeekFilter(filterWeek); // Вызов функции фильтрации, переданной через пропы
+        onWeekFilter(filterWeek); // Вызов метода фильтрации
+    };
+
+    const handleShowAll = () => {
+        setFilterWeek(''); // Сбрасываем поле фильтрации
+        onShowAll(); // Показываем все зарезервированные товары
     };
 
     return (
         <div className="reserved-items-list">
             <h3>Reserved Items</h3>
 
-            {/* Фильтрация по неделе */}
+            {/* Форма для фильтрации по неделе */}
             <form onSubmit={handleFilterSubmit} className="filter-form">
                 <label htmlFor="week-filter">Filter by Week:</label>
                 <input
@@ -40,7 +51,16 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({ reservedItems, on
                     value={filterWeek}
                     onChange={(e) => setFilterWeek(e.target.value)}
                 />
-                <button type="submit" className="btn btn-filter">Apply Filter</button>
+                <button type="submit" className="btn btn-filter">
+                    Apply Filter
+                </button>
+                <button
+                    type="button"
+                    className="btn btn-check-all"
+                    onClick={handleShowAll} // Обработчик сброса фильтрации
+                >
+                    Check All
+                </button>
             </form>
 
             {/* Список зарезервированных предметов */}
@@ -67,7 +87,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({ reservedItems, on
                 <QRScanner
                     onScan={(orderNumber) => {
                         setShowScanner(false);
-                        onScan(orderNumber);
+                        onScan(orderNumber); // Вызываем метод для завершения
                     }}
                     onClose={handleScanClose}
                 />
