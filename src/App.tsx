@@ -11,10 +11,9 @@ import { ReservedItem } from './types/ReservedItem';
 import { ReservationData } from './types/ReservationData';
 import './styles/App.css';
 import './App.css';
-import {AxiosError} from "axios";
+import { AxiosError } from "axios";
 
 function App() {
-  // Основные состояния
   const [items, setItems] = useState<Item[]>([]);
   const [reservedItems, setReservedItems] = useState<ReservedItem[]>([]);
   const [showScanner, setShowScanner] = useState<boolean>(false);
@@ -23,13 +22,11 @@ function App() {
   const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold'>('inventory');
   const [sortCriteria, setSortCriteria] = useState<string>('');
 
-  // Загрузка данных при изменении сортировки
   useEffect(() => {
     fetchItems(sortCriteria);
     fetchReservedItems();
   }, [sortCriteria]);
 
-  // Загрузка товаров
   const fetchItems = async (sortCriteria?: string) => {
     try {
       setLoading(true);
@@ -46,7 +43,6 @@ function App() {
     }
   };
 
-  // Загрузка зарезервированных товаров
   const fetchReservedItems = async () => {
     try {
       setLoading(true);
@@ -67,7 +63,29 @@ function App() {
     }
   };
 
-  // Добавление нового товара
+  const fetchSortedReservedItemsByWeek = async (week: string) => {
+    try {
+      setLoading(true);
+      const response = await api.get('/reservations/sorted', {
+        params: { reservationWeek: week },
+      });
+      const data = response.data.map((item: ReservationData) => ({
+        id: item.id?.toString() || '',
+        name: item.itemName || '',
+        quantity: item.reservedQuantity || 0,
+        orderNumber: item.orderNumber || '',
+        week: item.reservationWeek || '',
+      }));
+      setReservedItems(data);
+    } catch (error) {
+      console.error('Ошибка загрузки зарезервированных товаров по неделе:', error);
+      alert('Не удалось загрузить зарезервированные товары для указанной недели.');
+      setReservedItems([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAddItem = async (item: Item) => {
     try {
       setLoading(true);
@@ -81,7 +99,6 @@ function App() {
     }
   };
 
-  // Обработка сканирования (добавление или удаление количества)
   const handleScan = async (id: string) => {
     setShowScanner(false);
     if (!scannerAction) return;
@@ -111,7 +128,6 @@ function App() {
     }
   };
 
-  // Сканирование QR-кода Reserved Items
   const handleReservedItemScan = async (orderNumber: string) => {
     try {
       if (!orderNumber || orderNumber.trim() === '') {
@@ -121,13 +137,13 @@ function App() {
 
       setLoading(true);
 
-      // Отправка orderNumber для завершения резервирования
       await api.post('/reservations/scan', null, {
         params: { orderNumber },
       });
 
-      // Успешно завершено - обновляем состояние, удаляя элемент
-      setReservedItems((prevItems) => prevItems.filter(item => item.orderNumber !== orderNumber));
+      setReservedItems((prevItems) =>
+          prevItems.filter((item) => item.orderNumber !== orderNumber)
+      );
 
       alert('Reservation processed successfully!');
     } catch (error: unknown) {
@@ -146,23 +162,6 @@ function App() {
     }
   };
 
-
-
-
-
-  // // Завершение резервации
-  // const handleReserveComplete = async (id: string) => {
-  //   try {
-  //     await api.post(`/reservations/${id}/complete`);
-  //     alert('Резервация завершена!');
-  //     fetchReservedItems();
-  //   } catch (error) {
-  //     console.error('Ошибка завершения резервации:', error);
-  //     alert('Не удалось завершить резервацию.');
-  //   }
-  // };
-
-  // Изменение сортировки
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSortCriteria(event.target.value);
   };
@@ -274,6 +273,7 @@ function App() {
                 <ReservedItemsList
                     reservedItems={reservedItems}
                     onScan={handleReservedItemScan}
+                    onWeekFilter={fetchSortedReservedItemsByWeek} // Добавлено
                 />
               </>
           )}
