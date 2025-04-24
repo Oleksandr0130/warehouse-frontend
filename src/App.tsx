@@ -258,7 +258,19 @@ function App() {
 
           {activeMenu === 'reserve' && (
               <>
-                <ReserveForm items={items} onReserveComplete={fetchReservedItems} />
+                <ReserveForm
+                    items={items}
+                    onReserveComplete={fetchReservedItems}
+                    onUpdateItems={(updatedItemId, reservedQuantity) => {
+                      setItems((prevItems) =>
+                          prevItems.map((item) =>
+                              item.id === updatedItemId
+                                  ? { ...item, quantity: item.quantity - reservedQuantity }
+                                  : item
+                          )
+                      );
+                    }}
+                />
                 <ReservedItemsList
                     reservedItems={reservedItems}
                     onScan={handleReservedItemScan}

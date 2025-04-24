@@ -64,4 +64,54 @@
   color: #888;
 }
 
+.filter-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.filter-container input {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.filter-container button {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.filter-container button:hover {
+  background-color: #0056b3;
+}
+
+.sort-dropdown {
+  margin-bottom: 20px;
+}
+
+.sort-dropdown select {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.reserved-items-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.reserved-item {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
 

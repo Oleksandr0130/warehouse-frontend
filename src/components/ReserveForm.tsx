@@ -3,24 +3,29 @@ import { Item } from '../types/Item';
 import '../styles/ReserveForm.css';
 
 interface ReserveFormProps {
-    items: Item[]; // Список доступных предметов
-    onReserveComplete: () => void; // Функция для обновления зарезервированных предметов
+    items: Item[]; // Список предметов
+    onReserveComplete: () => void; // Функция для обновления списка резерваций
+    onUpdateItems: (itemId: string, reservedQuantity: number) => void; // Функция для обновления количества товаров
 }
 
-const ReserveForm: React.FC<ReserveFormProps> = ({ items, onReserveComplete }) => {
+const ReserveForm: React.FC<ReserveFormProps> = ({
+                                                     items,
+                                                     onReserveComplete,
+                                                     onUpdateItems,
+                                                 }) => {
     const [selectedItemId, setSelectedItemId] = useState<string>(''); // ID выбранного элемента
     const [quantity, setQuantity] = useState<number>(1); // Количество
-    const [week, setWeek] = useState<string>(''); // Резервируемая неделя
+    const [week, setWeek] = useState<string>(''); // Выбранная неделя
+    const [orderNumber, setOrderNumber] = useState<string>(''); // Заказ
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        if (!selectedItemId || !week || quantity <= 0) {
+        if (!selectedItemId || !week || quantity <= 0 || !orderNumber) {
             alert('Please fill out all fields correctly.');
             return;
         }
 
-        // Получаем выбранный элемент
         const selectedItem = items.find((item) => item.id === selectedItemId);
         if (!selectedItem) {
             alert('Selected item not found.');
@@ -28,23 +33,31 @@ const ReserveForm: React.FC<ReserveFormProps> = ({ items, onReserveComplete }) =
         }
 
         try {
-            // Формируем запрос для резервирования
+            // Отправка запроса на сервер для создания резервации
             await fetch('/api/reservations', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    orderNumber: `ORDER-${Math.random().toString(36).substr(2, 9)}`, // Генерируем уникальный orderNumber
-                    itemName: selectedItem.name, // Название предмета
-                    quantity: quantity, // Количество
-                    reservationWeek: week, // Резервируемая неделя
+                    orderNumber,
+                    itemName: selectedItem.name,
+                    quantity,
+                    reservationWeek: week,
                 }),
             });
 
+            // Уменьшаем локальное количество предметов на складе
+            onUpdateItems(selectedItemId, quantity);
+
+            // Запускаем обновление зарезервированных товаров
+            onReserveComplete();
+
             alert('Reservation created successfully!');
-            onReserveComplete(); // Обновляем список зарезервированных предметов
+
+            // Сбрасываем форму
             setSelectedItemId('');
             setQuantity(1);
             setWeek('');
+            setOrderNumber('');
         } catch (error) {
             console.error('Error creating reservation:', error);
             alert('Failed to create reservation.');
@@ -89,6 +102,17 @@ const ReserveForm: React.FC<ReserveFormProps> = ({ items, onReserveComplete }) =
                     placeholder="Enter week (e.g., Week 42)"
                     value={week}
                     onChange={(e) => setWeek(e.target.value)}
+                />
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="order-number-input">Order Number:</label>
+                <input
+                    type="text"
+                    id="order-number-input"
+                    placeholder="Enter Order Number"
+                    value={orderNumber}
+                    onChange={(e) => setOrderNumber(e.target.value)}
                 />
             </div>
 

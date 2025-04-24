@@ -30,6 +30,27 @@
     font-size: 14px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.reserve-form .form-group input[type="number"] {
+    -moz-appearance: textfield; /* Убираем стрелки (для Firefox) */
+}
+
+.reserve-form .form-group input::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+.reserve-form .form-group input:focus,
+.reserve-form .form-group select:focus {
+    border-color: #80bdff;
+    outline: none;
+    box-shadow: 0 0 4px rgba(128, 189, 255, 0.5);
+}
+
+.reserve-form .form-group input.error {
+    border-color: #dc3545;
 }
 
 .reserve-form .btn-submit {
@@ -46,4 +67,9 @@
 
 .reserve-form .btn-submit:hover {
     background-color: #218838;
+}
+
+.reserve-form .btn-submit:disabled {
+    cursor: not-allowed;
+    background-color: #94d3a2;
 }
