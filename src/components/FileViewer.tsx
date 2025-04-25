@@ -4,7 +4,7 @@ import '../styles/FileViever.css'// Импорт стилей
 const FileViewer: React.FC = () => {
     const [qrFiles, setQrFiles] = useState<string[]>([]);
     const [reservationFiles, setReservationFiles] = useState<string[]>([]);
-    const baseURL = 'http://localhost:3000'; // Укажите адрес вашего сервера
+    const baseURL = 'http://localhost:8080'; // Укажите адрес вашего сервера
 
     useEffect(() => {
         // Получаем QR-коды

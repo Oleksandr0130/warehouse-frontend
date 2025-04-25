@@ -1,46 +1,101 @@
 .item-list {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .item-list h2 {
-    font-size: 1.8em;
-    color: #333;
-    margin-bottom: 15px;
-  }
-  
-  .empty-message {
-    color: #666;
-    font-style: italic;
-  }
-  
-  .item-list-ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.item-list h2 {
+  font-size: 1.8em;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.empty-message {
+  color: #666;
+  font-style: italic;
+}
+
+.item-list-ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item-list-item {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.item-list-item:last-child {
+  border-bottom: none;
+}
+
+.item-low-stock {
+  background-color: #ffe6e6; /* Светло-красный фон */
+  color: red; /* Красный текст */
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
   .item-list-item {
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr 1fr;
-    gap: 10px;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
+    grid-template-columns: 1fr;
+    text-align: center;
   }
-  
-  .item-list-item:last-child {
-    border-bottom: none;
+}.item-list {
+   background-color: #f9f9f9;
+   padding: 20px;
+   border-radius: 8px;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ }
+
+.item-list h2 {
+  font-size: 1.8em;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.empty-message {
+  color: #666;
+  font-style: italic;
+}
+
+.item-list-ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item-list-item {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.item-list-item:last-child {
+  border-bottom: none;
+}
+
+.item-low-stock {
+  background-color: #ffe6e6; /* Светло-красный фон */
+  color: red; /* Красный текст */
+  font-weight: bold;
+}
+
+.item-green-stock {
+  background-color: #e6ffe6; /* Светло-зеленый фон */
+  color: green; /* Зеленый текст */
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  .item-list-item {
+    grid-template-columns: 1fr;
+    text-align: center;
   }
-  
-  .item-list-item span {
-    color: #333;
-  }
-  
-  @media (max-width: 600px) {
-    .item-list-item {
-      grid-template-columns: 1fr;
-      text-align: center;
-    }
-  }
+}
