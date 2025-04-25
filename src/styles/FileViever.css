@@ -1,0 +1,51 @@
+/* Контейнер для компонента FileViewer */
+.file-viewer-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    max-width: 800px;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Заголовки секций */
+.file-viewer-title {
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+}
+
+/* Список файлов */
+.file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Элемент списка */
+.file-item {
+    margin: 10px 0;
+    font-size: 1em;
+}
+
+/* Ссылка файла */
+.file-link {
+    color: #1a73e8;
+    text-decoration: none;
+    transition: color 0.2s, text-decoration 0.2s;
+}
+
+/* Ховер эффект для ссылки */
+.file-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Дополнительный стиль (при необходимости) */
+.file-list .file-link:visited {
+    color: darkgreen;
+}

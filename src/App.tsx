@@ -6,6 +6,7 @@ import AddItemForm from './components/AddItemForm';
 import ReserveForm from './components/ReserveForm';
 import SoldItemsList from './components/SoldItemsList';
 import QRScanner from './components/QRScanner';
+import FileViewer from './components/FileViewer'; // Добавлен импорт FileViewer
 import { Item } from './types/Item';
 import { ReservedItem } from './types/ReservedItem';
 import { ReservationData } from './types/ReservationData';
@@ -13,13 +14,14 @@ import './styles/App.css';
 import './App.css';
 import { AxiosError } from "axios";
 
+
 function App() {
   const [items, setItems] = useState<Item[]>([]);
   const [reservedItems, setReservedItems] = useState<ReservedItem[]>([]);
   const [showScanner, setShowScanner] = useState<boolean>(false);
   const [scannerAction, setScannerAction] = useState<'add' | 'remove' | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold'>('inventory');
+  const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold' | 'files'>('inventory'); // Обновление: добавлено новое состояние 'files'
   const [sortCriteria, setSortCriteria] = useState<string>('');
 
   useEffect(() => {
@@ -189,6 +191,12 @@ function App() {
             >
               Sold Items
             </li>
+            <li
+                className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`}
+                onClick={() => setActiveMenu('files')}
+            >
+              File Viewer {/* Новый пункт меню */}
+            </li>
           </ul>
         </aside>
         <main className="app-main">
@@ -280,6 +288,9 @@ function App() {
           )}
 
           {activeMenu === 'sold' && <SoldItemsList items={items} />}
+
+          {activeMenu === 'files' && <FileViewer />} {/* Отображение FileViewer */}
+
         </main>
       </div>
   );
