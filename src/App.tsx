@@ -12,8 +12,7 @@ import { ReservedItem } from './types/ReservedItem';
 import { ReservationData } from './types/ReservationData';
 import './styles/App.css';
 import './App.css';
-import { AxiosError } from "axios";
-
+import { AxiosError } from 'axios';
 
 function App() {
   const [items, setItems] = useState<Item[]>([]);
@@ -28,6 +27,14 @@ function App() {
     fetchItems(sortCriteria);
     fetchReservedItems();
   }, [sortCriteria]);
+
+  useEffect(() => {
+    // Проверяем пункт меню и обновляем список товаров
+    if (activeMenu === 'inventory') {
+      fetchItems(); // Обновляем товары на складе при нажатии на "Warehouse Inventory"
+    }
+  }, [activeMenu]);
+
 
   const fetchItems = async (sortCriteria?: string) => {
     try {
@@ -168,6 +175,16 @@ function App() {
     setSortCriteria(event.target.value);
   };
 
+  const handleReservationRemoved = (updatedItemId: string, returnedQuantity: number) => {
+    setItems(prevItems =>
+        prevItems.map(item =>
+            item.id === updatedItemId
+                ? { ...item, quantity: item.quantity + returnedQuantity }
+                : item
+        )
+    );
+  };
+
   return (
       <div className="app-container">
         <aside className="fixed-sidebar">
@@ -281,8 +298,9 @@ function App() {
                 <ReservedItemsList
                     reservedItems={reservedItems}
                     onScan={handleReservedItemScan}
-                    onWeekFilter={fetchSortedReservedItemsByWeek} // Метод для фильтрации
-                    onShowAll={fetchReservedItems} // Метод для отображения всех товаров
+                    onWeekFilter={fetchSortedReservedItemsByWeek}
+                    onShowAll={fetchReservedItems}
+                    onReservationRemoved={handleReservationRemoved} // Передаем обновление на склад
                 />
               </>
           )}
@@ -290,7 +308,6 @@ function App() {
           {activeMenu === 'sold' && <SoldItemsList items={items} />}
 
           {activeMenu === 'files' && <FileViewer />} {/* Отображение FileViewer */}
-
         </main>
       </div>
   );
