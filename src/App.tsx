@@ -6,22 +6,40 @@ import AddItemForm from './components/AddItemForm';
 import ReserveForm from './components/ReserveForm';
 import SoldItemsList from './components/SoldItemsList';
 import QRScanner from './components/QRScanner';
-import FileViewer from './components/FileViewer'; // Добавлен импорт FileViewer
+import FileViewer from './components/FileViewer';
+import Register from './components/Register';
+import Login from './components/Login';
+import Confirmation from './components/Confirmation';
 import { Item } from './types/Item';
 import { ReservedItem } from './types/ReservedItem';
 import { ReservationData } from './types/ReservationData';
+import { AxiosError } from 'axios';
 import './styles/App.css';
 import './App.css';
-import { AxiosError } from 'axios';
 
 function App() {
+  // Управление состоянием режима авторизации
+  const [authStage, setAuthStage] = useState<'login' | 'register' | 'confirmed'>('login');
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
+  // Основные состояния
   const [items, setItems] = useState<Item[]>([]);
   const [reservedItems, setReservedItems] = useState<ReservedItem[]>([]);
   const [showScanner, setShowScanner] = useState<boolean>(false);
   const [scannerAction, setScannerAction] = useState<'add' | 'remove' | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold' | 'files'>('inventory'); // Обновление: добавлено новое состояние 'files'
+  const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold' | 'files'>('inventory');
   const [sortCriteria, setSortCriteria] = useState<string>('');
+
+  // Проверка токена при загрузке
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsAuthenticated(true);
+      setAuthStage('confirmed');
+      fetchData();
+    }
+  }, []);
 
   useEffect(() => {
     fetchItems(sortCriteria);
@@ -35,7 +53,12 @@ function App() {
     }
   }, [activeMenu]);
 
+  const fetchData = () => {
+    fetchItems(sortCriteria);
+    fetchReservedItems();
+  };
 
+  // Загрузка товаров
   const fetchItems = async (sortCriteria?: string) => {
     try {
       setLoading(true);
@@ -52,6 +75,7 @@ function App() {
     }
   };
 
+  // Загрузка зарезервированных товаров
   const fetchReservedItems = async () => {
     try {
       setLoading(true);
@@ -72,6 +96,7 @@ function App() {
     }
   };
 
+  // Обновленная функция по неделе для зарезервированных
   const fetchSortedReservedItemsByWeek = async (week: string) => {
     try {
       setLoading(true);
@@ -95,6 +120,7 @@ function App() {
     }
   };
 
+  // Добавление товара
   const handleAddItem = async (item: Item) => {
     try {
       setLoading(true);
@@ -108,6 +134,7 @@ function App() {
     }
   };
 
+  // Обработка скана QR-кода
   const handleScan = async (id: string) => {
     setShowScanner(false);
     if (!scannerAction) return;
@@ -137,6 +164,7 @@ function App() {
     }
   };
 
+  // Обработка скана для резервирования
   const handleReservedItemScan = async (orderNumber: string) => {
     try {
       if (!orderNumber || orderNumber.trim() === '') {
@@ -145,7 +173,6 @@ function App() {
       }
 
       setLoading(true);
-
       await api.post('/reservations/scan', null, {
         params: { orderNumber },
       });
@@ -171,10 +198,12 @@ function App() {
     }
   };
 
+  // Обработка изменения сортировки
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSortCriteria(event.target.value);
   };
 
+  // Обновление данных при выходе из резервирования
   const handleReservationRemoved = (updatedItemId: string, returnedQuantity: number) => {
     setItems(prevItems =>
         prevItems.map(item =>
@@ -185,8 +214,50 @@ function App() {
     );
   };
 
+  // Обработка выхода из системы
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    setAuthStage('login');
+  };
+
+  // Обработка успешной авторизации
+  const handleAuthSuccess = () => {
+    setIsAuthenticated(true);
+    setAuthStage('confirmed');
+    fetchData();
+  };
+
+  // РЕНДЕРИМ форму авторизации
+  if (!isAuthenticated) {
+    return (
+        <div className="auth-container">
+          {authStage === 'login' && (
+              <>
+                <Login onSuccess={handleAuthSuccess} />
+                <p>
+                  Нет аккаунта?{' '}
+                  <button onClick={() => setAuthStage('register')}>Регистрация</button>
+                </p>
+              </>
+          )}
+          {authStage === 'register' && (
+              <>
+                <Register onSuccess={() => setAuthStage('login')} />
+                <p>
+                  Уже есть аккаунт? <button onClick={() => setAuthStage('login')}>Войти</button>
+                </p>
+              </>
+          )}
+          {authStage === 'confirmed' && <Confirmation />}
+        </div>
+    );
+  }
+
+  // Основной интерфейс после входа
   return (
       <div className="app-container">
+        {/* меню */}
         <aside className="fixed-sidebar">
           <h2 className="sidebar-title">Warehouse QR</h2>
           <ul className="sidebar-menu">
@@ -212,10 +283,18 @@ function App() {
                 className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`}
                 onClick={() => setActiveMenu('files')}
             >
-              File Viewer {/* Новый пункт меню */}
+              File Viewer
             </li>
+            <li
+                className="menu-item logout-item"
+                onClick={handleLogout}
+            >
+              LogOut
+            </li>
+
           </ul>
         </aside>
+        {/* основной контент */}
         <main className="app-main">
           {loading && <div className="loading-overlay">Загрузка...</div>}
 
@@ -246,10 +325,7 @@ function App() {
                   </button>
                 </div>
                 {showScanner && (
-                    <QRScanner
-                        onScan={handleScan}
-                        onClose={() => setShowScanner(false)}
-                    />
+                    <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />
                 )}
 
                 <div className="sort-dropdown">
@@ -300,14 +376,14 @@ function App() {
                     onScan={handleReservedItemScan}
                     onWeekFilter={fetchSortedReservedItemsByWeek}
                     onShowAll={fetchReservedItems}
-                    onReservationRemoved={handleReservationRemoved} // Передаем обновление на склад
+                    onReservationRemoved={handleReservationRemoved}
                 />
               </>
           )}
 
           {activeMenu === 'sold' && <SoldItemsList items={items} />}
 
-          {activeMenu === 'files' && <FileViewer />} {/* Отображение FileViewer */}
+          {activeMenu === 'files' && <FileViewer />}
         </main>
       </div>
   );

@@ -1,27 +1,47 @@
 import React, { useEffect, useState } from 'react';
-import '../styles/FileViever.css'// Импорт стилей
+import '../styles/FileViever.css';
+import api from '../api';
 
 const FileViewer: React.FC = () => {
     const [qrFiles, setQrFiles] = useState<string[]>([]);
     const [reservationFiles, setReservationFiles] = useState<string[]>([]);
-    const baseURL = 'http://localhost:8080'; // Укажите адрес вашего сервера
+
+    const baseURL = 'http://localhost:8080/api'; // Указывается базовый URL
 
     useEffect(() => {
-        // Получаем QR-коды
-        fetch('/api/folders/qrcodes')
-            .then((response) => response.json())
-            .then((data) => setQrFiles(data.map((file: string) => `${baseURL}${file}`)));
+        const fetchQrFiles = async () => {
+            try {
+                // Получаем файлы QR-кодов с backend
+                const response = await api.get('/folders/qrcodes');
+                setQrFiles(
+                    response.data.map((file: string) => `${baseURL}${file}`)
+                );
+            } catch (error) {
+                console.error('Ошибка при загрузке QR-кодов:', error);
+            }
+        };
 
-        // Получаем резервные файлы
-        fetch('/api/folders/reservations')
-            .then((response) => response.json())
-            .then((data) => setReservationFiles(data.map((file: string) => `${baseURL}${file}`)));
+        const fetchReservationFiles = async () => {
+            try {
+                // Получаем резервные файлы с backend
+                const response = await api.get('/folders/reservation');
+                setReservationFiles(
+                    response.data.map(
+                        (file: string) => `${baseURL}${file}`
+                    )
+                );
+            } catch (error) {
+                console.error('Ошибка при загрузке резервных файлов:', error);
+            }
+        };
+
+        fetchQrFiles();
+        fetchReservationFiles();
     }, []);
 
     const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
-        const targetUrl = event.currentTarget.href;
-        window.open(targetUrl, '_blank'); // Открываем файл в новой вкладке
+        window.open(event.currentTarget.href, '_blank');
     };
 
     return (
@@ -31,7 +51,7 @@ const FileViewer: React.FC = () => {
                 {qrFiles.map((file) => (
                     <li className="file-item" key={file}>
                         <a href={file} onClick={handleLinkClick} className="file-link">
-                            {file.split('/').pop()} {/* Отображаем только имя файла */}
+                            {file.split('/').pop()}
                         </a>
                     </li>
                 ))}
@@ -42,7 +62,7 @@ const FileViewer: React.FC = () => {
                 {reservationFiles.map((file) => (
                     <li className="file-item" key={file}>
                         <a href={file} onClick={handleLinkClick} className="file-link">
-                            {file.split('/').pop()} {/* Отображаем только имя файла */}
+                            {file.split('/').pop()}
                         </a>
                     </li>
                 ))}
