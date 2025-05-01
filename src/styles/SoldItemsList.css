@@ -1,36 +1,27 @@
-/* SoldItemsList.css */
 .sold-items-list {
-    margin-top: 20px;
+    margin: 20px;
     padding: 20px;
-    background-color: #f8f9fa;
+    border: 1px solid #ddd;
     border-radius: 8px;
-}
-
-.sold-items-list h2 {
-    margin-bottom: 10px;
-}
-
-.sold-items-list ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
+    background-color: #fafafa;
 }
 
 .sold-item {
     display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #ddd;
+    flex-direction: row;
+    gap: 50px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
 }
 
-.sold-item:last-child {
-    border-bottom: none;
+.sold-item > span {
+    margin: 5px 0;
 }
 
-.item-name {
-    font-weight: bold;
-}
-
-.item-sold {
-    color: #007bff;
+.empty-message {
+    color: #999;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 20px;
 }

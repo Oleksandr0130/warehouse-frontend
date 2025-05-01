@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {SoldReservation} from "./types/SoldReservation.ts";
 
 // Правильный базовый URL для доступа к backend через proxy
 const BASE_URL = '/api';
@@ -10,6 +11,13 @@ const api = axios.create({
     withCredentials: true, // Для передачи cookie
 });
 
+// Запрос к эндпоинту /sold для получения проданных резерваций
+export const fetchSoldReservations = async (): Promise<SoldReservation[]> => {
+    const response = await api.get('/sold');
+    return response.data;
+};
+
+
 // Функции для регистрации пользователя, входа, подтверждения email
 export const registerUser = (data: { username: string; email: string; password: string; role: string }) =>
     api.post('/auth/register', data);
@@ -19,6 +27,11 @@ export const loginUser = (data: { username: string; password: string }) =>
 
 export const confirmEmail = (code: string) =>
     api.get(`/confirmation?code=${code}`);
+// Новый метод для удаления QR-кода
+export const deleteQRCode = async (orderNumber: string): Promise<void> => {
+    await api.delete(`/reservations/${orderNumber}/qrcode`);
+};
+
 
 // Интерцептор запросов: добавляем заголовок Authorization, если токен доступен
 api.interceptors.request.use(

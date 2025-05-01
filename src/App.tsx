@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from './api';
+import api, {deleteQRCode} from './api';
 import ItemList from './components/ItemList';
 import ReservedItemsList from './components/ReservedItemsList';
 import AddItemForm from './components/AddItemForm';
@@ -16,6 +16,7 @@ import { ReservationData } from './types/ReservationData';
 import { AxiosError } from 'axios';
 import './styles/App.css';
 import './App.css';
+import {SoldReservation} from "./types/SoldReservation.ts";
 
 function App() {
   // Управление состоянием режима авторизации
@@ -30,6 +31,7 @@ function App() {
   const [loading, setLoading] = useState<boolean>(false);
   const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold' | 'files'>('inventory');
   const [sortCriteria, setSortCriteria] = useState<string>('');
+  const [soldReservations, setSoldReservations] = useState<SoldReservation[]>([]);
 
   // Проверка токена при загрузке
   useEffect(() => {
@@ -47,6 +49,12 @@ function App() {
   }, [sortCriteria]);
 
   useEffect(() => {
+    if (activeMenu === 'sold') {
+      fetchSoldReservations(); // Вызов функции для загрузки данных
+    }
+  }, [activeMenu]);
+
+  useEffect(() => {
     // Проверяем пункт меню и обновляем список товаров
     if (activeMenu === 'inventory' || activeMenu === 'sold') {
       fetchItems(); // Обновляем товары на складе при нажатии на "Warehouse Inventory"
@@ -57,6 +65,20 @@ function App() {
     fetchItems(sortCriteria);
     fetchReservedItems();
   };
+  // - функция для загрузки проданных резерваций
+  const fetchSoldReservations = async () => {
+    try {
+      setLoading(true); // Показать индикатор загрузки, если нужно
+      const response = await api.get<SoldReservation[]>('/reservations/sold');
+      setSoldReservations(response.data || []); // Устанавливаем список проданных товаров
+    } catch (error) {
+      console.error('Ошибка загрузки проданных резерваций:', error);
+      setSoldReservations([]);
+    } finally {
+      setLoading(false); // Скрываем индикатор загрузки
+    }
+  };
+
 
   // Загрузка товаров
   const fetchItems = async (sortCriteria?: string) => {
@@ -155,6 +177,20 @@ function App() {
       await api.put(`/items/${id}/${scannerAction}`, null, {
         params: { quantity },
       });
+      // Если удаляем (продаем товар), пробуем удалить QR-код
+      if (scannerAction === 'remove') {
+        const orderNumber = prompt('Введите orderNumber для подтверждения удаления QR-кода:');
+        if (orderNumber) {
+          try {
+            await deleteQRCode(orderNumber); // Вызов для удаления QR-кода
+            alert(`QR-код для заказа ${orderNumber} успешно удалён`);
+          } catch (error) {
+            console.error('Ошибка при удалении QR-кода:', error);
+            alert('Не удалось удалить QR-код для заказа');
+          }
+        }
+      }
+
       fetchItems(sortCriteria);
     } catch (error) {
       console.error('Ошибка при обновлении:', error);
@@ -381,7 +417,7 @@ function App() {
               </>
           )}
 
-          {activeMenu === 'sold' && <SoldItemsList items={items} />}
+          {activeMenu === 'sold' && <SoldItemsList reservations={soldReservations} />}
 
           {activeMenu === 'files' && <FileViewer />}
         </main>
