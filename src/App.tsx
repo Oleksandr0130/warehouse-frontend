@@ -48,7 +48,7 @@ function App() {
 
   useEffect(() => {
     // Проверяем пункт меню и обновляем список товаров
-    if (activeMenu === 'inventory') {
+    if (activeMenu === 'inventory' || activeMenu === 'sold') {
       fetchItems(); // Обновляем товары на складе при нажатии на "Warehouse Inventory"
     }
   }, [activeMenu]);
