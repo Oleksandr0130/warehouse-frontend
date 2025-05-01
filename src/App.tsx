@@ -159,13 +159,20 @@ function App() {
   // Обработка скана QR-кода
   const handleScan = async (id: string) => {
     setShowScanner(false);
+
+    // Проверяем, выбрано ли действие (add / remove)
     if (!scannerAction) return;
 
+    // Запрашиваем количество у пользователя
     const quantityStr = prompt(
         `Введите количество для ${scannerAction === 'add' ? 'добавления' : 'удаления'}:`
     );
 
-    if (!quantityStr || isNaN(Number(quantityStr))) return;
+    // Проверяем корректность введённого значения
+    if (!quantityStr || isNaN(Number(quantityStr))) {
+      alert('Введите корректное числовое значение.');
+      return;
+    }
     const quantity = parseInt(quantityStr);
     if (quantity <= 0) {
       alert('Количество должно быть больше 0.');
@@ -174,22 +181,29 @@ function App() {
 
     try {
       setLoading(true);
+
+      // Отправляем запрос на добавление или уменьшение количества товара
       await api.put(`/items/${id}/${scannerAction}`, null, {
         params: { quantity },
       });
-      // Если удаляем (продаем товар), пробуем удалить QR-код
+      alert(
+          `Операция "${scannerAction === 'add' ? 'добавлено' : 'удалено'}" выполнена успешно. Количество: ${quantity}.`
+      );
+
+      // Дополнительное действие для удаления QR-кода, если это "удаление"
       if (scannerAction === 'remove') {
         const orderNumber = prompt('Введите orderNumber для подтверждения удаления QR-кода:');
         if (orderNumber) {
           try {
-            await deleteQRCode(orderNumber); // Вызов для удаления QR-кода
-            alert(`QR-код для заказа ${orderNumber} успешно удалён`);
+            await deleteQRCode(orderNumber); // Вызов для удаления QR-кода через API
+            alert(`QR-код для заказа ${orderNumber} успешно удалён.`);
           } catch (error) {
             console.error('Ошибка при удалении QR-кода:', error);
-            alert('Не удалось удалить QR-код для заказа');
+            alert('Не удалось удалить QR-код для заказа.');
           }
         }
       }
+
 
       fetchItems(sortCriteria);
     } catch (error) {
