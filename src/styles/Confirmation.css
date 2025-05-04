@@ -1,9 +1,29 @@
-/* src/components/Confirmation.css */
+/* src/styles/Confirmation.css */
+
 .confirmation-container {
-    max-width: 400px;
-    margin: 20px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #4caf50, #81c784);
+    color: #fff;
+    font-family: 'Arial', sans-serif;
     text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.confirmation-container h2 {
+    font-size: 2.2em;
+    margin-bottom: 20px;
+}
+
+.confirmation-container p {
+    font-size: 1.2em;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 15px 25px;
+    border-radius: 8px;
+    display: inline-block;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
