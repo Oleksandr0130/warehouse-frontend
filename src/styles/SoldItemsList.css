@@ -25,3 +25,15 @@
     text-align: center;
     margin-top: 20px;
 }
+
+/* Адаптивные настройки */
+@media (max-width: 768px) {
+    .sold-item {
+        flex-direction: column; /* Изменяем на колонку на мелких экранах */
+        gap: 20px;
+    }
+
+    .sold-items-list {
+        padding: 10px;
+    }
+}
