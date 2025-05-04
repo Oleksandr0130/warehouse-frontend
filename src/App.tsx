@@ -17,6 +17,7 @@ import { AxiosError } from 'axios';
 import './styles/App.css';
 import './App.css';
 import {SoldReservation} from "./types/SoldReservation.ts";
+import {logout, validateTokens} from "./types/AuthManager.ts";
 
 function App() {
   // Управление состоянием режима авторизации
@@ -35,13 +36,19 @@ function App() {
 
   // Проверка токена при загрузке
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsAuthenticated(true);
-      setAuthStage('confirmed');
-      fetchData();
-    }
+    const initializeAuth = async () => {
+      const isValid = await validateTokens(); // Проверка токенов через AuthManager
+      if (isValid) {
+        setIsAuthenticated(true);
+        setAuthStage('confirmed');
+        fetchData();
+      } else {
+        setIsAuthenticated(false);
+      }
+    };
+    initializeAuth();
   }, []);
+
 
   useEffect(() => {
     fetchItems(sortCriteria);
@@ -266,7 +273,7 @@ function App() {
 
   // Обработка выхода из системы
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    logout(); // Удаление токенов через AuthManager
     setIsAuthenticated(false);
     setAuthStage('login');
   };
