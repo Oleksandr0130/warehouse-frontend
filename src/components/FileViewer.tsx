@@ -82,7 +82,7 @@ const FileViewer: React.FC = () => {
     const [reservationFiles, setReservationFiles] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
 
-    const baseURL = 'https://warehouse-qr-app-8adwv.ondigitalocean.app/api'; // Правильный базовый URL
+    const baseURL = 'https://warehouse-qr-app-8adwv.ondigitalocean.app'; // Правильный базовый URL
 
     useEffect(() => {
         const fetchQrFiles = async () => {
