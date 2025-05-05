@@ -6,7 +6,8 @@ const FileViewer: React.FC = () => {
     const [qrFiles, setQrFiles] = useState<string[]>([]);
     const [reservationFiles, setReservationFiles] = useState<string[]>([]);
 
-    const baseURL = 'http://localhost:8080/api'; // Указывается базовый URL
+    // const baseURL = 'http://localhost:8080/api'; // Указывается базовый URL
+    const baseURL = 'https://warehouse-qr-app-8adwv.ondigitalocean.app/api'; // Указывается базовый URL
 
     useEffect(() => {
         const fetchQrFiles = async () => {
