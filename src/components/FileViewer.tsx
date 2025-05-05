@@ -74,7 +74,7 @@
 // export default FileViewer;
 
 import React, { useEffect, useState } from 'react';
-import '../styles/FileViewer.css';
+import '../styles/FileViever.css';
 import api from '../api';
 
 const FileViewer: React.FC = () => {
