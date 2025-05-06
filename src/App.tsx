@@ -241,6 +241,12 @@ function App() {
 
       console.log('Response from API (scan reservation):', response.data);
 
+      // Обновляем список после успешного сканирования
+      setReservedItems((prevItems) =>
+          prevItems.filter((item) => item.orderNumber !== orderNumber)
+      );
+
+
       // Обновляем список зарезервированных товаров
       await fetchReservedItems();
 
