@@ -233,11 +233,15 @@ function App() {
       }
 
       setLoading(true);
-      await api.post('/reservations/scan', null, {
+
+      // Отправляем запрос на сервер
+      const response = await api.post('/reservations/scan', null, {
         params: { orderNumber },
       });
 
-      // Перезагружаем весь список зарезервированных товаров:
+      console.log('Response from API (scan reservation):', response.data);
+
+      // Обновляем список зарезервированных товаров
       await fetchReservedItems();
 
       alert('Reservation processed successfully!');
@@ -245,17 +249,15 @@ function App() {
       if (error instanceof AxiosError) {
         console.error('Ошибка обработана Axios:', error.response?.data || error.message);
         alert(`Ошибка: ${error.response?.data?.message || 'Не удалось обработать QR-код.'}`);
-      } else if (error instanceof Error) {
-        console.error('Ошибка обработки QR-кода для резервированных предметов:', error.message);
-        alert(`Ошибка: ${error.message}`);
       } else {
-        console.error('Неизвестная ошибка:', error);
+        console.error('Ошибка обработки QR-кода:', error instanceof Error ? error.message : error);
         alert('Произошла неизвестная ошибка.');
       }
     } finally {
       setLoading(false);
     }
   };
+
 
   // Обработка изменения сортировки
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
