@@ -240,11 +240,6 @@ function App() {
       // Перезагружаем весь список зарезервированных товаров:
       await fetchReservedItems();
 
-
-      setReservedItems((prevItems) =>
-          prevItems.filter((item) => item.orderNumber !== orderNumber)
-      );
-
       alert('Reservation processed successfully!');
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
