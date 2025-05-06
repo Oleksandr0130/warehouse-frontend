@@ -204,7 +204,10 @@ function App() {
           try {
             await deleteQRCode(orderNumber); // Вызов для удаления QR-кода через API
             alert(`QR-код для заказа ${orderNumber} успешно удалён.`);
-          } catch (error) {
+          // Принудительно обновляем список зарезервированных товаров:
+          fetchReservedItems();
+
+        } catch (error) {
             console.error('Ошибка при удалении QR-кода:', error);
             alert('Не удалось удалить QR-код для заказа.');
           }
@@ -233,6 +236,10 @@ function App() {
       await api.post('/reservations/scan', null, {
         params: { orderNumber },
       });
+
+      // Перезагружаем весь список зарезервированных товаров:
+      await fetchReservedItems();
+
 
       setReservedItems((prevItems) =>
           prevItems.filter((item) => item.orderNumber !== orderNumber)
@@ -269,6 +276,10 @@ function App() {
                 : item
         )
     );
+
+    // Принудительно обновляем зарезервированные товары с сервера:
+    fetchReservedItems();
+
   };
 
   // Обработка выхода из системы
