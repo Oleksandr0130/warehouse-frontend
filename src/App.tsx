@@ -63,10 +63,15 @@ function App() {
 
   useEffect(() => {
     // Проверяем пункт меню и обновляем список товаров
-    if (activeMenu === 'inventory' || activeMenu === 'sold') {
-      fetchItems(); // Обновляем товары на складе при нажатии на "Warehouse Inventory"
+    if (activeMenu === 'inventory') {
+      fetchItems(); // Обновляем данные для Warehouse Inventory
+    } else if (activeMenu === 'reserve') {
+      fetchReservedItems(); // Добавляем обновление зарезервированных товаров
+    } else if (activeMenu === 'sold') {
+      fetchSoldReservations(); // Обновляем данные для Sold Items
     }
-  }, [activeMenu]);
+  }, [activeMenu]); // Следим за изменением activeMenu
+
 
   const fetchData = () => {
     fetchItems(sortCriteria);
@@ -116,14 +121,16 @@ function App() {
         orderNumber: item.orderNumber || '',
         week: item.reservationWeek || '',
       }));
-      setReservedItems(data);
+      setReservedItems(data); // Обновляем состояние
+      console.log('Updated Reserved Items:', data); // Логируем данные для проверки
     } catch (error) {
       console.error('Ошибка загрузки зарезервированных товаров:', error);
-      setReservedItems([]);
+      setReservedItems([]); // Очищаем список в случае ошибки
     } finally {
       setLoading(false);
     }
   };
+
 
   // Обновленная функция по неделе для зарезервированных
   const fetchSortedReservedItemsByWeek = async (week: string) => {
