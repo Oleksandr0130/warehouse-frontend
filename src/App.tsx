@@ -93,21 +93,41 @@ function App() {
 
 
   // Загрузка товаров
+// Обновленный fetchItems с учетом проданных товаров
   const fetchItems = async (sortCriteria?: string) => {
     try {
       setLoading(true);
+
+      // Загружаем список всех товаров
       const endpoint = sortCriteria ? '/items/sorted' : '/items';
       const response = await api.get(endpoint, {
         params: sortCriteria ? { sortBy: sortCriteria } : {},
       });
-      setItems(response.data || []);
+
+      const itemsData = response.data;
+
+      // Загружаем информацию о проданных товарах
+      const soldResponse = await api.get('/items/sold');
+      const soldItems = soldResponse.data;
+
+      // Объединяем данные из двух запросов
+      const updatedItems = itemsData.map((item: Item) => {
+        const soldItem = soldItems.find((sold: any) => sold.id === item.id);
+        return {
+          ...item,
+          sold: soldItem ? soldItem.sold : 0, // Добавляем количество проданных товаров
+        };
+      });
+
+      setItems(updatedItems); // Сохраняем данные
     } catch (error) {
-      console.error('Ошибка загрузки товаров:', error);
+      console.error('Ошибка при загрузке товаров:', error);
       setItems([]);
     } finally {
       setLoading(false);
     }
   };
+
 
   // Загрузка зарезервированных товаров
   const fetchReservedItems = async () => {

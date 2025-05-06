@@ -99,3 +99,22 @@
     text-align: center;
   }
 }
+
+/* Детали товара */
+.item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.item-name {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.item-quantity,
+.item-sold {
+  font-size: 1rem;
+  color: #555;
+}

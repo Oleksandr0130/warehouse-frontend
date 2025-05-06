@@ -19,13 +19,19 @@ const ItemList: React.FC<ItemListProps> = ({ items }) => {
                         <li
                             key={item.id}
                             className={`item-list-item ${
-                                item.quantity <= 0
-                                    ? 'item-low-stock'
-                                    : 'item-green-stock'
+                                item.quantity <= 0 ? 'item-low-stock' : 'item-green-stock'
                             }`}
                         >
                             <div className="item-details">
-                                <strong>{item.name}</strong> (Available: {item.quantity})
+                <span className="item-name">
+                  <strong>{item.name}</strong>
+                </span>
+                                <span className="item-quantity">
+                  Available: {item.quantity}
+                </span>
+                                <span className="item-sold">
+                  Sold: {item.sold}
+                </span>
                             </div>
                         </li>
                     ))}
@@ -34,5 +40,6 @@ const ItemList: React.FC<ItemListProps> = ({ items }) => {
         </div>
     );
 };
+
 
 export default ItemList;
