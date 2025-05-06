@@ -112,7 +112,7 @@ function App() {
 
       // Объединяем данные из двух запросов
       const updatedItems = itemsData.map((item: Item) => {
-        const soldItem = soldItems.find((sold: any) => sold.id === item.id);
+        const soldItem = soldItems.find((sold: { id: string | number }) => sold.id === item.id);
         return {
           ...item,
           sold: soldItem ? soldItem.sold : 0, // Добавляем количество проданных товаров
