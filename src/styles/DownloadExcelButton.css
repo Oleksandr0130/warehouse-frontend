@@ -1,0 +1,26 @@
+.download-excel-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #4caf50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+}
+
+.download-excel-button:hover {
+    background-color: #45a049;
+}
+
+.download-excel-button:active {
+    background-color: #3e8e41;
+}
+
+.download-excel-button:focus {
+    outline: 2px solid #2e7d32;
+}

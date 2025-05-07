@@ -18,6 +18,7 @@ import './styles/App.css';
 import './App.css';
 import {SoldReservation} from "./types/SoldReservation.ts";
 import {logout, validateTokens} from "./types/AuthManager.ts";
+import DownloadExcelButton from "./components/DownloadExelButton.tsx";
 
 function App() {
   // Управление состоянием режима авторизации
@@ -440,6 +441,11 @@ function App() {
                     <option value="sold">Sold</option>
                   </select>
                 </div>
+                <div style={{ margin: '20px 0' }}>
+                  {/* Добавляем кнопку для скачивания файла */}
+                  <DownloadExcelButton />
+                </div>
+
                 <ItemList
                     items={items}
                     onScanAdd={() => {
