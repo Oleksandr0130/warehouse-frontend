@@ -6,7 +6,7 @@ const DownloadExcelButton: React.FC = () => {
     const handleDownload = async () => {
         try {
             // Отправляем GET-запрос на backend для скачивания файла
-            const response = await api.get('/download/excel', {
+            const response = await api.get('/items/download/excel', {
                 responseType: 'blob', // Тип ответа blob для обработки файлов
             });
 
