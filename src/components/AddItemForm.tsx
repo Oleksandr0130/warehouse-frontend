@@ -37,7 +37,7 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
     <form className="add-item-form" onSubmit={handleSubmit}>
       <h2>Neues Element hinzufügen</h2>
       <div className="form-group">
-        <label htmlFor="id">ID</label>
+        <label htmlFor="id">Name QR</label>
         <input
           type="text"
           id="id"
