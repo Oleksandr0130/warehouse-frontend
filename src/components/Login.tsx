@@ -41,11 +41,11 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
     return (
         <div className="login-container">
             <form className="login-form" onSubmit={handleSubmit}>
-                <h2>Логин</h2>
+                <h2>KSW</h2>
                 <input
                     type="text"          // поменял тип на text, логин обычно не email
                     name="username"
-                    placeholder="Логин"
+                    placeholder="Benutzername"
                     value={credentials.username}
                     onChange={handleChange}
                     required
@@ -53,12 +53,12 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 <input
                     type="password"
                     name="password"
-                    placeholder="Пароль"
+                    placeholder="Passwort"
                     value={credentials.password}
                     onChange={handleChange}
                     required
                 />
-                <button type="submit" className="login-btn">Войти</button>
+                <button type="submit" className="login-btn">Einloggen</button>
             </form>
             {message && <p>{message}</p>}
         </div>

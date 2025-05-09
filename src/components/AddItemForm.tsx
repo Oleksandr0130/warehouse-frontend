@@ -35,7 +35,7 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
 
   return (
     <form className="add-item-form" onSubmit={handleSubmit}>
-      <h2>Add New Item</h2>
+      <h2>Neues Element hinzufügen</h2>
       <div className="form-group">
         <label htmlFor="id">ID</label>
         <input
@@ -44,7 +44,7 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
           value={id}
           onChange={(e) => setId(e.target.value)}
           required
-          placeholder="Enter item ID"
+          placeholder="Name QR"
         />
       </div>
       <div className="form-group">
@@ -55,23 +55,23 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          placeholder="Enter item name"
+          placeholder="Name Ware"
         />
       </div>
       <div className="form-group">
-        <label htmlFor="quantity">Quantity</label>
+        <label htmlFor="quantity">Menge</label>
         <input
           type="number"
           id="quantity"
           value={quantity}
           onChange={(e) => setQuantity(e.target.value)}
           required
-          placeholder="Enter quantity"
+          placeholder="Menge eingeben"
           min="0"
         />
       </div>
       <button type="submit" className="submit-btn">
-        Add Item
+        Element hinzufügen
       </button>
     </form>
   );

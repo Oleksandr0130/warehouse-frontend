@@ -31,7 +31,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
     const handleFilterSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         if (filterWeek.trim() === '') {
-            alert('Введите корректное значение для недели.');
+            alert('Bitte geben Sie einen gültigen Wert für die Woche ein.');
             return;
         }
         onWeekFilter(filterWeek);
@@ -43,7 +43,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Вы уверены, что хотите удалить эту резервацию?')) return;
+        if (!confirm('Möchten Sie diese Reservierung wirklich löschen?')) return;
 
         try {
             // Выполняем DELETE запрос
@@ -65,7 +65,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
             // Удаляем резервацию из списка
             onShowAll();
         } catch (err) {
-            setError('Не удалось удалить резервацию.');
+            setError('Das Löschen der Reservierung ist fehlgeschlagen.');
             setMessage(null);
             console.error(err);
         }
@@ -73,45 +73,45 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
 
     return (
         <div className="reserved-items-list">
-            <h3>Reserved Items</h3>
+            <h3>Reservierungen</h3>
 
             {message && <div className="success-message">{message}</div>}
             {error && <div className="error-message">{error}</div>}
 
             {/* Форма для фильтрации по неделе */}
             <form onSubmit={handleFilterSubmit} className="filter-form">
-                <label htmlFor="week-filter">Filter by Week:</label>
+                <label htmlFor="week-filter">Filtern nach Woche:</label>
                 <input
                     type="text"
                     id="week-filter"
-                    placeholder="Enter week (e.g., Week 42)"
+                    placeholder="Woche eingeben (z. B. KW42)"
                     value={filterWeek}
                     onChange={(e) => setFilterWeek(e.target.value)}
                 />
                 <button type="submit" className="btn btn-filter">
-                    Apply Filter
+                    Filter anwenden
                 </button>
                 <button type="button" className="btn btn-check-all" onClick={handleShowAll}>
-                    Check All
+                    Alle auswählen
                 </button>
             </form>
 
             {/* Список зарезервированных предметов */}
             {reservedItems.length === 0 ? (
-                <p>No reserved items found.</p>
+                <p>Keine reservierten Artikel gefunden.</p>
             ) : (
                 <ul>
                     {reservedItems.map((item) => (
                         <li key={item.id} className="reserved-item">
                             <div className="reserved-item-details">
-                                <strong>{item.name}</strong> - Order # {item.orderNumber}, Week: {item.week}, Quantity: {item.quantity}
+                                <strong>{item.name}</strong> - Auftragsnummer # {item.orderNumber}, KW: {item.week}, Menge: {item.quantity}
                             </div>
                             <div className="reserved-item-actions">
                                 <button onClick={() => setShowScanner(true)} className="btn btn-scan">
-                                    Complete Reservation via QR
+                                    Reservierung per QR abschließen
                                 </button>
                                 <button onClick={() => handleDelete(item.id)} className="btn btn-delete">
-                                    Remove
+                                    Entfernen
                                 </button>
                             </div>
                         </li>

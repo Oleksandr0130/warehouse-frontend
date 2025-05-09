@@ -26,7 +26,7 @@ const DownloadExcelButton: React.FC = () => {
 
     return (
         <button className="download-excel-button" onClick={handleDownload}>
-            📊 Скачать Excel
+            📊 Excel herunterladen
         </button>
     );
 };

@@ -68,13 +68,13 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
         <form onSubmit={handleSubmit} className="reserve-form">
             <h3>Create a Reservation</h3>
             <div className="form-group">
-                <label htmlFor="item-select">Select Item:</label>
+                <label htmlFor="item-select">Artikel auswählen:</label>
                 <select
                     id="item-select"
                     value={selectedItemId}
                     onChange={(e) => setSelectedItemId(e.target.value)}
                 >
-                    <option value="">-- Choose an item --</option>
+                    <option value="">-- Wähle einen Artikel --</option>
                     {items.map((item) => (
                         <option key={item.id} value={item.id}>
                             {item.name} (Available: {item.quantity})
@@ -84,7 +84,7 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
             </div>
 
             <div className="form-group">
-                <label htmlFor="quantity-input">Quantity:</label>
+                <label htmlFor="quantity-input">Menge:</label>
                 <input
                     type="number"
                     id="quantity-input"
@@ -95,29 +95,29 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
             </div>
 
             <div className="form-group">
-                <label htmlFor="week-input">Reservation Week:</label>
+                <label htmlFor="week-input">Reservierung KW:</label>
                 <input
                     type="text"
                     id="week-input"
-                    placeholder="Enter week (e.g., Week 42)"
+                    placeholder="KW eingeben (z. B. KW42)"
                     value={week}
                     onChange={(e) => setWeek(e.target.value)}
                 />
             </div>
 
             <div className="form-group">
-                <label htmlFor="order-number-input">Order Number:</label>
+                <label htmlFor="order-number-input">Auftragsnummer:</label>
                 <input
                     type="text"
                     id="order-number-input"
-                    placeholder="Enter Order Number"
+                    placeholder="Auftragsnummer eingeben"
                     value={orderNumber}
                     onChange={(e) => setOrderNumber(e.target.value)}
                 />
             </div>
 
             <button type="submit" className="btn btn-submit">
-                Create Reservation
+                Reservierung erstellen
             </button>
         </form>
     );

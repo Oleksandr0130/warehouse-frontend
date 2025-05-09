@@ -88,11 +88,11 @@ function QRScanner({ onScan, onClose }: QRScannerProps) {
 
   return (
       <div className="qr-scanner">
-        <h2>Scan QR Code</h2>
+        <h2>QR-Code scannen</h2>
         <video ref={videoRef} className="qr-video" />
         {onClose && (
             <button className="btn btn-close" onClick={onClose}>
-              Close Scanner
+              Scanner schließen
             </button>
         )}
       </div>

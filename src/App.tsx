@@ -222,12 +222,12 @@ function App() {
         params: { quantity },
       });
       alert(
-          `Операция "${scannerAction === 'add' ? 'добавлено' : 'удалено'}" выполнена успешно. Количество: ${quantity}.`
+          `Der Vorgang "${scannerAction === 'add' ? 'Hinzufügen' : 'Entfernen'}" wurde erfolgreich abgeschlossen. Menge: ${quantity}.`
       );
 
       // Дополнительное действие для удаления QR-кода, если это "удаление"
       if (scannerAction === 'remove') {
-        const orderNumber = prompt('Введите orderNumber для подтверждения удаления QR-кода:');
+        const orderNumber = prompt('Geben Sie die Auftragsnummer ein, um das Löschen des QR-Codes zu bestätigen:');
         if (orderNumber) {
           try {
             await deleteQRCode(orderNumber); // Вызов для удаления QR-кода через API
@@ -335,8 +335,8 @@ function App() {
               <>
                 <Login onSuccess={handleAuthSuccess} />
                 <p>
-                  Нет аккаунта?{' '}
-                  <button onClick={() => setAuthStage('register')}>Регистрация</button>
+                  Neues Konto{' '}
+                  <button onClick={() => setAuthStage('register')}>Registrieren</button>
                 </p>
               </>
           )}
@@ -344,7 +344,7 @@ function App() {
               <>
                 <Register onSuccess={() => setAuthStage('login')} />
                 <p>
-                  Уже есть аккаунт? <button onClick={() => setAuthStage('login')}>Войти</button>
+                  Hast du schon ein Konto? <button onClick={() => setAuthStage('login')}>Einloggen</button>
                 </p>
               </>
           )}
@@ -364,38 +364,38 @@ function App() {
                 className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`}
                 onClick={() => setActiveMenu('inventory')}
             >
-              Warehouse Inventory
+              Lagerbestand
             </li>
             <li
                 className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`}
                 onClick={() => setActiveMenu('reserve')}
             >
-              Reserved Items
+              Reservierte Artikel
             </li>
             <li
                 className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`}
                 onClick={() => setActiveMenu('sold')}
             >
-              Sold Items
+              Verkaufte Artikel
             </li>
             <li
                 className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`}
                 onClick={() => setActiveMenu('files')}
             >
-              File Viewer
+              Dateibetrachter
             </li>
             <li
                 className="menu-item logout-item"
                 onClick={handleLogout}
             >
-              LogOut
+              Abmelden
             </li>
 
           </ul>
         </aside>
         {/* основной контент */}
         <main className="app-main">
-          {loading && <div className="loading-overlay">Загрузка...</div>}
+          {loading && <div className="loading-overlay">Laden...</div>}
 
           {activeMenu === 'inventory' && (
               <>
@@ -410,7 +410,7 @@ function App() {
                       }}
                       disabled={loading}
                   >
-                    Scan to Add
+                    Zum Hinzufügen scannen
                   </button>
                   <button
                       className="btn btn-remove"
@@ -420,7 +420,7 @@ function App() {
                       }}
                       disabled={loading}
                   >
-                    Scan to Remove
+                    Zum Entfernen scannen
                   </button>
                 </div>
                 {showScanner && (
@@ -428,17 +428,17 @@ function App() {
                 )}
 
                 <div className="sort-dropdown">
-                  <label htmlFor="sort-menu">Сортировать по:</label>
+                  <label htmlFor="sort-menu">Sortieren nach:</label>
                   <select
                       id="sort-menu"
                       value={sortCriteria}
                       onChange={handleSortChange}
                       className="sort-select"
                   >
-                    <option value="">Default</option>
+                    <option value="">Standard</option>
                     <option value="name">Name</option>
-                    <option value="quantity">Quantity</option>
-                    <option value="sold">Sold</option>
+                    <option value="quantity">Menge</option>
+                    <option value="sold">Verkauft</option>
                   </select>
                 </div>
                 <div style={{ margin: '20px 0' }}>
