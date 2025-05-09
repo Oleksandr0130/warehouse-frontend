@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { registerUser } from '../api';
 import '../styles/Register.css';
-import {toast, ToastContainer} from "react-toastify";
 
 interface RegisterProps {
     onSuccess: () => void;
@@ -10,33 +9,21 @@ interface RegisterProps {
 
 const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
     const [form, setForm] = useState({ username: '', email: '', password: '', role: 'USER' });
-    // const [message, setMessage] = useState<string | null>(null);
+    const [message, setMessage] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    // const handleSubmit = async (e: React.FormEvent) => {
-    //     e.preventDefault();
-    //     try {
-    //         await registerUser(form);
-    //         setMessage('Регистрация успешно отправлена. Проверьте почту для подтверждения.');
-    //         onSuccess(); // вызов после успешной регистрации
-    //     } catch (err) {
-    //         console.error(err);
-    //         setMessage('Ошибка регистрации');
-    //     }
-    // };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             await registerUser(form);
-            toast.success('Registrierung erfolgreich gesendet. Bitte überprüfen Sie Ihre E-Mail zur Bestätigung.');
+            setMessage('Registrierung erfolgreich gesendet. Bitte überprüfen Sie Ihre E-Mail zur Bestätigung.');
             onSuccess(); // вызов после успешной регистрации
         } catch (err) {
             console.error(err);
-            toast.error('Registrierungsfehler');
+            setMessage('Registrierungsfehler');
         }
     };
 
@@ -54,8 +41,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
                 </select>
                 <button type="submit">Registrieren</button>
             </form>
-            {/*{message && <p>{message}</p>}*/}
-            <ToastContainer position="top-right" autoClose={5000} />
+            {message && <p>{message}</p>}
         </div>
     );
 };
