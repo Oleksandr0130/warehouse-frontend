@@ -199,6 +199,8 @@ function App() {
     );
     fetchReservedItems();
 
+    fetchItems(sortCriteria);
+
     toast.success('Резервация удалена.');
   };
 
