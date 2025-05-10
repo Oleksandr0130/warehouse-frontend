@@ -44,9 +44,9 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
                 <button type="submit">Registrieren</button>
             </form>
             {/*{message && <p>{message}</p>}*/}
-            toast.configure()
         </div>
     );
 };
+
 
 export default Register;
