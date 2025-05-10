@@ -1,6 +1,8 @@
 // src/components/Register.tsx
 import React, { useState } from 'react';
 import { registerUser } from '../api';
+import { toast} from "react-toastify";
+import 'react-toastify/dist/dist/ReactToastify.css'
 import '../styles/Register.css';
 
 interface RegisterProps {
@@ -9,7 +11,7 @@ interface RegisterProps {
 
 const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
     const [form, setForm] = useState({ username: '', email: '', password: '', role: 'USER' });
-    const [message, setMessage] = useState<string | null>(null);
+    // const [message, setMessage] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,11 +21,11 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
         e.preventDefault();
         try {
             await registerUser(form);
-            setMessage('Registrierung erfolgreich gesendet. Bitte überprüfen Sie Ihre E-Mail zur Bestätigung.');
+            toast.success('Registrierung erfolgreich gesendet. Bitte überprüfen Sie Ihre E-Mail zur Bestätigung.');
             onSuccess(); // вызов после успешной регистрации
         } catch (err) {
             console.error(err);
-            setMessage('Registrierungsfehler');
+            toast.error('Registrierungsfehler');
         }
     };
 
@@ -41,7 +43,8 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
                 </select>
                 <button type="submit">Registrieren</button>
             </form>
-            {message && <p>{message}</p>}
+            {/*{message && <p>{message}</p>}*/}
+            toast.configure()
         </div>
     );
 };
