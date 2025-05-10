@@ -45,7 +45,7 @@ function App() {
       if (isValid) {
         setIsAuthenticated(true);
         setAuthStage('confirmed');
-        fetchData();
+        fetchData(); // Загружаем соответствующие данные
       } else {
         setIsAuthenticated(false);
       }
@@ -53,21 +53,53 @@ function App() {
     initializeAuth();
   }, []);
 
+// Обновление данных при изменении activeMenu или sortCriteria
   useEffect(() => {
-    fetchItems(sortCriteria);
-    fetchReservedItems();
-  }, [sortCriteria]);
+    fetchData();
+  }, [sortCriteria, activeMenu]);
 
-  useEffect(() => {
-    if (activeMenu === 'sold') {
-      fetchSoldReservations(); // Вызов функции для загрузки данных
-    }
-  }, [activeMenu]);
-
+// Универсальная функция для загрузки данных
   const fetchData = () => {
-    fetchItems(sortCriteria);
-    fetchReservedItems();
+    if (activeMenu === 'inventory') {
+      fetchItems(sortCriteria);
+    } else if (activeMenu === 'reserve') {
+      fetchReservedItems();
+    } else if (activeMenu === 'sold') {
+      fetchSoldReservations();
+    }
   };
+
+
+  // // Проверка токена при загрузке
+  // useEffect(() => {
+  //   const initializeAuth = async () => {
+  //     const isValid = await validateTokens(); // Проверка токенов через AuthManager
+  //     if (isValid) {
+  //       setIsAuthenticated(true);
+  //       setAuthStage('confirmed');
+  //       fetchData();
+  //     } else {
+  //       setIsAuthenticated(false);
+  //     }
+  //   };
+  //   initializeAuth();
+  // }, []);
+  //
+  // useEffect(() => {
+  //   fetchItems(sortCriteria);
+  //   fetchReservedItems();
+  // }, [sortCriteria]);
+  //
+  // useEffect(() => {
+  //   if (activeMenu === 'sold') {
+  //     fetchSoldReservations(); // Вызов функции для загрузки данных
+  //   }
+  // }, [activeMenu]);
+  //
+  // const fetchData = () => {
+  //   fetchItems(sortCriteria);
+  //   fetchReservedItems();
+  // };
 
   // Загрузка товаров
   const fetchItems = async (sortCriteria?: string) => {
@@ -199,7 +231,7 @@ function App() {
     );
     fetchReservedItems();
 
-    fetchItems(sortCriteria);
+    fetchItems(sortCriteria)
 
     toast.success('Резервация удалена.');
   };
