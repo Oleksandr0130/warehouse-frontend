@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { registerUser } from '../api';
 import { toast} from "react-toastify";
-import 'react-toastify/dist/dist/ReactToastify.css'
+import 'react-toastify/dist/ReactToastify.css'
 import '../styles/Register.css';
 
 interface RegisterProps {
