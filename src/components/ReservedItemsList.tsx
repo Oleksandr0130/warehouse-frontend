@@ -61,7 +61,6 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
 
             // Вызываем callback для обновления в App.tsx
             onReservationRemoved(itemId, returnedQuantity);
-
             // Уведомление об успехе
             toast.success('Reservierung erfolgreich gelöscht.');
 
