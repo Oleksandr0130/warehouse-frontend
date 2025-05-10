@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import api, {deleteQRCode} from './api';
+import { useState, useEffect } from 'react';
+// import api, { deleteQRCode } from './api';
 import ItemList from './components/ItemList';
 import ReservedItemsList from './components/ReservedItemsList';
 import AddItemForm from './components/AddItemForm';
@@ -13,12 +13,15 @@ import Confirmation from './components/Confirmation';
 import { Item } from './types/Item';
 import { ReservedItem } from './types/ReservedItem';
 import { ReservationData } from './types/ReservationData';
-import { AxiosError } from 'axios';
+// import { AxiosError } from 'axios';
 import './styles/App.css';
 import './App.css';
-import {SoldReservation} from "./types/SoldReservation.ts";
-import {logout, validateTokens} from "./types/AuthManager.ts";
-import DownloadExcelButton from "./components/DownloadExelButton.tsx";
+import { SoldReservation } from './types/SoldReservation.ts';
+import { logout, validateTokens } from './types/AuthManager.ts';
+import DownloadExcelButton from './components/DownloadExelButton.tsx';
+import { toast } from 'react-toastify'; // Импортируем toast
+import 'react-toastify/dist/ReactToastify.css';
+import api from "./api.ts"; // Подключение стилей toast
 
 function App() {
   // Управление состоянием режима авторизации
@@ -50,7 +53,6 @@ function App() {
     initializeAuth();
   }, []);
 
-
   useEffect(() => {
     fetchItems(sortCriteria);
     fetchReservedItems();
@@ -62,73 +64,28 @@ function App() {
     }
   }, [activeMenu]);
 
-  useEffect(() => {
-    // Проверяем пункт меню и обновляем список товаров
-    if (activeMenu === 'inventory') {
-      fetchItems(); // Обновляем данные для Warehouse Inventory
-    } else if (activeMenu === 'reserve') {
-      fetchReservedItems(); // Добавляем обновление зарезервированных товаров
-    } else if (activeMenu === 'sold') {
-      fetchSoldReservations(); // Обновляем данные для Sold Items
-    }
-  }, [activeMenu]); // Следим за изменением activeMenu
-
-
   const fetchData = () => {
     fetchItems(sortCriteria);
     fetchReservedItems();
   };
-  // - функция для загрузки проданных резерваций
-  const fetchSoldReservations = async () => {
-    try {
-      setLoading(true); // Показать индикатор загрузки, если нужно
-      const response = await api.get<SoldReservation[]>('/reservations/sold');
-      setSoldReservations(response.data || []); // Устанавливаем список проданных товаров
-    } catch (error) {
-      console.error('Ошибка загрузки проданных резерваций:', error);
-      setSoldReservations([]);
-    } finally {
-      setLoading(false); // Скрываем индикатор загрузки
-    }
-  };
-
 
   // Загрузка товаров
-// Обновленный fetchItems с учетом проданных товаров
   const fetchItems = async (sortCriteria?: string) => {
     try {
       setLoading(true);
-
-      // Загружаем список всех товаров
       const endpoint = sortCriteria ? '/items/sorted' : '/items';
       const response = await api.get(endpoint, {
         params: sortCriteria ? { sortBy: sortCriteria } : {},
       });
-
-      const itemsData = response.data;
-
-      // Загружаем информацию о проданных товарах
-      const soldResponse = await api.get('/items/sold');
-      const soldItems = soldResponse.data;
-
-      // Объединяем данные из двух запросов
-      const updatedItems = itemsData.map((item: Item) => {
-        const soldItem = soldItems.find((sold: { id: string | number }) => sold.id === item.id);
-        return {
-          ...item,
-          sold: soldItem ? soldItem.sold : 0, // Добавляем количество проданных товаров
-        };
-      });
-
-      setItems(updatedItems); // Сохраняем данные
+      setItems(response.data);
     } catch (error) {
       console.error('Ошибка при загрузке товаров:', error);
       setItems([]);
+      toast.error('Ошибка при загрузке списка товаров.');
     } finally {
       setLoading(false);
     }
   };
-
 
   // Загрузка зарезервированных товаров
   const fetchReservedItems = async () => {
@@ -142,192 +99,124 @@ function App() {
         orderNumber: item.orderNumber || '',
         week: item.reservationWeek || '',
       }));
-      setReservedItems(data); // Обновляем состояние
-      console.log('Updated Reserved Items:', data); // Логируем данные для проверки
-    } catch (error) {
-      console.error('Ошибка загрузки зарезервированных товаров:', error);
-      setReservedItems([]); // Очищаем список в случае ошибки
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-  // Обновленная функция по неделе для зарезервированных
-  const fetchSortedReservedItemsByWeek = async (week: string) => {
-    try {
-      setLoading(true);
-      const response = await api.get('/reservations/sorted', {
-        params: { reservationWeek: week },
-      });
-      const data = response.data.map((item: ReservationData) => ({
-        id: item.id?.toString() || '',
-        name: item.itemName || '',
-        quantity: item.reservedQuantity || 0,
-        orderNumber: item.orderNumber || '',
-        week: item.reservationWeek || '',
-      }));
       setReservedItems(data);
     } catch (error) {
-      console.error('Ошибка загрузки зарезервированных товаров по неделе:', error);
-      alert('Не удалось загрузить зарезервированные товары для указанной недели.');
+      console.error('Ошибка загрузки зарезервированных товаров:', error);
+      toast.error('Ошибка загрузки зарезервированных товаров.');
       setReservedItems([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Добавление товара
+  // Загрузка продаж
+  const fetchSoldReservations = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get<SoldReservation[]>('/reservations/sold');
+      setSoldReservations(response.data || []);
+    } catch (error) {
+      console.error('Ошибка загрузки проданных резерваций:', error);
+      toast.error('Ошибка при загрузке проданных товаров.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Обработка добавления товара
   const handleAddItem = async (item: Item) => {
     try {
       setLoading(true);
       await api.post('/items', item);
       fetchItems(sortCriteria);
+      toast.success('Товар успешно добавлен!');
     } catch (error) {
       console.error('Ошибка добавления товара:', error);
-      alert('Не удалось добавить товар.');
+      toast.error('Ошибка при добавлении товара.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Обработка скана QR-кода
+  // Обработка QR-кодов
   const handleScan = async (id: string) => {
     setShowScanner(false);
-
-    // Проверяем, выбрано ли действие (add / remove)
     if (!scannerAction) return;
 
-    // Запрашиваем количество у пользователя
-    const quantityStr = prompt(
-        `Введите количество для ${scannerAction === 'add' ? 'добавления' : 'удаления'}:`
-    );
-
-    // Проверяем корректность введённого значения
+    const quantityStr = prompt(`Введите количество для ${scannerAction === 'add' ? 'добавления' : 'удаления'}:`);
     if (!quantityStr || isNaN(Number(quantityStr))) {
-      alert('Введите корректное числовое значение.');
+      toast.error('Введите корректное числовое значение.');
       return;
     }
+
     const quantity = parseInt(quantityStr);
     if (quantity <= 0) {
-      alert('Количество должно быть больше 0.');
+      toast.error('Количество должно быть больше 0.');
       return;
     }
 
     try {
       setLoading(true);
-
-      // Отправляем запрос на добавление или уменьшение количества товара
-      await api.put(`/items/${id}/${scannerAction}`, null, {
-        params: { quantity },
-      });
-      alert(
-          `Der Vorgang "${scannerAction === 'add' ? 'Hinzufügen' : 'Entfernen'}" wurde erfolgreich abgeschlossen. Menge: ${quantity}.`
+      await api.put(`/items/${id}/${scannerAction}`, null, { params: { quantity } });
+      toast.success(
+          `Операция "${scannerAction === 'add' ? 'Добавление' : 'Удаление'}" успешно завершена. Количество: ${quantity}.`
       );
-
-      // Дополнительное действие для удаления QR-кода, если это "удаление"
-      if (scannerAction === 'remove') {
-        const orderNumber = prompt('Geben Sie die Auftragsnummer ein, um das Löschen des QR-Codes zu bestätigen:');
-        if (orderNumber) {
-          try {
-            await deleteQRCode(orderNumber); // Вызов для удаления QR-кода через API
-            alert(`QR-код для заказа ${orderNumber} успешно удалён.`);
-          // Принудительно обновляем список зарезервированных товаров:
-          fetchReservedItems();
-
-        } catch (error) {
-            console.error('Ошибка при удалении QR-кода:', error);
-            alert('Не удалось удалить QR-код для заказа.');
-          }
-        }
-      }
-
-
       fetchItems(sortCriteria);
     } catch (error) {
-      console.error('Ошибка при обновлении:', error);
-      alert('Не удалось обновить товар.');
+      console.error('Ошибка при выполнении операции:', error);
+      toast.error('Ошибка при выполнении операции.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Обработка скана для резервирования
+  // Обработка сканирования для резерваций
   const handleReservedItemScan = async (orderNumber: string) => {
     try {
-      if (!orderNumber || orderNumber.trim() === '') {
-        alert('QR-код не содержит действительного номера заказа.');
+      if (!orderNumber) {
+        toast.error('Некорректный QR-код.');
         return;
       }
 
       setLoading(true);
-
-      // Отправляем запрос на сервер
-      const response = await api.post('/reservations/scan', null, {
-        params: { orderNumber },
-      });
-
-      console.log('Response from API (scan reservation):', response.data);
-
-      // Обновляем список после успешного сканирования
-      setReservedItems((prevItems) =>
-          prevItems.filter((item) => item.orderNumber !== orderNumber)
-      );
-
-
-      // Обновляем список зарезервированных товаров
-      await fetchReservedItems();
-
-      alert('Reservation processed successfully!');
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        console.error('Ошибка обработана Axios:', error.response?.data || error.message);
-        alert(`Ошибка: ${error.response?.data?.message || 'Не удалось обработать QR-код.'}`);
-      } else {
-        console.error('Ошибка обработки QR-кода:', error instanceof Error ? error.message : error);
-        alert('Произошла неизвестная ошибка.');
-      }
+      await api.post('/reservations/scan', null, { params: { orderNumber } });
+      fetchReservedItems();
+      toast.success('Резерв успешно обработан!');
+    } catch (error) {
+      console.error('Ошибка обработки резервации:', error);
+      toast.error('Не удалось обработать резерв.');
     } finally {
       setLoading(false);
     }
   };
 
-
-  // Обработка изменения сортировки
-  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSortCriteria(event.target.value);
-  };
-
-  // Обновление данных при выходе из резервирования
+  // Обработка удаления резервации
   const handleReservationRemoved = (updatedItemId: string, returnedQuantity: number) => {
-    setItems(prevItems =>
-        prevItems.map(item =>
-            item.id === updatedItemId
-                ? { ...item, quantity: item.quantity + returnedQuantity }
-                : item
+    setItems((prevItems) =>
+        prevItems.map((item) =>
+            item.id === updatedItemId ? { ...item, quantity: item.quantity + returnedQuantity } : item
         )
     );
-
-    // Принудительно обновляем зарезервированные товары с сервера:
     fetchReservedItems();
-
+    toast.success('Резервация удалена.');
   };
 
-  // Обработка выхода из системы
-  const handleLogout = () => {
-    logout(); // Удаление токенов через AuthManager
-    setIsAuthenticated(false);
-    setAuthStage('login');
-  };
-
-  // Обработка успешной авторизации
+  // Авторизация
   const handleAuthSuccess = () => {
     setIsAuthenticated(true);
     setAuthStage('confirmed');
     fetchData();
+    toast.success('Вы успешно вошли в систему!');
   };
 
-  // РЕНДЕРИМ форму авторизации
+  // Logout
+  const handleLogout = () => {
+    logout();
+    setIsAuthenticated(false);
+    setAuthStage('login');
+    toast.info('Вы вышли из системы.');
+  };
+
   if (!isAuthenticated) {
     return (
         <div className="auth-container">
@@ -353,10 +242,8 @@ function App() {
     );
   }
 
-  // Основной интерфейс после входа
   return (
       <div className="app-container">
-        {/* меню */}
         <aside className="fixed-sidebar">
           <h2 className="sidebar-title">Warehouse QR</h2>
           <ul className="sidebar-menu">
@@ -384,23 +271,17 @@ function App() {
             >
               Dateibetrachter
             </li>
-            <li
-                className="menu-item logout-item"
-                onClick={handleLogout}
-            >
+            <li className="menu-item logout-item" onClick={handleLogout}>
               Abmelden
             </li>
-
           </ul>
         </aside>
-        {/* основной контент */}
         <main className="app-main">
           {loading && <div className="loading-overlay">Laden...</div>}
 
           {activeMenu === 'inventory' && (
               <>
                 <AddItemForm onAdd={handleAddItem} />
-
                 <div className="scanner-buttons">
                   <button
                       className="btn btn-add"
@@ -423,16 +304,14 @@ function App() {
                     Zum Entfernen scannen
                   </button>
                 </div>
-                {showScanner && (
-                    <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />
-                )}
+                {showScanner && <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />}
 
                 <div className="sort-dropdown">
                   <label htmlFor="sort-menu">Sortieren nach:</label>
                   <select
                       id="sort-menu"
                       value={sortCriteria}
-                      onChange={handleSortChange}
+                      onChange={(e) => setSortCriteria(e.target.value)}
                       className="sort-select"
                   >
                     <option value="">Standard</option>
@@ -442,7 +321,6 @@ function App() {
                   </select>
                 </div>
                 <div style={{ margin: '20px 0' }}>
-                  {/* Добавляем кнопку для скачивания файла */}
                   <DownloadExcelButton />
                 </div>
 
@@ -478,7 +356,27 @@ function App() {
                 <ReservedItemsList
                     reservedItems={reservedItems}
                     onScan={handleReservedItemScan}
-                    onWeekFilter={fetchSortedReservedItemsByWeek}
+                    onWeekFilter={async (week: string) => {
+                      try {
+                        setLoading(true);
+                        const response = await api.get('/reservations/sorted', { params: { reservationWeek: week } });
+                        const data = response.data.map((item: ReservationData) => ({
+                          id: item.id?.toString() || '',
+                          name: item.itemName || '',
+                          quantity: item.reservedQuantity || 0,
+                          orderNumber: item.orderNumber || '',
+                          week: item.reservationWeek || '',
+                        }));
+                        setReservedItems(data);
+                        toast.success(`Товары отсортированы по неделе: ${week}`);
+                      } catch (error) {
+                        console.error('Ошибка сортировки зарезервированных товаров:', error);
+                        toast.error('Не удалось загрузить зарезервированные товары.');
+                        setReservedItems([]);
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
                     onShowAll={fetchReservedItems}
                     onReservationRemoved={handleReservationRemoved}
                 />

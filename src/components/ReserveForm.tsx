@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Item } from '../types/Item';
 import '../styles/ReserveForm.css';
+import { toast} from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css'
 
 interface ReserveFormProps {
     items: Item[]; // Список предметов
@@ -21,14 +23,15 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
+        // Проверка на заполненность полей
         if (!selectedItemId || !week || quantity <= 0 || !orderNumber) {
-            alert('Please fill out all fields correctly.');
+            toast.error('Bitte füllen Sie alle Felder korrekt aus.'); // Ошибка toast вместо alert
             return;
         }
 
         const selectedItem = items.find((item) => item.id === selectedItemId);
         if (!selectedItem) {
-            alert('Selected item not found.');
+            toast.error('Der ausgewählte Artikel wurde nicht gefunden.'); // Ошибка toast
             return;
         }
 
@@ -48,10 +51,11 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
             // Уменьшаем локальное количество предметов на складе
             onUpdateItems(selectedItemId, quantity);
 
-            // Запускаем обновление зарезервированных товаров
+            // Обновляем список резерваций
             onReserveComplete();
 
-            alert('Reservation created successfully!');
+            // Уведомление об успехе через toast
+            toast.success('Reservierung erfolgreich erstellt!');
 
             // Сбрасываем форму
             setSelectedItemId('');
@@ -59,8 +63,10 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
             setWeek('');
             setOrderNumber('');
         } catch (error) {
-            console.error('Error creating reservation:', error);
-            alert('Failed to create reservation.');
+            console.error('Fehler beim Erstellen der Reservierung:', error);
+
+            // Уведомление об ошибке через toast
+            toast.error('Fehler beim Erstellen der Reservierung.');
         }
     };
 
@@ -122,5 +128,6 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
         </form>
     );
 };
+
 
 export default ReserveForm;

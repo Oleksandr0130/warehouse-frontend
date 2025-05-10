@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { loginUser } from '../api';
+import { toast} from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css'
 import '../styles/Login.css';
 import {AxiosError} from "axios";
 
@@ -9,7 +11,7 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = ({ onSuccess }) => {
     const [credentials, setCredentials] = useState({ username: '', password: '' });
-    const [message, setMessage] = useState<string | null>(null);
+    // const [message, setMessage] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -20,7 +22,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
         try {
             const response = await loginUser({ username: credentials.username, password: credentials.password });
             localStorage.setItem('token', response.data.token);
-            setMessage('Успешный вход!');
+            toast.success('Erfolgreiche Anmeldung!');
             onSuccess();
 
         } catch (err) {
@@ -33,7 +35,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 console.error('Ошибка:', err);
                 alert('Произошла неизвестная ошибка при входе.');
             }
-            setMessage('Ошибка входа');
+            toast.error('Falscher Benutzername/Passwort!');
         }
     };
 
@@ -60,7 +62,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 />
                 <button type="submit" className="login-btn">Einloggen</button>
             </form>
-            {message && <p>{message}</p>}
+            {/*{message && <p>{message}</p>}*/}
         </div>
     );
 };
