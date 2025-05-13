@@ -17,7 +17,7 @@ export const fetchSoldReservations = async (): Promise<SoldReservation[]> => {
 
 // Метод для фильтрации резерваций по префиксу заказа
 export const fetchReservationsByOrderPrefix = async (orderPrefix: string) => {
-    const response = await api.get('/search/by-order-prefix', {
+    const response = await api.get('/reservations/search/by-order-prefix', {
         params: { orderPrefix },
     });
     return response.data;
