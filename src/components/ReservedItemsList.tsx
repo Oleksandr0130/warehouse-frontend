@@ -5,6 +5,7 @@ import QRScanner from './QRScanner';
 import api, {fetchReservationsByOrderPrefix} from '../api';
 import {toast} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'
+import {ReservationData} from "../types/ReservationData.ts";
 
 interface ReservedItemsListProps {
     reservedItems: ReservedItem[]; // Список зарезервированных предметов
@@ -41,7 +42,19 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
         try {
             setLoading(true);
             const filteredReservations = await fetchReservationsByOrderPrefix(orderPrefix);
-            setReservedItems(filteredReservations);
+            // Преобразование данных для правильного сопоставления полей
+            const mappedReservations = filteredReservations.map((item: ReservationData) => {
+                return {
+                    id: item.id?.toString() || '', // Идентификатор
+                    name: item.itemName || 'Не указано', // Вывод названия товара (itemName -> name)
+                    orderNumber: item.orderNumber || 'Не указан', // Номер заказа
+                    week: item.reservationWeek || 'N/A', // Неделя (reservationWeek -> week)
+                    quantity: item.reservedQuantity || 0, // Количество (reservedQuantity -> quantity)
+                };
+            });
+
+            setReservedItems(mappedReservations); // Устанавливаем преобразованный список резерваций
+
             toast.success(`Auftragsnummer "${orderPrefix}" gefunden.`);
         } catch (error) {
             console.error('Ошибка фильтрации резерваций:', error);

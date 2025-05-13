@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { SoldReservation } from './types/SoldReservation.ts';
+import {ReservationData} from "./types/ReservationData.ts";
 
 const BASE_URL = '/api';
 
@@ -16,12 +17,11 @@ export const fetchSoldReservations = async (): Promise<SoldReservation[]> => {
 };
 
 // Метод для фильтрации резерваций по префиксу заказа
-export const fetchReservationsByOrderPrefix = async (orderPrefix: string) => {
-    const response = await api.get('/reservations/search/by-order-prefix', {
-        params: { orderPrefix },
-    });
+export const fetchReservationsByOrderPrefix = async (prefix: string): Promise<ReservationData[]> => {
+    const response = await api.get(`/reservations/search/by-order-prefix`, { params: { orderPrefix: prefix } });
     return response.data;
 };
+
 
 // Функции для регистрации пользователя, входа, подтверждения email
 export const registerUser = (data: { username: string; email: string; password: string; role: string }) =>
