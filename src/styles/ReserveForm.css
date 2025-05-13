@@ -1,150 +1,153 @@
-/* ReservedItemList.css */
+.reserve-form {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #ffffff;
+}
 
-/* Стиль для сообщений об успехе или ошибке */
-.success-message {
-    background-color: #d4edda;
-    color: #155724;
-    padding: 10px;
-    border: 1px solid #c3e6cb;
-    border-radius: 5px;
+.reserve-form h3 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.reserve-form .form-group {
     margin-bottom: 15px;
 }
 
-.error-message {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 10px;
-    border: 1px solid #f5c6cb;
-    border-radius: 5px;
-    margin-bottom: 15px;
+.reserve-form .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
 }
 
-/* Стиль для формы фильтрации */
+.reserve-form .form-group select,
+.reserve-form .form-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.reserve-form .form-group input[type="number"] {
+    -moz-appearance: textfield; /* Убираем стрелки (для Firefox) */
+}
+
+.reserve-form .form-group input::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+.reserve-form .form-group input:focus,
+.reserve-form .form-group select:focus {
+    border-color: #80bdff;
+    outline: none;
+    box-shadow: 0 0 4px rgba(128, 189, 255, 0.5);
+}
+
+.reserve-form .form-group input.error {
+    border-color: #dc3545;
+}
+
+.reserve-form .btn-submit {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.reserve-form .btn-submit:hover {
+    background-color: #218838;
+}
+
+.reserve-form .btn-submit:disabled {
+    cursor: not-allowed;
+    background-color: #94d3a2;
+}
+
+/* Формы фильтрации */
 .filter-form {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
+    align-items: center; /* Центровка по вертикали */
+    justify-content: space-between; /* Размещение пространства между элементами */
+    gap: 10px; /* Расстояние между элементами */
+    margin-bottom: 20px;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
     background-color: #f9f9f9;
 }
 
+/* Метка для поля ввода */
 .filter-form label {
+    flex-shrink: 0; /* Фиксируем ширину метки */
     font-weight: bold;
-    margin-right: 8px;
     color: #555;
 }
 
+/* Поле ввода */
 .filter-form input {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    flex-grow: 1; /* Поле ввода занимает всю доступную ширину */
+    padding: 10px;
     font-size: 14px;
-    transition: border-color 0.3s;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
 }
 
 .filter-form input:focus {
+    border-color: #80bdff;
     outline: none;
-    border-color: #007bff;
+    box-shadow: 0 0 4px rgba(128, 189, 255, 0.5);
 }
 
-/* Кнопки формы фильтрации */
-.filter-form .btn {
-    padding: 8px 15px;
-    background-color: #6c757d;
+/* Кнопки */
+.filter-form .btn-group {
+    display: flex;
+    flex-shrink: 0; /* Кнопки не сжимаются */
+    gap: 10px; /* Пространство между кнопками */
+}
+
+/* Кнопка фильтрации */
+.filter-form .btn-filter {
+    padding: 10px 15px;
+    font-size: 14px;
+    background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 5px;
-    font-size: 14px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.filter-form .btn:hover {
-    background-color: #5a6268;
-}
-
-.filter-form .btn-filter {
-    background-color: #007bff;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .filter-form .btn-filter:hover {
     background-color: #0056b3;
+    transform: translateY(-2px); /* Легкое поднятие кнопки */
 }
 
+/* Кнопка для сброса фильтра */
 .filter-form .btn-check-all {
+    padding: 10px 15px;
+    font-size: 14px;
     background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .filter-form .btn-check-all:hover {
     background-color: #218838;
-}
-
-/* Стили для списка зарезервированных предметов */
-.reserved-items-list ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.reserved-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    background-color: #ffffff;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    transition: box-shadow 0.3s, transform 0.2s; /* Эффект тени и перемещения */
-}
-
-.reserved-item:hover {
-    background-color: #f1f1f1;
-    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-}
-
-.reserved-item-details {
-    flex-grow: 1;
-}
-
-.reserved-item-actions button {
-    margin-left: 10px;
-    padding: 5px 10px;
-    font-size: 14px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.btn-scan {
-    background-color: #007bff;
-    color: white;
-}
-
-.btn-scan:hover {
-    background-color: #0056b3;
-}
-
-.btn-delete {
-    background-color: #dc3545;
-    color: white;
-}
-
-.btn-delete:hover {
-    background-color: #c82333;
-}
-
-/* Заголовок списка */
-.reserved-items-list h3 {
-    margin-bottom: 20px;
-    text-align: center;
-    color: #333;
+    transform: translateY(-2px); /* Легкое поднятие кнопки */
 }

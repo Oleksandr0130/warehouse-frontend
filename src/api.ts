@@ -15,13 +15,13 @@ export const fetchSoldReservations = async (): Promise<SoldReservation[]> => {
     return response.data;
 };
 
+// Метод для фильтрации резерваций по префиксу заказа
 export const fetchReservationsByOrderPrefix = async (orderPrefix: string) => {
     const response = await api.get('/search/by-order-prefix', {
         params: { orderPrefix },
     });
     return response.data;
 };
-
 
 // Функции для регистрации пользователя, входа, подтверждения email
 export const registerUser = (data: { username: string; email: string; password: string; role: string }) =>
