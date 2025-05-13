@@ -21,7 +21,7 @@ import { logout, validateTokens } from './types/AuthManager.ts';
 import DownloadExcelButton from './components/DownloadExelButton.tsx';
 import { toast } from 'react-toastify'; // Импортируем toast
 import 'react-toastify/dist/ReactToastify.css';
-import api, {fetchReservationsByOrderPrefix} from "./api.ts"; // Подключение стилей toast
+import api from "./api.ts"; // Подключение стилей toast
 
 function App() {
   // Управление состоянием режима авторизации
@@ -37,7 +37,6 @@ function App() {
   const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold' | 'files'>('inventory');
   const [sortCriteria, setSortCriteria] = useState<string>('');
   const [soldReservations, setSoldReservations] = useState<SoldReservation[]>([]);
-  const [orderPrefix, setOrderPrefix] = useState<string>(''); // Для фильтрации по префиксу
 
   // Проверка токена при загрузке
   useEffect(() => {
@@ -120,31 +119,6 @@ function App() {
     }
   };
 
-  const fetchFilteredReservations = async () => {
-    try {
-      setLoading(true);
-      if (!orderPrefix.trim()) {
-        toast.error('Введите корректный префикс заказа.');
-        return;
-      }
-
-      const filteredReservations = await fetchReservationsByOrderPrefix(orderPrefix); // Вызов API
-      const data = filteredReservations.map((item: ReservationData) => ({
-        id: item.id?.toString() || '',
-        name: item.itemName || '',
-        quantity: item.reservedQuantity || 0,
-        orderNumber: item.orderNumber || '',
-        week: item.reservationWeek || '',
-      }));
-      setReservedItems(data); // Обновляем список зарезервированных товаров
-      toast.success(`Результаты фильтрации для префикса "${orderPrefix}" обновлены.`);
-    } catch (error) {
-      console.error('Ошибка фильтрации зарезервированных товаров:', error);
-      toast.error('Ошибка фильтрации по префиксу.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Загрузка зарезервированных товаров
   const fetchReservedItems = async () => {
@@ -415,32 +389,11 @@ function App() {
                       );
                     }}
                 />
-                <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      fetchFilteredReservations();
-                    }}
-                    className="filter-form"
-                >
-                  <label htmlFor="order-prefix">Filtern nach Auftrags:</label>
-                  <input
-                      type="text"
-                      id="order-prefix"
-                      placeholder="Geben Sie das Auftragsnummer ein (z. B. 2516024)"
-                      value={orderPrefix}
-                      onChange={(e) => setOrderPrefix(e.target.value)}
-                  />
-                  <button type="submit" className="btn btn-filter">Versuchen</button>
-                  <button
-                      type="button"
-                      className="btn btn-check-all"
-                      onClick={fetchReservedItems}
-                  >
-                    Zurücksetzen
-                  </button>
-                </form>
+
+
                 <ReservedItemsList
                     reservedItems={reservedItems}
+                    setReservedItems={setReservedItems} // Передаём метод для обновления списка
                     onScan={handleReservedItemScan}
                     onWeekFilter={async (week: string) => {
                       try {
