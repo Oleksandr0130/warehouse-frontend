@@ -42,14 +42,21 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
             setLoading(true);
             const filteredReservations = await fetchReservationsByOrderPrefix(orderPrefix);
             setReservedItems(filteredReservations);
-            toast.success(`Результаты фильтрации для префикса "${orderPrefix}" обновлены.`);
+            toast.success(`Auftragsnummer "${orderPrefix}" gefunden.`);
         } catch (error) {
             console.error('Ошибка фильтрации резерваций:', error);
-            toast.error('Ошибка фильтрации по префиксу заказа.');
+            toast.error('Auftragsnummer nicht gefunden.');
         } finally {
             setLoading(false);
         }
     };
+
+    const handleShowAllReservations = () => {
+        setOrderPrefix('');
+        onShowAll(); // Загружаем полный список резерваций через родительский метод
+        toast.success('Фильтр сброшен. Показаны все резервации.');
+    };
+
 
 
     const handleScanClose = () => {
@@ -122,6 +129,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                     <button
                         type="button"
                         className="btn btn-check-all"
+                        onClick={handleShowAllReservations}
                         disabled={loading}
                     >
                         Zurücksetzen
