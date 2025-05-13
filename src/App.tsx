@@ -415,7 +415,30 @@ function App() {
                       );
                     }}
                 />
-
+                <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      fetchFilteredReservations();
+                    }}
+                    className="filter-form"
+                >
+                  <label htmlFor="order-prefix">Filtern nach Auftrags:</label>
+                  <input
+                      type="text"
+                      id="order-prefix"
+                      placeholder="Geben Sie das Auftragsnummer ein (z. B. 2516024)"
+                      value={orderPrefix}
+                      onChange={(e) => setOrderPrefix(e.target.value)}
+                  />
+                  <button type="submit" className="btn btn-filter">Versuchen</button>
+                  <button
+                      type="button"
+                      className="btn btn-check-all"
+                      onClick={fetchReservedItems}
+                  >
+                    Zurücksetzen
+                  </button>
+                </form>
                 <ReservedItemsList
                     reservedItems={reservedItems}
                     onScan={handleReservedItemScan}
@@ -443,31 +466,6 @@ function App() {
                     onShowAll={fetchReservedItems}
                     onReservationRemoved={handleReservationRemoved}
                 />
-
-                <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      fetchFilteredReservations();
-                    }}
-                    className="filter-form"
-                >
-                  <label htmlFor="order-prefix">Filtern nach Auftrags:</label>
-                  <input
-                      type="text"
-                      id="order-prefix"
-                      placeholder="Geben Sie das Auftragsnummer ein (z. B. 2516024)"
-                      value={orderPrefix}
-                      onChange={(e) => setOrderPrefix(e.target.value)}
-                  />
-                  <button type="submit" className="btn btn-filter">Versuchen</button>
-                  <button
-                      type="button"
-                      className="btn btn-check-all"
-                      onClick={fetchReservedItems}
-                  >
-                    Zurücksetzen
-                  </button>
-                </form>
               </>
           )}
 
