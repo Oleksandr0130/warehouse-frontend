@@ -106,25 +106,25 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
 
             {/* Форма для фильтрации по префиксу заказа */}
             <form onSubmit={handleFilterByOrderPrefix} className="filter-form">
-                <label htmlFor="order-prefix">Фильтр по префиксу заказа:</label>
+                <label htmlFor="order-prefix">Filtern nach Auftragsnummer:</label>
                 <input
                     type="text"
                     id="order-prefix"
-                    placeholder="Введите префикс заказа (например, ORD123)"
+                    placeholder="Geben Sie das Auftragsnummer ein (z. B. 2516024)"
                     value={orderPrefix}
                     onChange={(e) => setOrderPrefix(e.target.value)}
                     disabled={loading}
                 />
                 <div className="btn-group">
                     <button type="submit" className="btn btn-filter" disabled={loading}>
-                        Применить
+                        Anwenden
                     </button>
                     <button
                         type="button"
                         className="btn btn-check-all"
                         disabled={loading}
                     >
-                        Сбросить
+                        Zurücksetzen
                     </button>
                 </div>
             </form>
