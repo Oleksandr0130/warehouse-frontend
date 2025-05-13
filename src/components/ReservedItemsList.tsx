@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ReservedItem } from '../types/ReservedItem';
 import '../styles/ReservedItemList.css';
 import QRScanner from './QRScanner';
-import api from '../api';
+import api, {fetchReservationsByOrderPrefix} from '../api';
 import {toast} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -12,6 +12,8 @@ interface ReservedItemsListProps {
     onWeekFilter: (week: string) => void; // Метод для фильтрации по неделе
     onShowAll: () => void; // Метод для отображения всех товаров
     onReservationRemoved: (updatedItemId: string, returnedQuantity: number) => void; // Новый callback для обновления Warehouse Item
+    onSetReservedItems: (updatedItems: ReservedItem[]) => void;
+
 }
 
 const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
@@ -20,9 +22,12 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                                                                  onWeekFilter,
                                                                  onShowAll,
                                                                  onReservationRemoved,
+                                                                 onSetReservedItems,
                                                              }) => {
     const [showScanner, setShowScanner] = useState(false);
     const [filterWeek, setFilterWeek] = useState('');
+    const [orderPrefix, setOrderPrefix] = useState(''); // Поле для ввода префикса
+
 
     const handleScanClose = () => {
         setShowScanner(false);
@@ -37,6 +42,23 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
         onWeekFilter(filterWeek);
         toast.success(`Gefiltert nach Woche: ${filterWeek}`);
     };
+
+    const handleOrderPrefixSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        if (orderPrefix.trim() === '') {
+            toast.error('Пожалуйста, введите префикс.');
+            return;
+        }
+        try {
+            const filteredReservations = await fetchReservationsByOrderPrefix(orderPrefix);
+            onSetReservedItems(filteredReservations); // Обновляем список, применив фильтр
+            toast.success(`Резервирования с префиксом "${orderPrefix}" получены.`);
+        } catch (error) {
+            console.error('Ошибка загрузки резервов по префиксу:', error);
+            toast.error('Не удалось найти резервирования по указанному префиксу.');
+        }
+    };
+
 
     const handleShowAll = () => {
         setFilterWeek('');
@@ -89,6 +111,22 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                 <button type="submit" className="btn btn-filter">
                     Filter anwenden
                 </button>
+
+                {/* Фильтрация по префиксу orderNumber */}
+                <form onSubmit={handleOrderPrefixSubmit} className="filter-form">
+                    <label htmlFor="order-prefix-filter">Префикс заказа:</label>
+                    <input
+                        type="text"
+                        id="order-prefix-filter"
+                        placeholder="Введите префикс заказа"
+                        value={orderPrefix}
+                        onChange={(e) => setOrderPrefix(e.target.value)}
+                    />
+                    <button type="submit" className="btn btn-filter">
+                        Найти резервации
+                    </button>
+                </form>
+
                 <button type="button" className="btn btn-check-all" onClick={handleShowAll}>
                     Alle anzeigen
                 </button>

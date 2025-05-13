@@ -236,6 +236,11 @@ function App() {
     toast.success('Резервация удалена.');
   };
 
+  const updateReservedItems = (updatedItems: ReservedItem[]) => {
+    setReservedItems(updatedItems);
+  };
+
+
   // Авторизация
   const handleAuthSuccess = () => {
     setIsAuthenticated(true);
@@ -414,6 +419,7 @@ function App() {
                     }}
                     onShowAll={fetchReservedItems}
                     onReservationRemoved={handleReservationRemoved}
+                    onSetReservedItems={updateReservedItems}
                 />
               </>
           )}
