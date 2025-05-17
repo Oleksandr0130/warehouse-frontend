@@ -27,8 +27,17 @@ export const fetchReservationsByOrderPrefix = async (prefix: string): Promise<Re
 export const registerUser = (data: { username: string; email: string; password: string; role: string }) =>
     api.post('/auth/register', data);
 
-export const loginUser = (data: { username: string; password: string }) =>
-    api.post('/auth/login', data);
+// export const loginUser = (data: { username: string; password: string }) =>
+//     api.post('/auth/login', data);
+
+export const loginUser = async (credentials: { username: string; password: string }) => {
+    return await axios.post(
+        '/auth/login',
+        credentials,
+        { withCredentials: true } // Важно для отправки и получения HttpOnly cookies
+    );
+};
+
 
 export const confirmEmail = (code: string) =>
     api.get(`/confirmation?code=${code}`);
