@@ -45,7 +45,7 @@ api.interceptors.request.use(
         if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
-        console.log(`API Request -> ${config.method?.toUpperCase()} ${config.url}`, config.params || {});
+        // console.log(`API Request -> ${config.method?.toUpperCase()} ${config.url}`, config.params || {});
         return config;
     },
     (error) => {
@@ -57,7 +57,7 @@ api.interceptors.request.use(
 // Интерцептор ответа: автоматическое обновление Access Token при истечении
 api.interceptors.response.use(
     (response) => {
-        console.log(`API Response <- ${response.status} ${response.config.url}`, response.data);
+        // console.log(`API Response <- ${response.status} ${response.config.url}`, response.data);
         return response;
     },
     async (error) => {
@@ -68,7 +68,7 @@ api.interceptors.response.use(
             originalRequest._retry = true; // Устанавливаем флаг, чтобы не выполнить запрос повторно
 
             try {
-                console.log('Access Token истек. Выполняем обновление через Refresh Token...');
+                // console.log('Access Token истек. Выполняем обновление через Refresh Token...');
 
                 // Получаем Refresh Token из localStorage
                 const refreshToken = localStorage.getItem('refreshToken');
