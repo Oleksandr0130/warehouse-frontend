@@ -49,3 +49,10 @@
 .file-list .file-link:visited {
     color: darkgreen;
 }
+
+.qr-code-image {
+    max-width: 200px;
+    max-height: 200px;
+    border: 1px solid #ccc;
+    margin: 10px;
+}
