@@ -120,45 +120,27 @@ function App() {
   };
 
 
-  // // Загрузка зарезервированных товаров
-  // const fetchReservedItems = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const response = await api.get('/reservations');
-  //     const data = response.data.map((item: ReservationData) => ({
-  //       id: item.id?.toString() || '',
-  //       name: item.itemName || '',
-  //       quantity: item.reservedQuantity || 0,
-  //       orderNumber: item.orderNumber || '',
-  //       week: item.reservationWeek || '',
-  //     }));
-  //     setReservedItems(data);
-  //   } catch (error) {
-  //     console.error('Ошибка загрузки зарезервированных товаров:', error);
-  //     toast.error('Ошибка загрузки зарезервированных товаров.');
-  //     setReservedItems([]);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
+  // Загрузка зарезервированных товаров
   const fetchReservedItems = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/folders/reservation/qrcodes');
-      const data = response.data.map((file: string) => ({
-        id: file, // ID резервации
-        qrCodeUrl: `/folders/reservation/${file}/qrcode` // Генерируем URL для QR-кода
+      const response = await api.get('/reservations');
+      const data = response.data.map((item: ReservationData) => ({
+        id: item.id?.toString() || '',
+        name: item.itemName || '',
+        quantity: item.reservedQuantity || 0,
+        orderNumber: item.orderNumber || '',
+        week: item.reservationWeek || '',
       }));
       setReservedItems(data);
     } catch (error) {
       console.error('Ошибка загрузки зарезервированных товаров:', error);
       toast.error('Ошибка загрузки зарезервированных товаров.');
+      setReservedItems([]);
     } finally {
       setLoading(false);
     }
   };
-
 
   // Загрузка продаж
   const fetchSoldReservations = async () => {
@@ -189,70 +171,37 @@ function App() {
     }
   };
 
-  // // Обработка QR-кодов
-  // const handleScan = async (id: string) => {
-  //   setShowScanner(false);
-  //   if (!scannerAction) return;
-  //
-  //   const quantityStr = prompt(`Введите количество для ${scannerAction === 'add' ? 'добавления' : 'удаления'}:`);
-  //   if (!quantityStr || isNaN(Number(quantityStr))) {
-  //     toast.error('Введите корректное числовое значение.');
-  //     return;
-  //   }
-  //
-  //   const quantity = parseInt(quantityStr);
-  //   if (quantity <= 0) {
-  //     toast.error('Количество должно быть больше 0.');
-  //     return;
-  //   }
-  //
-  //   try {
-  //     setLoading(true);
-  //     await api.put(`/items/${id}/${scannerAction}`, null, { params: { quantity } });
-  //     toast.success(
-  //         `Операция "${scannerAction === 'add' ? 'Добавление' : 'Удаление'}" успешно завершена. Количество: ${quantity}.`
-  //     );
-  //     fetchItems(sortCriteria);
-  //   } catch (error) {
-  //     console.error('Ошибка при выполнении операции:', error);
-  //     toast.error('Ошибка при выполнении операции.');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
+  // Обработка QR-кодов
   const handleScan = async (id: string) => {
     setShowScanner(false);
     if (!scannerAction) return;
 
+    const quantityStr = prompt(`Введите количество для ${scannerAction === 'add' ? 'добавления' : 'удаления'}:`);
+    if (!quantityStr || isNaN(Number(quantityStr))) {
+      toast.error('Введите корректное числовое значение.');
+      return;
+    }
+
+    const quantity = parseInt(quantityStr);
+    if (quantity <= 0) {
+      toast.error('Количество должно быть больше 0.');
+      return;
+    }
+
     try {
       setLoading(true);
-      // Воспользуемся эндпоинтом по ID
-      const endpoint = scannerAction === 'add'
-          ? `/folders/item/${id}/qrcode`
-          : `/folders/reservation/${id}/qrcode`;
-
-      const response = await api.get(endpoint, { responseType: 'arraybuffer' });
-
-      // Преобразование файла QR-кода в Blob для загрузки
-      const qrBlob = new Blob([response.data], { type: 'image/png' });
-      const qrUrl = window.URL.createObjectURL(qrBlob);
-
-      // Сохранение QR-кода (опционально)
-      const link = document.createElement('a');
-      link.href = qrUrl;
-      link.download = `qr-${id}.png`;
-      link.click();
-
-      toast.success(`QR-код успешно обработан для ${scannerAction === 'add' ? 'добавления' : 'удаления'}.`);
+      await api.put(`/items/${id}/${scannerAction}`, null, { params: { quantity } });
+      toast.success(
+          `Операция "${scannerAction === 'add' ? 'Добавление' : 'Удаление'}" успешно завершена. Количество: ${quantity}.`
+      );
+      fetchItems(sortCriteria);
     } catch (error) {
-      console.error('Ошибка при обработке QR-кода:', error);
-      toast.error('Ошибка при обработке QR-кода.');
+      console.error('Ошибка при выполнении операции:', error);
+      toast.error('Ошибка при выполнении операции.');
     } finally {
       setLoading(false);
     }
   };
-
 
   // Обработка сканирования для резерваций
   const handleReservedItemScan = async (orderNumber: string) => {
