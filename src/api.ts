@@ -22,20 +22,6 @@ export const fetchReservationsByOrderPrefix = async (prefix: string): Promise<Re
     return response.data;
 };
 
-// Получение QR-кода для определенного товара
-export const fetchItemQRCode = async (itemId: string): Promise<Blob> => {
-    try {
-        const response = await axios.get(`/items/${itemId}/qrcode`, {
-            responseType: 'arraybuffer', // Чтобы данные приходили как бинарный массив
-        });
-        return new Blob([response.data], { type: 'image/png' });
-    } catch (error) {
-        console.error(`Ошибка при получении QR-кода для товара с ID ${itemId}:`, error);
-        throw error; // Выброс ошибки, чтобы обработка была на фронтенде
-    }
-};
-
-
 
 // Функции для регистрации пользователя, входа, подтверждения email
 export const registerUser = (data: { username: string; email: string; password: string; role: string }) =>
