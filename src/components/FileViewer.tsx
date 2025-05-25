@@ -13,7 +13,7 @@ const FileViewer: React.FC = () => {
         const fetchQrFiles = async () => {
             try {
                 // Получаем файлы QR-кодов с backend
-                const response = await api.get('/folders/qrcodes');
+                const response = await api.get('/folders/item/qrcodes');
                 setQrFiles(
                     response.data.map((file: string) => `${baseURL}${file}`)
                 );
@@ -25,7 +25,7 @@ const FileViewer: React.FC = () => {
         const fetchReservationFiles = async () => {
             try {
                 // Получаем резервные файлы с backend
-                const response = await api.get('/folders/reservation');
+                const response = await api.get('/folders/reservation/qrcodes');
                 setReservationFiles(
                     response.data.map(
                         (file: string) => `${baseURL}${file}`
