@@ -125,14 +125,20 @@ interface QRFile {
 //     );
 // };
 
+
+interface ReservationFile {
+    id: string; // ID резервации
+    qrCode: string; // Base64 строка QR-кода резервации
+}
+
 const FileViewer: React.FC = () => {
-    const [qrFiles, setQrFiles] = useState<QRFile[]>([]); // Состояние для QR-кодов с их ID
-    const [reservationFiles, setReservationFiles] = useState<string[]>([]); // Состояние для резервных файлов
+    const [qrFiles, setQrFiles] = useState<QRFile[]>([]); // Состояние для QR-кодов товаров
+    const [reservationFiles, setReservationFiles] = useState<ReservationFile[]>([]); // Состояние для QR-кодов резервации
     const [showModal, setShowModal] = useState(false); // Состояние для отображения модального окна
     const [activeQrCode, setActiveQrCode] = useState<string | null>(null); // Храним QR-код для модального окна
 
     useEffect(() => {
-        // Получение данных QR-кодов
+        // Получение данных QR-кодов товаров
         const fetchQrFiles = async () => {
             try {
                 const response = await api.get('/items'); // Эндпоинт возвращает все данные товара
@@ -142,19 +148,21 @@ const FileViewer: React.FC = () => {
                 }));
                 setQrFiles(qrBase64Files);
             } catch (error) {
-                console.error('Ошибка при загрузке QR-кодов:', error);
+                console.error('Ошибка при загрузке QR-кодов товаров:', error);
             }
         };
 
-        // Получение резервных файлов
+        // Получение данных QR-кодов резерваций
         const fetchReservationFiles = async () => {
             try {
-                const response = await api.get('/folders/reservation');
-                setReservationFiles(
-                    response.data.map((file: string) => `${file}`)
-                );
+                const response = await api.get('/reservations'); // Эндпоинт возвращает резервации
+                const reservationFiles = response.data.map((reservation: { id: string; qrCode: string }) => ({
+                    id: reservation.id, // Используем ID резервации
+                    qrCode: reservation.qrCode, // Base64 строка QR-кода резервации
+                }));
+                setReservationFiles(reservationFiles);
             } catch (error) {
-                console.error('Ошибка при загрузке резервных файлов:', error);
+                console.error('Ошибка при загрузке QR-кодов резерваций:', error);
             }
         };
 
@@ -164,9 +172,10 @@ const FileViewer: React.FC = () => {
     }, []);
 
     // Обработчик для скачивания QR-кода
-    const handleDownloadQRCode = async (id: string) => {
+    const handleDownloadQRCode = async (id: string, type: 'item' | 'reservation') => {
         try {
-            const response = await api.get(`/items/${id}/download-qrcode`, {
+            const endpoint = type === 'item' ? `/items/${id}/download-qrcode` : `/reservations/${id}/download-qrcode`;
+            const response = await api.get(endpoint, {
                 responseType: 'blob',
             });
             const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -196,21 +205,21 @@ const FileViewer: React.FC = () => {
 
     return (
         <div className="file-viewer-container">
+            {/* QR-коды товаров */}
             <h1 className="file-viewer-title">Lager QR</h1>
             <ul className="file-list">
                 {qrFiles.map((file) => (
                     <li className="file-item" key={file.id}>
-                        {/* Отображение изображения QR-кода */}
                         <img
                             src={`data:image/png;base64,${file.qrCode}`}
-                            alt={`QR код ${file.id}`}
+                            alt={`QR код товара ${file.id}`}
                             className="qr-image"
                             onClick={() => handleImageClick(file.qrCode)} // Открытие модального окна
                         />
-                        <span className="file-name">{file.id}</span>
+                        <span className="file-name">Товар ID: {file.id}</span>
                         <button
                             className="download-button"
-                            onClick={() => handleDownloadQRCode(file.id)}
+                            onClick={() => handleDownloadQRCode(file.id, 'item')}
                         >
                             Скачать
                         </button>
@@ -218,18 +227,24 @@ const FileViewer: React.FC = () => {
                 ))}
             </ul>
 
+            {/* QR-коды резерваций */}
             <h1 className="file-viewer-title">Reserved QR</h1>
             <ul className="file-list">
-                {reservationFiles.map((file, index) => (
-                    <li className="file-item" key={index}>
-                        <a
-                            href={file}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="file-link"
+                {reservationFiles.map((file) => (
+                    <li className="file-item" key={file.id}>
+                        <img
+                            src={`data:image/png;base64,${file.qrCode}`}
+                            alt={`QR код резервации ${file.id}`}
+                            className="qr-image"
+                            onClick={() => handleImageClick(file.qrCode)} // Открытие модального окна
+                        />
+                        <span className="file-name">Резервация ID: {file.id}</span>
+                        <button
+                            className="download-button"
+                            onClick={() => handleDownloadQRCode(file.id, 'reservation')}
                         >
-                            {file.split('/').pop()}
-                        </a>
+                            Скачать
+                        </button>
                     </li>
                 ))}
             </ul>
@@ -253,5 +268,5 @@ const FileViewer: React.FC = () => {
     );
 };
 
-
 export default FileViewer;
+
