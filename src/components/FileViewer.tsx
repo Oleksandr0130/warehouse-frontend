@@ -129,6 +129,7 @@ interface QRFile {
 interface ReservationFile {
     id: string; // ID резервации
     qrCode: string; // Base64 строка QR-кода резервации
+    orderNumber: string; // Номер заказа
 }
 
 const FileViewer: React.FC = () => {
@@ -156,9 +157,10 @@ const FileViewer: React.FC = () => {
         const fetchReservationFiles = async () => {
             try {
                 const response = await api.get('/reservations'); // Эндпоинт возвращает резервации
-                const reservationFiles = response.data.map((reservation: { id: string; qrCode: string }) => ({
+                const reservationFiles = response.data.map((reservation: { id: string; qrCode: string; orderNumber: string }) => ({
                     id: reservation.id, // Используем ID резервации
                     qrCode: reservation.qrCode, // Base64 строка QR-кода резервации
+                    orderNumber: reservation.orderNumber, // Номер заказа
                 }));
                 setReservationFiles(reservationFiles);
             } catch (error) {
@@ -234,11 +236,11 @@ const FileViewer: React.FC = () => {
                     <li className="file-item" key={file.id}>
                         <img
                             src={`data:image/png;base64,${file.qrCode}`}
-                            alt={`QR код резервации ${file.id}`}
+                            alt={`QR код резервации ${file.orderNumber}`}
                             className="qr-image"
                             onClick={() => handleImageClick(file.qrCode)} // Открытие модального окна
                         />
-                        <span className="file-name">Резервация ID: {file.id}</span>
+                        <span className="file-name">Номер заказа: {file.orderNumber}</span> {/* Отображаем номер заказа */}
                         <button
                             className="download-button"
                             onClick={() => handleDownloadQRCode(file.id, 'reservation')}
@@ -269,4 +271,5 @@ const FileViewer: React.FC = () => {
 };
 
 export default FileViewer;
+
 
