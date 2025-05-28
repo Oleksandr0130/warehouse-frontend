@@ -139,6 +139,7 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 interface ReserveFormProps {
+    items: Item[]; // Добавляем пропс для передачи массива товаров
     onReserveComplete: () => void; // Функция для обновления списка резерваций
     onUpdateItems: (itemId: string, reservedQuantity: number) => void; // Функция для обновления количества товаров
 }
