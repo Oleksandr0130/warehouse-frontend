@@ -135,34 +135,42 @@
 import React, { useState } from 'react';
 import { Item } from '../types/Item';
 import '../styles/ReserveForm.css';
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface ReserveFormProps {
-    items: Item[];
+    items: Item[]; // Список товаров передаётся через пропсы
     onReserveComplete: () => void; // Функция для обновления списка резерваций
     onUpdateItems: (itemId: string, reservedQuantity: number) => void; // Функция для обновления количества товаров
 }
 
 const ReserveForm: React.FC<ReserveFormProps> = ({
+                                                     items,
                                                      onReserveComplete,
                                                      onUpdateItems,
                                                  }) => {
     const [selectedItem, setSelectedItem] = useState<Item | null>(null); // Выбранный товар
     const [quantity, setQuantity] = useState<number>(1); // Количество
     const [week, setWeek] = useState<string>(''); // Выбранная неделя
-    const [orderNumber, setOrderNumber] = useState<string>(''); // Заказ
-    const [searchQuery, setSearchQuery] = useState<string>(''); // Введённый текст
-    const [suggestions, setSuggestions] = useState<Item[]>([]); // Список автозаполнения
+    const [orderNumber, setOrderNumber] = useState<string>(''); // Номер заказа
+    const [searchQuery, setSearchQuery] = useState<string>(''); // Поле для поиска
+    const [suggestions, setSuggestions] = useState<Item[]>([]); // Список подсказок
 
-    const fetchSuggestions = async (query: string) => {
-        try {
-            const response = await fetch(`/api/reservations/search/by-item-name?itemName=${query}`);
-            const result: Item[] = await response.json();
-            setSuggestions(result);
-        } catch (error) {
-            console.error('Ошибка загрузки подсказок:', error);
+    // Локальный поиск внутри массива items
+    const fetchSuggestions = (query: string) => {
+        if (!query) {
+            setSuggestions([]);
+            return;
         }
+
+        const lowerCaseQuery = query.toLowerCase();
+
+        // Поиск в списке товаров (игнорирует регистр)
+        const filteredItems = items.filter((item) =>
+            item.name.toLowerCase().includes(lowerCaseQuery)
+        );
+
+        setSuggestions(filteredItems);
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -170,16 +178,16 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
         setSearchQuery(value);
 
         if (value.length > 2) {
-            fetchSuggestions(value); // Запрашиваем сервер только при вводе от 3 символов
+            fetchSuggestions(value); // Показываем подсказки только при вводе от 3 символов
         } else {
-            setSuggestions([]); // Если мало символов, очищаем подсказки
+            setSuggestions([]); // Очищаем подсказки, если ввод слишком короткий
         }
     };
 
     const handleSelectItem = (item: Item) => {
-        setSelectedItem(item); // Устанавливаем выбранный товар
-        setSearchQuery(item.name); // Отображаем его имя в поле ввода
-        setSuggestions([]); // Скрываем список подсказок
+        setSelectedItem(item); // Устанавливаем выбранный товар в состоянии
+        setSearchQuery(item.name); // Показываем его название в поле поиска
+        setSuggestions([]); // Закрываем выпадающий список
     };
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -187,12 +195,12 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
 
         // Проверка на заполненность полей
         if (!selectedItem || !week || quantity <= 0 || !orderNumber) {
-            toast.error('Bitte füllen Sie alle Felder korrekt aus.'); // Ошибка toast вместо alert
+            toast.error('Заполните все поля корректно!'); // Ошибка через toast
             return;
         }
 
         try {
-            // Отправка запроса на сервер для создания резервации
+            // Здесь отправляется запрос на создание резервации
             await fetch('/api/reservations', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -204,43 +212,39 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
                 }),
             });
 
-            // Уменьшаем локальное количество предметов на складе
-            onUpdateItems(selectedItem.id, quantity);
+            // После успешного резервирования обновляем локальные данные
+            onUpdateItems(selectedItem.id, quantity); // Уменьшаем количество товара локально
+            onReserveComplete(); // Обновляем общий список резерваций
 
-            // Обновляем список резерваций
-            onReserveComplete();
+            toast.success('Резервация успешно создана!'); // Успешное уведомление через toast
 
-            // Уведомление об успехе через toast
-            toast.success('Reservierung erfolgreich erstellt!');
-
-            // Сбрасываем форму
+            // Сбрасываем состояния формы
             setSelectedItem(null);
             setSearchQuery('');
             setQuantity(1);
             setWeek('');
             setOrderNumber('');
         } catch (error) {
-            console.error('Fehler beim Erstellen der Reservierung:', error);
-
-            // Уведомление об ошибке через toast
-            toast.error('Fehler beim Erstellen der Reservierung.');
+            console.error('Ошибка создания резервации:', error);
+            toast.error('Ошибка при создании резервации!');
         }
     };
 
     return (
         <form onSubmit={handleSubmit} className="reserve-form">
-            <h3>Create a Reservation</h3>
+            <h3>Создать резервацию</h3>
 
+            {/* Поле для поиска товаров */}
             <div className="form-group">
-                <label htmlFor="item-input">Artikel eingeben:</label>
+                <label htmlFor="item-input">Введите название товара:</label>
                 <input
                     type="text"
                     id="item-input"
-                    placeholder="Artikelname eingeben..."
+                    placeholder="Введите название товара..."
                     value={searchQuery}
                     onChange={handleInputChange}
                 />
-                {/* Выпадающий список подсказок */}
+                {/* Выпадающий список с подсказками */}
                 {suggestions.length > 0 && (
                     <ul className="suggestions">
                         {suggestions.map((item) => (
@@ -248,15 +252,16 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
                                 key={item.id}
                                 onClick={() => handleSelectItem(item)}
                             >
-                                {item.name} (Available: {item.quantity})
+                                {item.name} (Доступно: {item.quantity})
                             </li>
                         ))}
                     </ul>
                 )}
             </div>
 
+            {/* Поле для ввода количества */}
             <div className="form-group">
-                <label htmlFor="quantity-input">Menge:</label>
+                <label htmlFor="quantity-input">Количество:</label>
                 <input
                     type="number"
                     id="quantity-input"
@@ -266,30 +271,33 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
                 />
             </div>
 
+            {/* Поле для ввода недели */}
             <div className="form-group">
-                <label htmlFor="week-input">Reservierung KW:</label>
+                <label htmlFor="week-input">Неделя резервации:</label>
                 <input
                     type="text"
                     id="week-input"
-                    placeholder="KW eingeben (z. B. KW42)"
+                    placeholder="Введите неделю (например, 42)"
                     value={week}
                     onChange={(e) => setWeek(e.target.value)}
                 />
             </div>
 
+            {/* Поле для ввода номера заказа */}
             <div className="form-group">
-                <label htmlFor="order-number-input">Auftragsnummer:</label>
+                <label htmlFor="order-number-input">Номер заказа:</label>
                 <input
                     type="text"
                     id="order-number-input"
-                    placeholder="Auftragsnummer eingeben"
+                    placeholder="Введите номер заказа"
                     value={orderNumber}
                     onChange={(e) => setOrderNumber(e.target.value)}
                 />
             </div>
 
+            {/* Кнопка отправки */}
             <button type="submit" className="btn btn-submit">
-                Reservierung erstellen
+                Создать резервацию
             </button>
         </form>
     );
