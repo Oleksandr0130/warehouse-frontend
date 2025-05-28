@@ -157,7 +157,7 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
 
     const fetchSuggestions = async (query: string) => {
         try {
-            const response = await fetch(`/reservations/search/by-item-name?itemName=${query}`);
+            const response = await fetch(`/api/reservations/search/by-item-name?itemName=${query}`);
             const result: Item[] = await response.json();
             setSuggestions(result);
         } catch (error) {
