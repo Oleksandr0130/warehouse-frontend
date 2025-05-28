@@ -232,15 +232,15 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
 
     return (
         <form onSubmit={handleSubmit} className="reserve-form">
-            <h3>Создать резервацию</h3>
+            <h3>Erstellen einer Reservierung</h3>
 
             {/* Поле для поиска товаров */}
             <div className="form-group">
-                <label htmlFor="item-input">Введите название товара:</label>
+                <label htmlFor="item-input">Geben Sie den Produktnamen ein:</label>
                 <input
                     type="text"
                     id="item-input"
-                    placeholder="Введите название товара..."
+                    placeholder="Produktnamen eingeben...(z. B. LK2)"
                     value={searchQuery}
                     onChange={handleInputChange}
                 />
@@ -252,7 +252,7 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
                                 key={item.id}
                                 onClick={() => handleSelectItem(item)}
                             >
-                                {item.name} (Доступно: {item.quantity})
+                                {item.name} (Verfügbar: {item.quantity})
                             </li>
                         ))}
                     </ul>
@@ -261,7 +261,7 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
 
             {/* Поле для ввода количества */}
             <div className="form-group">
-                <label htmlFor="quantity-input">Количество:</label>
+                <label htmlFor="quantity-input">Menge:</label>
                 <input
                     type="number"
                     id="quantity-input"
@@ -273,11 +273,11 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
 
             {/* Поле для ввода недели */}
             <div className="form-group">
-                <label htmlFor="week-input">Неделя резервации:</label>
+                <label htmlFor="week-input">Reservierung KW: </label>
                 <input
                     type="text"
                     id="week-input"
-                    placeholder="Введите неделю (например, 42)"
+                    placeholder="KW eingeben (z. B. 42)"
                     value={week}
                     onChange={(e) => setWeek(e.target.value)}
                 />
@@ -285,11 +285,11 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
 
             {/* Поле для ввода номера заказа */}
             <div className="form-group">
-                <label htmlFor="order-number-input">Номер заказа:</label>
+                <label htmlFor="order-number-input">Auftragsnummer:</label>
                 <input
                     type="text"
                     id="order-number-input"
-                    placeholder="Введите номер заказа"
+                    placeholder="Auftragsnummer eingeben"
                     value={orderNumber}
                     onChange={(e) => setOrderNumber(e.target.value)}
                 />
@@ -297,7 +297,7 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
 
             {/* Кнопка отправки */}
             <button type="submit" className="btn btn-submit">
-                Создать резервацию
+                Reservierung erstellen
             </button>
         </form>
     );
