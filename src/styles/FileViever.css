@@ -141,14 +141,15 @@
 }
 
 .accordion-content {
-    padding: 15px;
-    background-color: #fff;
-    display: none;
+    max-height: 0px; /* Свёрнутое состояние */
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out; /* Анимация разворачивания */
 }
 
 .accordion-content.open {
-    display: block;
+    max-height: 1000px; /* Развёрнутый блок, значение можно поставить больше */
 }
+
 
 .arrow {
     transition: transform 0.2s;

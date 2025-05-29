@@ -134,14 +134,13 @@ interface ReservationFile {
 }
 
 const FileViewer: React.FC = () => {
-    const [qrFiles, setQrFiles] = useState<QRFile[]>([]); // Состояние для QR-кодов товаров
-    const [reservationFiles, setReservationFiles] = useState<ReservationFile[]>([]); // Состояние для QR-кодов резервации
+    const [qrFiles, setQrFiles] = useState<QRFile[]>([]);
+    const [reservationFiles, setReservationFiles] = useState<ReservationFile[]>([]);
 
     useEffect(() => {
-        // Получение данных QR-кодов товаров
         const fetchQrFiles = async () => {
             try {
-                const response = await api.get('/items'); // Эндпоинт возвращает все данные товара
+                const response = await api.get('/items');
                 const qrBase64Files = response.data.map((item: { id: string; qrCode: string }) => ({
                     id: item.id,
                     qrCode: item.qrCode,
@@ -152,35 +151,30 @@ const FileViewer: React.FC = () => {
             }
         };
 
-        // Получение данных QR-кодов резерваций
         const fetchReservationFiles = async () => {
             try {
-                const response = await api.get('/reservations'); // Эндпоинт возвращает резервации
-                const reservationFiles = response.data.map(
+                const response = await api.get('/reservations');
+                const reservationBase64Files = response.data.map(
                     (reservation: { id: string; qrCode: string; orderNumber: string }) => ({
                         id: reservation.id,
                         qrCode: reservation.qrCode,
                         orderNumber: reservation.orderNumber,
                     })
                 );
-                setReservationFiles(reservationFiles);
+                setReservationFiles(reservationBase64Files);
             } catch (error) {
                 console.error('Ошибка при загрузке QR-кодов резерваций:', error);
             }
         };
 
-        // Вызов функций
         fetchQrFiles();
         fetchReservationFiles();
     }, []);
 
-    // Обработчик для скачивания QR-кода
     const handleDownloadQRCode = async (id: string, type: 'item' | 'reservation') => {
         try {
             const endpoint = type === 'item' ? `/items/${id}/download-qrcode` : `/reservations/${id}/download-qrcode`;
-            const response = await api.get(endpoint, {
-                responseType: 'blob',
-            });
+            const response = await api.get(endpoint, { responseType: 'blob' });
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
@@ -244,6 +238,7 @@ const FileViewer: React.FC = () => {
 };
 
 export default FileViewer;
+
 
 
 
