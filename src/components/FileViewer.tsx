@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/FileViever.css';
 import api from '../api';
+import Accordion from './Accordion';
 
 interface QRFile {
     id: string; // ID элемента
@@ -135,8 +136,6 @@ interface ReservationFile {
 const FileViewer: React.FC = () => {
     const [qrFiles, setQrFiles] = useState<QRFile[]>([]); // Состояние для QR-кодов товаров
     const [reservationFiles, setReservationFiles] = useState<ReservationFile[]>([]); // Состояние для QR-кодов резервации
-    const [showModal, setShowModal] = useState(false); // Состояние для отображения модального окна
-    const [activeQrCode, setActiveQrCode] = useState<string | null>(null); // Храним QR-код для модального окна
 
     useEffect(() => {
         // Получение данных QR-кодов товаров
@@ -144,8 +143,8 @@ const FileViewer: React.FC = () => {
             try {
                 const response = await api.get('/items'); // Эндпоинт возвращает все данные товара
                 const qrBase64Files = response.data.map((item: { id: string; qrCode: string }) => ({
-                    id: item.id, // Используем ID для подписей
-                    qrCode: item.qrCode, // Base64 строка QR-кода
+                    id: item.id,
+                    qrCode: item.qrCode,
                 }));
                 setQrFiles(qrBase64Files);
             } catch (error) {
@@ -157,11 +156,13 @@ const FileViewer: React.FC = () => {
         const fetchReservationFiles = async () => {
             try {
                 const response = await api.get('/reservations'); // Эндпоинт возвращает резервации
-                const reservationFiles = response.data.map((reservation: { id: string; qrCode: string; orderNumber: string }) => ({
-                    id: reservation.id, // Используем ID резервации
-                    qrCode: reservation.qrCode, // Base64 строка QR-кода резервации
-                    orderNumber: reservation.orderNumber, // Номер заказа
-                }));
+                const reservationFiles = response.data.map(
+                    (reservation: { id: string; qrCode: string; orderNumber: string }) => ({
+                        id: reservation.id,
+                        qrCode: reservation.qrCode,
+                        orderNumber: reservation.orderNumber,
+                    })
+                );
                 setReservationFiles(reservationFiles);
             } catch (error) {
                 console.error('Ошибка при загрузке QR-кодов резерваций:', error);
@@ -193,83 +194,56 @@ const FileViewer: React.FC = () => {
         }
     };
 
-    // Обработчик для отображения модального окна
-    const handleImageClick = (qrCode: string) => {
-        setActiveQrCode(qrCode); // Устанавливаем текущий QR-код для отображения
-        setShowModal(true); // Показываем модальное окно
-    };
-
-    // Обработчик для закрытия модального окна
-    const handleCloseModal = () => {
-        setShowModal(false); // Скрываем окно
-        setActiveQrCode(null); // Сбрасываем QR-код
-    };
-
     return (
         <div className="file-viewer-container">
-            {/* QR-коды товаров */}
-            <h1 className="file-viewer-title">Lager QR</h1>
-            <ul className="file-list">
-                {qrFiles.map((file) => (
-                    <li className="file-item" key={file.id}>
-                        <img
-                            src={`data:image/png;base64,${file.qrCode}`}
-                            alt={`QR код товара ${file.id}`}
-                            className="qr-image"
-                            onClick={() => handleImageClick(file.qrCode)} // Открытие модального окна
-                        />
-                        <span className="file-name">Товар ID: {file.id}</span>
-                        <button
-                            className="download-button"
-                            onClick={() => handleDownloadQRCode(file.id, 'item')}
-                        >
-                            Скачать
-                        </button>
-                    </li>
-                ))}
-            </ul>
+            {/* Аккордеон для QR-кодов товаров */}
+            <Accordion title="Lager QR">
+                <ul className="file-list">
+                    {qrFiles.map((file) => (
+                        <li className="file-item" key={file.id}>
+                            <img
+                                src={`data:image/png;base64,${file.qrCode}`}
+                                alt={`QR код товара ${file.id}`}
+                                className="qr-image"
+                            />
+                            <span className="file-name">Товар ID: {file.id}</span>
+                            <button
+                                className="download-button"
+                                onClick={() => handleDownloadQRCode(file.id, 'item')}
+                            >
+                                Скачать
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            </Accordion>
 
-            {/* QR-коды резерваций */}
-            <h1 className="file-viewer-title">Reserved QR</h1>
-            <ul className="file-list">
-                {reservationFiles.map((file) => (
-                    <li className="file-item" key={file.id}>
-                        <img
-                            src={`data:image/png;base64,${file.qrCode}`}
-                            alt={`QR код резервации ${file.orderNumber}`}
-                            className="qr-image"
-                            onClick={() => handleImageClick(file.qrCode)} // Открытие модального окна
-                        />
-                        <span className="file-name">Номер заказа: {file.orderNumber}</span> {/* Отображаем номер заказа */}
-                        <button
-                            className="download-button"
-                            onClick={() => handleDownloadQRCode(file.id, 'reservation')}
-                        >
-                            Скачать
-                        </button>
-                    </li>
-                ))}
-            </ul>
-
-            {/* Модальное окно */}
-            {showModal && activeQrCode && (
-                <div className="modal-overlay" onClick={handleCloseModal}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <img
-                            src={`data:image/png;base64,${activeQrCode}`}
-                            alt="QR Code"
-                            className="modal-image"
-                        />
-                        <button className="close-button" onClick={handleCloseModal}>
-                            Закрыть
-                        </button>
-                    </div>
-                </div>
-            )}
+            {/* Аккордеон для QR-кодов резерваций */}
+            <Accordion title="Reserved QR">
+                <ul className="file-list">
+                    {reservationFiles.map((file) => (
+                        <li className="file-item" key={file.id}>
+                            <img
+                                src={`data:image/png;base64,${file.qrCode}`}
+                                alt={`QR код резервации ${file.orderNumber}`}
+                                className="qr-image"
+                            />
+                            <span className="file-name">Номер заказа: {file.orderNumber}</span>
+                            <button
+                                className="download-button"
+                                onClick={() => handleDownloadQRCode(file.id, 'reservation')}
+                            >
+                                Скачать
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            </Accordion>
         </div>
     );
 };
 
 export default FileViewer;
+
 
 
