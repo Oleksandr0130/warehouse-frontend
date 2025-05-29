@@ -119,43 +119,4 @@
 .close-button:hover {
     background-color: #d32f2f; /* Более темный оттенок красного при наведении */
 }
-/* Стили аккордеона */
-.accordion-container {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.accordion-header {
-    background-color: #f7f7f7;
-    cursor: pointer;
-    padding: 10px 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 16px;
-    font-weight: bold;
-    border-bottom: 1px solid #ddd;
-}
-
-.accordion-content {
-    max-height: 0px; /* Свёрнутое состояние */
-    overflow: hidden;
-    transition: max-height 0.3s ease-in-out; /* Анимация разворачивания */
-}
-
-.accordion-content.open {
-    max-height: 1000px; /* Развёрнутый блок, значение можно поставить больше */
-}
-
-
-.arrow {
-    transition: transform 0.2s;
-}
-
-.accordion-header.open .arrow {
-    transform: rotate(90deg);
-}
 
