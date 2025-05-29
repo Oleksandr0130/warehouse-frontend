@@ -96,6 +96,8 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
         if (!confirm('Möchten Sie diese Reservierung wirklich löschen?')) return; // Подтверждение удаления
 
         try {
+            console.log("Удаление резервации с ID:", id);
+
             // Выполняем DELETE запрос
             const response = await api.delete(`/reservations/${id}`);
 
