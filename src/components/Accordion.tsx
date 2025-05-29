@@ -17,11 +17,16 @@ const Accordion: React.FC<AccordionProps> = ({ title, children }) => {
                 {title}
                 <span className="arrow">{isOpen ? "▼" : "▶"}</span>
             </div>
-            {isOpen && (
-                <div className="accordion-content">
-                    {children}
-                </div>
-            )}
+            <div
+                className={`accordion-content ${isOpen ? 'open' : ''}`}
+                style={{
+                    maxHeight: isOpen ? '1000px' : '0px', // Плавная анимация открытия
+                    overflow: 'hidden',
+                    transition: 'max-height 0.2s ease-out',
+                }}
+            >
+                {children}
+            </div>
         </div>
     );
 };
