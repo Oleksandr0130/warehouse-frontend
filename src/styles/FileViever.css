@@ -19,6 +19,35 @@
     padding-bottom: 5px;
 }
 
+/* Поле поиска */
+.search-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Кнопка для печати */
+.print-button {
+    display: block;
+    margin-bottom: 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+.print-button:hover {
+    background-color: #45a045;
+}
+
 /* Список файлов */
 .file-list {
     list-style: none;
@@ -29,27 +58,33 @@
 /* Элемент списка */
 .file-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     background-color: #f9f9f9;
     padding: 10px 15px;
     margin-bottom: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Изображение QR кода */
 .qr-image {
     width: 150px;
     height: 150px;
-    object-fit: contain; /* Предотвращает искажение */
+    object-fit: contain;
     margin-right: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
 }
+
+/* Название файла/товара */
 .file-name {
     font-size: 14px;
     margin-left: 15px;
+    flex-grow: 1; /* Заполняет оставшееся пространство */
 }
+
+/* Кнопка для скачивания */
 .download-button {
     margin-left: 15px;
     padding: 5px 10px;
@@ -62,24 +97,22 @@
 .download-button:hover {
     background-color: #0056b3;
 }
-.file-list {
-    list-style: none;
-    padding: 0;
-}
-.file-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
+
+/* Чекбокс выбора */
+.select-checkbox {
+    margin-right: 15px;
+    transform: scale(1.5); /* Увеличение размера чекбокса */
+    cursor: pointer;
 }
 
-/* Стили для модального окна */
+/* Модальное окно */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8); /* Полупрозрачный темный фон */
+    background-color: rgba(0, 0, 0, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -101,22 +134,21 @@
 
 .modal-image {
     max-width: 100%;
-    max-height: 80vh; /* Ограничиваем высоту изображения */
+    max-height: 80vh;
     margin-bottom: 20px;
 }
 
+/* Кнопка закрытия модального окна */
 .close-button {
-    background-color: #f44336; /* Красный цвет кнопки */
+    background-color: #f44336;
     color: #fff;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    align-self: flex-end; /* Располагаем кнопку справа */
+    align-self: flex-end;
 }
-
 .close-button:hover {
-    background-color: #d32f2f; /* Более темный оттенок красного при наведении */
+    background-color: #d32f2f;
 }
-
