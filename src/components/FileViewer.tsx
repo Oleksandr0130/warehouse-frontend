@@ -295,6 +295,7 @@ const FileViewer: React.FC = () => {
     const [activeQrCode, setActiveQrCode] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState(''); // Для поиска
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]); // Для отмеченных QR кодов
+    const [selectedReservations, setSelectedReservations] = useState<string[]>([]); // Для отмеченных резерваций
 
     useEffect(() => {
         const fetchQrFiles = async () => {
@@ -361,6 +362,7 @@ const FileViewer: React.FC = () => {
         setSearchTerm(event.target.value.toLowerCase());
     };
 
+    // Текущие чекбоксы выбора
     const toggleSelectFile = (id: string) => {
         if (selectedFiles.includes(id)) {
             setSelectedFiles(selectedFiles.filter((fileId) => fileId !== id));
@@ -369,16 +371,28 @@ const FileViewer: React.FC = () => {
         }
     };
 
+    const toggleSelectReservation = (id: string) => {
+        if (selectedReservations.includes(id)) {
+            setSelectedReservations(selectedReservations.filter((fileId) => fileId !== id));
+        } else {
+            setSelectedReservations([...selectedReservations, id]);
+        }
+    };
+
     const handlePrintSelected = () => {
-        if (selectedFiles.length === 0) {
+        if (selectedFiles.length === 0 && selectedReservations.length === 0) {
             alert('Вы не выбрали ни одного QR-кода для печати.');
             return;
         }
 
-        const selectedQrCodes = qrFiles
-            .filter((file) => selectedFiles.includes(file.id))
-            .map((file) => `<img src="data:image/png;base64,${file.qrCode}" style="margin: 10px; width: 200px; height: 200px;" />`)
-            .join('');
+        const selectedQrCodes = [
+            ...qrFiles
+                .filter((file) => selectedFiles.includes(file.id))
+                .map((file) => `<img src="data:image/png;base64,${file.qrCode}" style="margin: 10px; width: 200px; height: 200px;" />`),
+            ...reservationFiles
+                .filter((file) => selectedReservations.includes(file.id))
+                .map((file) => `<img src="data:image/png;base64,${file.qrCode}" style="margin: 10px; width: 200px; height: 200px;" />`),
+        ].join('');
 
         const printWindow = window.open('', '_blank');
         if (printWindow) {
@@ -445,7 +459,13 @@ const FileViewer: React.FC = () => {
             <h1 className="file-viewer-title">Reserved QR</h1>
             <ul className="file-list">
                 {reservationFiles.map((file) => (
-                    <li className="file-item" key={file.id}>
+                    <li className="file-item reservation" key={file.id}>
+                        <input
+                            type="checkbox"
+                            className="select-checkbox"
+                            checked={selectedReservations.includes(file.id)}
+                            onChange={() => toggleSelectReservation(file.id)}
+                        />
                         <img
                             src={`data:image/png;base64,${file.qrCode}`}
                             alt={`QR код резервации ${file.orderNumber}`}
