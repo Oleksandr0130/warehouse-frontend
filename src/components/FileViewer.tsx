@@ -421,7 +421,7 @@ const FileViewer: React.FC = () => {
             {/* Поле для поиска */}
             <input
                 type="text"
-                placeholder="Поиск по названию..."
+                placeholder="Suche nach Namen..."
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className="search-input"
@@ -429,7 +429,7 @@ const FileViewer: React.FC = () => {
 
             {/* Кнопка для печати выбранных QR-кодов */}
             <button className="print-button" onClick={handlePrintSelected}>
-                Печать выбранных
+                Drucken
             </button>
 
             <h1 className="file-viewer-title">Lager QR</h1>
@@ -448,9 +448,9 @@ const FileViewer: React.FC = () => {
                             className="qr-image"
                             onClick={() => handleImageClick(file.qrCode)}
                         />
-                        <span className="file-name">Товар ID: {file.id}</span>
+                        <span className="file-name">{file.id}</span>
                         <button className="download-button" onClick={() => handleDownloadQRCode(file.id, 'item')}>
-                            Скачать
+                            Laden
                         </button>
                     </li>
                 ))}
@@ -472,9 +472,9 @@ const FileViewer: React.FC = () => {
                             className="qr-image"
                             onClick={() => handleImageClick(file.qrCode)}
                         />
-                        <span className="file-name">Номер заказа: {file.orderNumber}</span>
+                        <span className="file-name">Auftragsnummer: {file.orderNumber}</span>
                         <button className="download-button" onClick={() => handleDownloadQRCode(file.id, 'reservation')}>
-                            Скачать
+                            Laden
                         </button>
                     </li>
                 ))}
@@ -485,7 +485,7 @@ const FileViewer: React.FC = () => {
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <img src={`data:image/png;base64,${activeQrCode}`} alt="QR Code" className="modal-image" />
                         <button className="close-button" onClick={handleCloseModal}>
-                            Закрыть
+                            Schließen
                         </button>
                     </div>
                 </div>
