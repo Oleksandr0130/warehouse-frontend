@@ -10,7 +10,7 @@ export default defineConfig(() => ({
     open: true,
     proxy: {
       "/api": {
-        target: "https://warehouse-qr-app-8adwv.ondigitalocean.app/api/", // Прокси для локальной разработки
+        target: "https://warehouse-qr-app-8adwv.ondigitalocean.app/", // Прокси для локальной разработки
         changeOrigin: true,
         secure: false,
       },
