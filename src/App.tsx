@@ -320,6 +320,13 @@ function App() {
               Abmelden
             </li>
           </ul>
+          <div
+              className="sidebar-footer"
+              onClick={() => setActiveMenu('about')} // Переключение на "О приложении"
+          >
+            <p>© 2025 Alexander Starikov. Alle Rechte vorbehalten.</p>
+          </div>
+
         </aside>
         <main className="app-main">
           {loading && <div className="loading-overlay">Laden...</div>}

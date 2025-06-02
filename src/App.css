@@ -156,3 +156,18 @@
     padding: 10px;
   }
 }
+
+.sidebar-footer {
+  margin-top: auto; /* Размещаем блок внизу */
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
+  color: #999;
+  cursor: pointer; /* Указатель мыши */
+  border-top: 1px solid #ddd;
+}
+
+.sidebar-footer:hover {
+  color: #555; /* Цвет текста при наведении */
+  text-decoration: underline; /* Подчеркивание текста при наведении */
+}

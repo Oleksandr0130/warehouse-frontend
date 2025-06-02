@@ -43,7 +43,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
                 </select>
                 <button type="submit">Registrieren</button>
             </form>
-            {/*{message && <p>{message}</p>}*/}
+            <p>© 2025 Alexander Starikov. Alle Rechte vorbehalten.</p>
         </div>
     );
 };
