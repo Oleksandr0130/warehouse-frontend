@@ -65,7 +65,9 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
 
             {/* Блок с информацией об авторских правах */}
             <footer className="login-footer">
-                <p>© 2025 Alexander Starikov. Alle Rechte vorbehalten.</p>
+                <p>© 2025 Alexander Starikov. <br/>
+                    <span>Alle Rechte vorbehalten.</span>
+                </p>
             </footer>
         </div>
     );

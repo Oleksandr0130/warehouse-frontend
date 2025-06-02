@@ -45,7 +45,9 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
             </form>
             {/* Блок с информацией об авторских правах */}
             <footer className="register-footer">
-                <p>© 2025 Alexander Starikov. Alle Rechte vorbehalten.</p>
+                <p>© 2025 Alexander Starikov. <br/>
+                    <span>Alle Rechte vorbehalten.</span>
+                </p>
             </footer>
         </div>
     );
