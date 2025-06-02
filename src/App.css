@@ -159,15 +159,28 @@
 
 .sidebar-footer {
   margin-top: auto; /* Размещаем блок внизу */
-  text-align: center;
-  padding: 10px;
-  font-size: 14px;
-  color: #999;
-  cursor: pointer; /* Указатель мыши */
-  border-top: 1px solid #ddd;
+  text-align: center; /* Центрируем текст */
+  padding: 15px; /* Добавляем внутренние отступы */
+  font-size: 14px; /* Размер текста */
+  color: #888; /* Бледный цвет текста */
+  cursor: pointer; /* Делаем текст кликабельным */
+  border-top: 1px solid #ddd; /* Разделительная линия сверху */
+  background-color: #f9f9f9; /* Лёгкий фоновый оттенок */
+  transition: color 0.3s ease, background-color 0.3s ease; /* Плавные переходы для эффектов */
 }
 
 .sidebar-footer:hover {
-  color: #555; /* Цвет текста при наведении */
-  text-decoration: underline; /* Подчеркивание текста при наведении */
+  color: #555; /* Более тёмный цвет при наведении */
+  background-color: #eaeaea; /* Лёгкий светлый фон при наведении */
+}
+
+.sidebar-footer p {
+  margin: 0; /* Убираем внешние отступы вокруг параграфа */
+  line-height: 1.5; /* Увеличиваем межстрочный интервал */
+}
+
+.sidebar-footer span {
+  font-weight: bold; /* Делаем вторую строку жирной */
+  display: block; /* Гарантируем, что текст занимает новую строку */
+  color: #666; /* Меняем цвет нижней строки для визуального выделения */
 }

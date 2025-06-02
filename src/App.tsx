@@ -324,7 +324,8 @@ function App() {
               className="sidebar-footer"
               onClick={() => setActiveMenu('about')} // Переключение на "О приложении"
           >
-            <p>© 2025 Alexander Starikov. Alle Rechte vorbehalten.</p>
+            <p>© 2025 Alexander Starikov. <br/>
+              <span>Alle Rechte vorbehalten.</span></p>
           </div>
 
         </aside>
