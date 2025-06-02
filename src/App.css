@@ -160,12 +160,11 @@
 .sidebar-footer {
   margin-top: auto; /* Размещаем блок внизу */
   text-align: center; /* Центрируем текст */
-  padding: 15px; /* Добавляем внутренние отступы */
+  padding: 15px 15px 30px; /* Добавляем внутренние отступы */
   font-size: 14px; /* Размер текста */
   color: #888; /* Бледный цвет текста */
   cursor: pointer; /* Делаем текст кликабельным */
   border-top: 1px solid #ddd; /* Разделительная линия сверху */
-  background-color: #f9f9f9; /* Лёгкий фоновый оттенок */
   transition: color 0.3s ease, background-color 0.3s ease; /* Плавные переходы для эффектов */
 }
 
