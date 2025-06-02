@@ -21,7 +21,8 @@ import { logout, validateTokens } from './types/AuthManager.ts';
 import DownloadExcelButton from './components/DownloadExelButton.tsx';
 import { toast } from 'react-toastify'; // Импортируем toast
 import 'react-toastify/dist/ReactToastify.css';
-import api from "./api.ts"; // Подключение стилей toast
+import api from "./api.ts";
+import AboutApp from "./components/AboutApp.tsx"; // Подключение стилей toast
 
 function App() {
   // Управление состоянием режима авторизации
@@ -34,7 +35,7 @@ function App() {
   const [showScanner, setShowScanner] = useState<boolean>(false);
   const [scannerAction, setScannerAction] = useState<'add' | 'remove' | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold' | 'files'>('inventory');
+  const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold' | 'files' | 'about'>('inventory');
   const [sortCriteria, setSortCriteria] = useState<string>('');
   const [soldReservations, setSoldReservations] = useState<SoldReservation[]>([]);
 
@@ -309,6 +310,12 @@ function App() {
             >
               Dateibetrachter
             </li>
+            <li
+                className={`menu-item ${activeMenu === 'about' ? 'active' : ''}`}
+                onClick={() => setActiveMenu('about')}
+            >
+              Über die App
+            </li>
             <li className="menu-item logout-item" onClick={handleLogout}>
               Abmelden
             </li>
@@ -429,6 +436,9 @@ function App() {
           {activeMenu === 'sold' && <SoldItemsList reservations={soldReservations} />}
 
           {activeMenu === 'files' && <FileViewer />}
+
+          {activeMenu === 'about' && <AboutApp />}
+
         </main>
       </div>
   );
