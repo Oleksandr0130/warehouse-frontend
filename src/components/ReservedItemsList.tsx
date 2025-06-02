@@ -41,7 +41,9 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
 
         try {
             setLoading(true);
-            const filteredReservations = await fetchReservationsByOrderPrefix(orderPrefix);
+            const filteredReservations = (await fetchReservationsByOrderPrefix(orderPrefix)).filter(
+                (item) => !item.isSold
+            );
             // Преобразование данных для правильного сопоставления полей
             const mappedReservations = filteredReservations.map((item: ReservationData) => {
                 return {

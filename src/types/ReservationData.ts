@@ -5,4 +5,5 @@ export interface ReservationData {
     reservedQuantity?: number;
     reservationWeek?: string;
     status?: string;
+    isSold?: boolean;
 }
