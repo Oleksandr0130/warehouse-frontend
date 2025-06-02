@@ -62,9 +62,9 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 />
                 <button type="submit" className="login-btn">Einloggen</button>
             </form>
-           <p>© 2025 Alexander Starikov. Alle Rechte vorbehalten.</p>
         </div>
     );
+           <p>© 2025 Alexander Starikov. Alle Rechte vorbehalten.</p>
 };
 
 export default Login;
