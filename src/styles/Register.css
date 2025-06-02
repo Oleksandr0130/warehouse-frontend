@@ -54,3 +54,10 @@
     background: linear-gradient(135deg, #45a049, #66bb6a);
     transform: translateY(-2px);
 }
+
+/* Стили для переноса текста об авторских правах вниз */
+.register-footer {
+    text-align: center; /* Центрируем текст */
+    font-size: 14px; /* Размер шрифта */
+    color: #888; /* Цвет текста */
+}
