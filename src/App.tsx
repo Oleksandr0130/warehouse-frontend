@@ -401,7 +401,9 @@ function App() {
                       try {
                         setLoading(true);
                         const response = await api.get('/reservations/sorted', { params: { reservationWeek: week } });
-                        const data = response.data.map((item: ReservationData) => ({
+                        const data = response.data
+                            .filter((item: ReservationData) => !item.isSold)
+                            .map((item: ReservationData) => ({
                           id: item.id?.toString() || '',
                           name: item.itemName || '',
                           quantity: item.reservedQuantity || 0,
