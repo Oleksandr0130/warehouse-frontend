@@ -388,31 +388,38 @@ const FileViewer: React.FC = () => {
         const selectedQrCodes = [
             ...qrFiles
                 .filter((file) => selectedFiles.includes(file.id))
-                .map((file) => `<img src="data:image/png;base64,${file.qrCode}" style="margin: 10px; width: 200px; height: 200px;" />`),
+                .map(
+                    (file) =>
+                        `<div style="page-break-after: always;"><img src="data:image/png;base64,${file.qrCode}" style="margin: 10px; width: 200px; height: 200px;" /></div>`
+                ),
             ...reservationFiles
                 .filter((file) => selectedReservations.includes(file.id))
-                .map((file) => `<img src="data:image/png;base64,${file.qrCode}" style="margin: 10px; width: 200px; height: 200px;" />`),
+                .map(
+                    (file) =>
+                        `<div style="page-break-after: always;"><img src="data:image/png;base64,${file.qrCode}" style="margin: 10px; width: 200px; height: 200px;" /></div>`
+                ),
         ].join('');
 
-        const printWindow = window.open('', '_blank');
+        const printWindow = window.open('', '_self'); // Открытие в той же вкладке
         if (printWindow) {
             printWindow.document.write(`
-        <html>
-          <head>
-            <title>Печать QR-кодов</title>
-            <style>
-              body { display: flex; flex-wrap: wrap; justify-content: center; }
-            </style>
-          </head>
-          <body>
-            ${selectedQrCodes}
-          </body>
-        </html>
-      `);
+    <html>
+      <head>
+        <title>Печать QR-кодов</title>
+        <style>
+          body { display: flex; flex-direction: column; align-items: center; }
+        </style>
+      </head>
+      <body>
+        ${selectedQrCodes}
+      </body>
+    </html>
+  `);
             printWindow.document.close();
             printWindow.print();
         }
     };
+
 
     const filteredQrFiles = qrFiles.filter((file) => file.id.toLowerCase().includes(searchTerm));
 
