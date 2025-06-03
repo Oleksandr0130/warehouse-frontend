@@ -390,33 +390,57 @@ const FileViewer: React.FC = () => {
                 .filter((file) => selectedFiles.includes(file.id))
                 .map(
                     (file) =>
-                        `<div style="page-break-after: always;"><img src="data:image/png;base64,${file.qrCode}" style="margin: 10px; width: 200px; height: 200px;" /></div>`
+                        `<div style="page-break-after: always;">
+                        <img src="data:image/png;base64,${file.qrCode}" 
+                            style="margin: 10px; width: 200px; height: 200px;" />
+                    </div>`
                 ),
             ...reservationFiles
                 .filter((file) => selectedReservations.includes(file.id))
                 .map(
                     (file) =>
-                        `<div style="page-break-after: always;"><img src="data:image/png;base64,${file.qrCode}" style="margin: 10px; width: 200px; height: 200px;" /></div>`
+                        `<div style="page-break-after: always;">
+                        <img src="data:image/png;base64,${file.qrCode}" 
+                            style="margin: 10px; width: 200px; height: 200px;" />
+                    </div>`
                 ),
         ].join('');
 
-        const printWindow = window.open('', '_self'); // Открытие в той же вкладке
-        if (printWindow) {
-            printWindow.document.write(`
-    <html>
-      <head>
-        <title>Печать QR-кодов</title>
-        <style>
-          body { display: flex; flex-direction: column; align-items: center; }
-        </style>
-      </head>
-      <body>
-        ${selectedQrCodes}
-      </body>
-    </html>
-  `);
-            printWindow.document.close();
-            printWindow.print();
+        // Создаем скрытый iframe для печати
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+
+        const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
+        if (iframeDocument) {
+            iframeDocument.open();
+            iframeDocument.write(`
+            <html>
+              <head>
+                <title>Печать QR-кодов</title>
+                <style>
+                  body { display: flex; flex-direction: column; align-items: center; }
+                  div { page-break-after: always; }
+                </style>
+              </head>
+              <body>
+                ${selectedQrCodes}
+              </body>
+            </html>
+        `);
+            iframeDocument.close();
+
+            // Запускаем печать
+            iframe.contentWindow?.focus(); // Убеждаемся, что iframe в фокусе
+            iframe.contentWindow?.print();
+
+            // Удаляем iframe после печати
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 1000);
         }
     };
 
