@@ -391,24 +391,26 @@ const FileViewer: React.FC = () => {
                 .filter((file) => selectedFiles.includes(file.id))
                 .map(
                     (file) =>
-                        `<div class="print-item">
+                        `<div style="page-break-after: always;">
                         <h2>${file.name || file.id}</h2> <!-- Используем name, если есть, иначе id -->
-                        <img src="data:image/png;base64,${file.qrCode}" class="print-image" />
+                        <img src="data:image/png;base64,${file.qrCode}" 
+                        style="margin: 10px; width: 200px; height: 200px;" />>
                     </div>`
                 ),
             ...reservationFiles
                 .filter((file) => selectedReservations.includes(file.id))
                 .map(
                     (file) =>
-                        `<div class="print-item">
+                        `<div style="page-break-after: always;">
                         <h2>${file.orderNumber}</h2> <!-- Используем orderNumber -->
-                        <img src="data:image/png;base64,${file.qrCode}" class="print-image" />
+                        <img src="data:image/png;base64,${file.qrCode}" 
+                        style="margin: 10px; width: 200px; height: 200px;" />
                     </div>`
                 ),
         ].join('');
 
         // Динамический заголовок
-        const dynamicTitle = `Печать QR-кодов для ${selectedFiles.join(', ')}`;
+        const dynamicTitle = `${selectedFiles.join(', ')}`;
 
         // Создаем скрытый iframe для печати
         const iframe = document.createElement('iframe');
@@ -425,7 +427,10 @@ const FileViewer: React.FC = () => {
             <html>
               <head>
                 <title>${dynamicTitle}</title>
-                <link rel="stylesheet" href="FileViever.css" />
+                <style>
+                  body { display: flex; flex-direction: column; align-items: center; }
+                  div { page-break-after: always; }
+                </style>
               </head>
               <body class="print-body">
                 ${selectedQrCodes}
