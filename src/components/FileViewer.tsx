@@ -416,11 +416,15 @@ const FileViewer: React.FC = () => {
 
         const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
         if (iframeDocument) {
+
+            const dynamicTitle = `${selectedFiles.join(', ')}`;
+
+
             iframeDocument.open();
             iframeDocument.write(`
             <html>
               <head>
-                <title>Печать QR-кодов</title>
+                <title>${dynamicTitle}</title>
                 <style>
                   body { display: flex; flex-direction: column; align-items: center; }
                   div { page-break-after: always; }

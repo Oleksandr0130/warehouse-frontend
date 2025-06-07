@@ -258,7 +258,7 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
                 <input
                     type="text"
                     id="week-input"
-                    placeholder="KW eingeben (z. B. KW42)"
+                    placeholder="KW eingeben (z. B. 42)"
                     value={week}
                     onChange={(e) => setWeek(e.target.value)}
                 />
