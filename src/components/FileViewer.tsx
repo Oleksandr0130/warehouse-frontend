@@ -279,6 +279,7 @@ import api from '../api';
 
 interface QRFile {
     id: string;
+    name:string
     qrCode: string;
 }
 
@@ -390,21 +391,24 @@ const FileViewer: React.FC = () => {
                 .filter((file) => selectedFiles.includes(file.id))
                 .map(
                     (file) =>
-                        `<div style="page-break-after: always;">
-                        <img src="data:image/png;base64,${file.qrCode}" 
-                            style="margin: 10px; width: 200px; height: 200px;" />
+                        `<div class="print-item">
+                        <h2>${file.name || file.id}</h2> <!-- Используем name, если есть, иначе id -->
+                        <img src="data:image/png;base64,${file.qrCode}" class="print-image" />
                     </div>`
                 ),
             ...reservationFiles
                 .filter((file) => selectedReservations.includes(file.id))
                 .map(
                     (file) =>
-                        `<div style="page-break-after: always;">
-                        <img src="data:image/png;base64,${file.qrCode}" 
-                            style="margin: 10px; width: 200px; height: 200px;" />
+                        `<div class="print-item">
+                        <h2>${file.orderNumber}</h2> <!-- Используем orderNumber -->
+                        <img src="data:image/png;base64,${file.qrCode}" class="print-image" />
                     </div>`
                 ),
         ].join('');
+
+        // Динамический заголовок
+        const dynamicTitle = `Печать: Lager QR (${selectedFiles.length}) и Reservations (${selectedReservations.length})`;
 
         // Создаем скрытый iframe для печати
         const iframe = document.createElement('iframe');
@@ -416,21 +420,14 @@ const FileViewer: React.FC = () => {
 
         const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
         if (iframeDocument) {
-
-            const dynamicTitle = `${selectedFiles.join(', ')}`;
-
-
             iframeDocument.open();
             iframeDocument.write(`
             <html>
               <head>
                 <title>${dynamicTitle}</title>
-                <style>
-                  body { display: flex; flex-direction: column; align-items: center; }
-                  div { page-break-after: always; }
-                </style>
+                <link rel="stylesheet" href="FileViever.css" />
               </head>
-              <body>
+              <body class="print-body">
                 ${selectedQrCodes}
               </body>
             </html>
@@ -438,7 +435,7 @@ const FileViewer: React.FC = () => {
             iframeDocument.close();
 
             // Запускаем печать
-            iframe.contentWindow?.focus(); // Убеждаемся, что iframe в фокусе
+            iframe.contentWindow?.focus();
             iframe.contentWindow?.print();
 
             // Удаляем iframe после печати
@@ -447,6 +444,7 @@ const FileViewer: React.FC = () => {
             }, 1000);
         }
     };
+
 
 
     const filteredQrFiles = qrFiles.filter((file) => file.id.toLowerCase().includes(searchTerm));
