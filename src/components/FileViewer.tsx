@@ -408,7 +408,7 @@ const FileViewer: React.FC = () => {
         ].join('');
 
         // Динамический заголовок
-        const dynamicTitle = `Печать: Lager QR (${selectedFiles.length}) и Reservations (${selectedReservations.length})`;
+        const dynamicTitle = `Печать QR-кодов для ${selectedFiles.join(', ')}`;
 
         // Создаем скрытый iframe для печати
         const iframe = document.createElement('iframe');
