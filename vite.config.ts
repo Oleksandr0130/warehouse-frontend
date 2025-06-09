@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
-  base: mode === "production" ? "/assets/" : "/", // Изменяем базовый путь для продакшена
+  base: mode === "production" ? "/" : "/", // Изменяем базовый путь для продакшена
   server: {
     port: 5173,
     open: true,
