@@ -32,7 +32,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
 
     return (
         <div className="register-container">
-            <h2>Anmeldung</h2>
+            <h2>Warehouse-QR</h2>
             <form onSubmit={handleSubmit}>
                 <input name="username" placeholder="Benutzername" onChange={handleChange} required />
                 <input name="email" type="email" placeholder="Email" onChange={handleChange} required />
