@@ -486,7 +486,7 @@ const FileViewer: React.FC = () => {
                             className="qr-image"
                             onClick={() => handleImageClick(file.qrCode)}
                         />
-                        <span className="file-name">{file.name}</span>
+                        <span className="file-name">{file.id}</span>
                         <button className="download-button" onClick={() => handleDownloadQRCode(file.id, 'item')}>
                             Laden
                         </button>
