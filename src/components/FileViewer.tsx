@@ -482,7 +482,7 @@ const FileViewer: React.FC = () => {
                         />
                         <img
                             src={`data:image/png;base64,${file.qrCode}`}
-                            alt={`QR код товара ${file.name || file.id}`}
+                            alt={`QR код товара ${file.name}`}
                             className="qr-image"
                             onClick={() => handleImageClick(file.qrCode)}
                         />
