@@ -43,7 +43,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
     return (
         <div className="login-container">
             <form className="login-form" onSubmit={handleSubmit}>
-                <h2>KSW</h2>
+                <h2>Warehouse-QR</h2>
                 <input
                     type="text"          // поменял тип на text, логин обычно не email
                     name="username"
