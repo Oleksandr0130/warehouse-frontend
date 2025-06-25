@@ -24,7 +24,7 @@ export const fetchReservationsByOrderPrefix = async (prefix: string): Promise<Re
 
 
 // Функции для регистрации пользователя, входа, подтверждения email
-export const registerUser = (data: { username: string; email: string; password: string; role: string }) =>
+export const registerUser = (data: { username: string; email: string; password: string; role: string; companyName: string }) =>
     api.post('/auth/register', data);
 
 export const loginUser = (data: { username: string; password: string }) =>

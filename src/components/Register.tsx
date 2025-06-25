@@ -1,8 +1,8 @@
 // src/components/Register.tsx
 import React, { useState } from 'react';
 import { registerUser } from '../api';
-import { toast} from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css'
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 import '../styles/Register.css';
 
 interface RegisterProps {
@@ -10,8 +10,13 @@ interface RegisterProps {
 }
 
 const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
-    const [form, setForm] = useState({ username: '', email: '', password: '', role: 'USER' });
-    // const [message, setMessage] = useState<string | null>(null);
+    const [form, setForm] = useState({
+        username: '',
+        email: '',
+        password: '',
+        role: 'USER',
+        companyName: '' // Новое поле для имени компании
+    });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,39 +24,64 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!form.companyName.trim()) {
+            toast.error('Имя компании обязательно для заполнения');
+            return;
+        }
+
         try {
             await registerUser(form);
-            toast.success('Registrierung erfolgreich gesendet. Bitte überprüfen Sie Ihre E-Mail zur Bestätigung.');
+            toast.success('Регистрация прошла успешно. Пожалуйста, проверьте вашу электронную почту для подтверждения.');
             onSuccess(); // вызов после успешной регистрации
         } catch (err) {
             console.error(err);
-            toast.error('Registrierungsfehler');
+            toast.error('Ошибка регистрации. Проверьте введённые данные и повторите попытку.');
         }
     };
-
 
     return (
         <div className="register-container">
             <h2>Warehouse-QR</h2>
             <form onSubmit={handleSubmit}>
-                <input name="username" placeholder="Benutzername" onChange={handleChange} required />
-                <input name="email" type="email" placeholder="Email" onChange={handleChange} required />
-                <input name="password" type="password" placeholder="Passwort" onChange={handleChange} required />
+                <input
+                    name="username"
+                    placeholder="Имя пользователя"
+                    onChange={handleChange}
+                    required
+                />
+                <input
+                    name="email"
+                    type="email"
+                    placeholder="Email"
+                    onChange={handleChange}
+                    required
+                />
+                <input
+                    name="password"
+                    type="password"
+                    placeholder="Пароль"
+                    onChange={handleChange}
+                    required
+                />
+                <input
+                    name="companyName"
+                    placeholder="Имя компании"
+                    onChange={handleChange}
+                    required
+                />
                 <select name="role" onChange={handleChange} defaultValue="USER">
-                    <option value="USER">Benutzer</option>
-                    <option value="ADMIN">Administrator</option>
+                    <option value="USER">Пользователь</option>
+                    <option value="ADMIN">Администратор</option>
                 </select>
-                <button type="submit">Registrieren</button>
+                <button type="submit">Регистрация</button>
             </form>
-            {/* Блок с информацией об авторских правах */}
             <footer className="register-footer">
-                <p>© 2025 Alexander Starikov. <br/>
-                    <span>Alle Rechte vorbehalten.</span>
+                <p>© 2025 Alexander Starikov. <br />
+                    <span>Все права защищены.</span>
                 </p>
             </footer>
         </div>
     );
 };
-
 
 export default Register;
