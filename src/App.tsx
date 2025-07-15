@@ -57,18 +57,24 @@ function App() {
 // Обновление данных при изменении activeMenu или sortCriteria
   useEffect(() => {
     fetchData();
-  }, [sortCriteria, activeMenu]);
+  }, [sortCriteria, activeMenu, isAuthenticated]);
 
 // Универсальная функция для загрузки данных
   const fetchData = () => {
+    if (!isAuthenticated) {
+      console.log('Пользователь не авторизован. Данные не загружаются.');
+      return; // Убедитесь, что данные не загружаются, если пользователь не авторизован
+    }
+
     if (activeMenu === 'inventory') {
-      fetchItems(sortCriteria);
+      fetchItems(sortCriteria); // Загрузка товаров из инвентаря
     } else if (activeMenu === 'reserve') {
-      fetchReservedItems();
+      fetchReservedItems(); // Загрузка зарезервированных товаров
     } else if (activeMenu === 'sold') {
-      fetchSoldReservations();
+      fetchSoldReservations(); // Загрузка проданных резерваций
     }
   };
+
 
 
   // // Проверка токена при загрузке
