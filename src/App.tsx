@@ -466,6 +466,7 @@ function App() {
 
           {activeMenu === 'about' && <AboutApp />}
           {/* Вставка нового компонента подписки */}
+          console.log('Передан userId в SubscriptionStatus:', userId);
           {userId && <SubscriptionStatus userId={userId} />}
 
         </main>

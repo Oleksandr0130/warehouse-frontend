@@ -17,30 +17,31 @@ const SubscriptionStatus = ({ userId }: { userId: number }) => {
 
     useEffect(() => {
         if (!userId) {
-            console.error('userId не установлен или равен 0'); // Лог отсутствующего userId
+            console.error('userId не передан в компонент SubscriptionStatus.');
             setError('Пользователь не найден.');
             return;
         }
 
         const fetchSubscriptionStatus = async () => {
             try {
-                console.log('Fetching subscription status for userId:', userId); // Лог начала запроса
+                console.log('Fetching subscription status for userId:', userId);
                 const response = await api.get<SubscriptionStatusResponse>(`/${userId}/subscription-status`);
-                console.log('Ответ от сервера:', response.data); // Лог ответа сервера
+                console.log('Ответ от сервера:', response.data);
                 setStatus(response.data.status);
                 setMessage(response.data.message);
                 setTrialEndDate(response.data.trialEndDate || '');
-                console.log('Обновленное состояние:', {
+
+                console.log('Состояние компонента обновлено:', {
                     status: response.data.status,
                     message: response.data.message,
                     trialEndDate: response.data.trialEndDate || '',
                 });
             } catch (e: unknown) {
                 if (axios.isAxiosError(e) && e.response) {
-                    console.error('Ошибка сервера:', e.response.data); // Лог ошибки ответа
+                    console.error('Ошибка сервера:', e.response.data);
                     setError(e.response.data.message || 'Ошибка получения данных о подписке.');
                 } else {
-                    console.error('Неизвестная ошибка:', e); // Лог других ошибок
+                    console.error('Неизвестная ошибка:', e);
                     setError('Неизвестная ошибка.');
                 }
             }
