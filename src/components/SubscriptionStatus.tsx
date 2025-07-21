@@ -25,7 +25,7 @@ const SubscriptionStatus = ({ userId }: { userId: number }) => {
         const fetchSubscriptionStatus = async () => {
             try {
                 console.log('Fetching subscription status for userId:', userId);
-                const response = await api.get<SubscriptionStatusResponse>(`/${userId}/subscription-status`);
+                const response = await api.get<SubscriptionStatusResponse>(`/users/${userId}/subscription-status`);
                 console.log('Ответ от сервера:', response.data);
                 setStatus(response.data.status);
                 setMessage(response.data.message);
