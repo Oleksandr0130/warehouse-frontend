@@ -25,7 +25,7 @@ const SubscriptionStatus = ({ userId }: { userId: number }) => {
         const fetchSubscriptionStatus = async () => {
             try {
                 console.log('Fetching subscription status for userId:', userId); // Лог начала запроса
-                const response = await api.get<SubscriptionStatusResponse>(`/api/${userId}/subscription-status`);
+                const response = await api.get<SubscriptionStatusResponse>(`/${userId}/subscription-status`);
                 console.log('Ответ от сервера:', response.data); // Лог ответа сервера
                 setStatus(response.data.status);
                 setMessage(response.data.message);
@@ -52,7 +52,7 @@ const SubscriptionStatus = ({ userId }: { userId: number }) => {
     const handlePaymentRedirect = async () => {
         try {
             console.log('Создание сессии оплаты для userId:', userId); // Лог перед запросом
-            const { data: checkoutUrl } = await api.get(`/api/payment/create-checkout-session`, {
+            const { data: checkoutUrl } = await api.get(`/payment/create-checkout-session`, {
                 params: { userId },
             });
             console.log('URL оплаты:', checkoutUrl); // Лог успешного URL
