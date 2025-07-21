@@ -1,68 +1,71 @@
-import React, { useEffect, useState } from 'react';
+import './SubscriptionStatus.css';
+import { useEffect, useState } from 'react';
 import api from '../api';
-import '../styles/SubscriptionStatus.css';
+import axios from "axios";
 
-interface SubscriptionStatusProps {
-    userId: number; // ID текущего пользователя
+interface SubscriptionStatusResponse {
+    status: string;
+    message: string;
+    trialEndDate?: string;
 }
 
-const SubscriptionStatus: React.FC<SubscriptionStatusProps> = ({ userId }) => {
-    const [status, setStatus] = useState({
-        trialEndDate: '',
-        isPaid: false,
-    });
-    const [loading, setLoading] = useState(true);
+const SubscriptionStatus = ({ userId }: { userId: number }) => {
+    const [status, setStatus] = useState<string>('');
+    const [message, setMessage] = useState<string>('');
+    const [trialEndDate, setTrialEndDate] = useState<string>('');
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchSubscriptionStatus = async () => {
             try {
-                const response = await api.get(`/${userId}/subscription-status`);
-                setStatus(response.data);
-                setLoading(false);
-            } catch (error) {
-                console.error('Ошибка при загрузке статуса подписки:', error);
-                setLoading(false);
+                const response = await api.get<SubscriptionStatusResponse>(`/${userId}/subscription-status`);
+                setStatus(response.data.status);
+                setMessage(response.data.message);
+                setTrialEndDate(response.data.trialEndDate || '');
+            } catch (e: unknown) {
+                if (axios.isAxiosError(e) && e.response) {
+                    setError(e.response.data.message || 'Ошибка получения данных о подписке.');
+                } else {
+                    setError('Неизвестная ошибка.');
+                }
             }
         };
+
         fetchSubscriptionStatus();
     }, [userId]);
 
-    const handlePayClick = async () => {
+    const handlePaymentRedirect = async () => {
         try {
-            const response = await api.get(`/payment/create-checkout-session`, {
+            const { data: checkoutUrl } = await api.get(`/payment/create-checkout-session`, {
                 params: { userId },
             });
-            window.location.href = response.data; // Перенаправление на страницу оплаты Stripe
-        } catch (error) {
-            console.error('Ошибка при создании платежной сессии:', error);
-            alert('Произошла ошибка при создании платежа. Попробуйте еще раз.');
+            window.location.href = checkoutUrl; // Перенаправление на URL Stripe CheckOut
+        } catch {
+            setError('Не удалось создать сессию оплаты.');
         }
     };
 
-    if (loading) return <p>Загрузка...</p>;
-
-    const isTrialExpired =
-        status.trialEndDate &&
-        new Date(status.trialEndDate) < new Date() &&
-        !status.isPaid;
+    if (error) {
+        return <div className="subscription-status error">{error}</div>;
+    }
 
     return (
         <div className="subscription-status">
-            <h2>Подписка</h2>
-            {status.isPaid ? (
-                <p className="success">Ваша подписка активна!</p>
-            ) : isTrialExpired ? (
-                <p className="error">Пробный период истёк. Пожалуйста, оплатите, чтобы продолжить.</p>
-            ) : (
-                <p>
-                    Пробный период истекает:{" "}
-                    <strong>{new Date(status.trialEndDate).toLocaleDateString()}</strong>
-                </p>
+            <h2>Статус подписки</h2>
+            {status === 'active' && (
+                <p className="success">{message}</p>
             )}
-            {!status.isPaid && (
-                <button className="pay-button" onClick={handlePayClick}>
-                    Оплатить
-                </button>
+            {status === 'trial' && (
+                <>
+                    <p className="info">{message}</p>
+                    <p>Пробный период доступен до: {trialEndDate}</p>
+                </>
+            )}
+            {status === 'expired' && (
+                <>
+                    <p className="error">{message}</p>
+                    <button onClick={handlePaymentRedirect} className="pay-button">Продлить подписку</button>
+                </>
             )}
         </div>
     );
