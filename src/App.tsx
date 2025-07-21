@@ -351,9 +351,6 @@ function App() {
         <main className="app-main">
           {loading && <div className="loading-overlay">Laden...</div>}
 
-          {/* Вставка нового компонента подписки */}
-          {userId && <SubscriptionStatus userId={userId} />}
-
           {activeMenu === 'inventory' && (
               <>
                 <AddItemForm onAdd={handleAddItem} />
@@ -468,6 +465,8 @@ function App() {
           {activeMenu === 'files' && <FileViewer />}
 
           {activeMenu === 'about' && <AboutApp />}
+          {/* Вставка нового компонента подписки */}
+          {userId && <SubscriptionStatus userId={userId} />}
 
         </main>
       </div>
