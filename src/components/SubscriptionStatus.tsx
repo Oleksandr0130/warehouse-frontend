@@ -18,7 +18,7 @@ const SubscriptionStatus = ({ userId }: { userId: number }) => {
     useEffect(() => {
         const fetchSubscriptionStatus = async () => {
             try {
-                const response = await api.get<SubscriptionStatusResponse>(`/${userId}/subscription-status`);
+                const response = await api.get<SubscriptionStatusResponse>(`/api/${userId}/subscription-status`);
                 setStatus(response.data.status);
                 setMessage(response.data.message);
                 setTrialEndDate(response.data.trialEndDate || '');
@@ -36,7 +36,7 @@ const SubscriptionStatus = ({ userId }: { userId: number }) => {
 
     const handlePaymentRedirect = async () => {
         try {
-            const { data: checkoutUrl } = await api.get(`/payment/create-checkout-session`, {
+            const { data: checkoutUrl } = await api.get(`/api/payment/create-checkout-session`, {
                 params: { userId },
             });
             window.location.href = checkoutUrl; // Перенаправление на URL Stripe CheckOut
