@@ -10,6 +10,11 @@ const api = axios.create({
     withCredentials: true, // Для передачи cookie
 });
 
+export const fetchSubscriptionStatus = async (userId: number) => {
+    return await api.get(`/${userId}/subscription-status`);
+};
+
+
 // Запрос к /sold для получения проданных резерваций
 export const fetchSoldReservations = async (): Promise<SoldReservation[]> => {
     const response = await api.get('/sold');
