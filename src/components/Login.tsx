@@ -7,7 +7,7 @@ import '../styles/Login.css';
 import { AxiosError } from "axios";
 
 interface LoginProps {
-    onSuccess: () => void;
+    onSuccess: (userId: number) => void; // Теперь принимает userId
 }
 
 const Login: React.FC<LoginProps> = ({ onSuccess }) => {
@@ -22,10 +22,11 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
         try {
             const response = await loginUser(credentials);
             localStorage.setItem('token', response.data.token);
-            localStorage.setItem('role', response.data.role); // Сохраняем роль пользователя
-            localStorage.setItem('companyName', response.data.companyName); // Сохраняем имя компании
+            localStorage.setItem('role', response.data.role);
+            localStorage.setItem('companyName', response.data.companyName);
+            localStorage.setItem('userId', response.data.userId); // Сохраняем userId
             toast.success('Успешный вход в систему!');
-            onSuccess();
+            onSuccess(response.data.userId); // Передаем userId
         } catch (err) {
             if (err instanceof AxiosError && err.response) {
                 alert(`Ошибка входа: ${err.response.status} - ${err.response.data.message || 'Неизвестная ошибка'}`);

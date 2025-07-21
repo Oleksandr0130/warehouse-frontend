@@ -53,13 +53,13 @@ function App() {
         const storedUserId = localStorage.getItem('userId');
         if (storedUserId) {
           setUserId(Number(storedUserId));
+          fetchData(); // Загружаем соответствующие данные
         } else {
           toast.error('Ошибка получения информации о пользователе.');
           setIsAuthenticated(false);
           setAuthStage('login');
-        }
 
-        fetchData(); // Загружаем соответствующие данные
+        }
       } else {
         setIsAuthenticated(false);
       }
@@ -260,7 +260,8 @@ function App() {
   };
 
   // Авторизация
-  const handleAuthSuccess = () => {
+  const handleAuthSuccess = (userId: number) => {
+    localStorage.setItem('userId', userId.toString());
     setIsAuthenticated(true);
     setAuthStage('confirmed');
     fetchData();

@@ -24,13 +24,20 @@ export const fetchReservationsByOrderPrefix = async (prefix: string): Promise<Re
 
 
 // Функции для регистрации пользователя, входа, подтверждения email
-export const registerUser = (data: { username: string; email: string; password: string; role: string; companyName: string }) =>
-    api.post('/auth/register', data);
+export const registerUser = async (data: { username: string; email: string; password: string; role: string; companyName: string }) => {
+    const response = await api.post('/auth/register', data);
+    return response.data; // Теперь возвращается { message: string }
+};
 
 
-
-export const loginUser = (data: { username: string; password: string }) =>
-    api.post('/auth/login', data);
+export const loginUser = async (data: { username: string; password: string }) => {
+    const response = await api.post('/auth/login', data);
+    // Предполагается, что сервер возвращает userId в ответе
+    if (response.data.userId) {
+        localStorage.setItem('userId', response.data.userId.toString());
+    }
+    return response;
+};
 
 export const confirmEmail = (code: string) =>
     api.get(`/confirmation?code=${code}`);
@@ -78,6 +85,7 @@ api.interceptors.response.use(
                     console.error('Refresh Token отсутствует. Перенаправляем на страницу входа.');
                     localStorage.removeItem('accessToken');
                     localStorage.removeItem('refreshToken');
+                    localStorage.removeItem('userId');
                     window.location.href = '/login';
                     return Promise.reject(error);
                 }
@@ -96,6 +104,7 @@ api.interceptors.response.use(
                 console.error('Ошибка обновления токена:', refreshError);
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
+                localStorage.removeItem('userId');
                 window.location.href = '/login'; // Перенаправляем на страницу логина при ошибке Refresh Token
                 return Promise.reject(refreshError);
             }
