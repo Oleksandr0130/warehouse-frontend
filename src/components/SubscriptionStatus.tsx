@@ -52,23 +52,23 @@ const SubscriptionStatus = ({ userId }: { userId: number }) => {
     return (
         <div className="subscription-status">
             <h2>Статус подписки</h2>
-            {status === 'active' && (
-                <p className="success">{message}</p>
-            )}
+            {status === 'active' && <p className="success">{message}</p>}
             {status === 'trial' && (
                 <>
                     <p className="info">{message}</p>
-                    <p>Пробный период доступен до: {trialEndDate}</p>
+                    <p>Пробный период действует до: {trialEndDate || 'нет информации'}</p>
                 </>
             )}
             {status === 'expired' && (
                 <>
                     <p className="error">{message}</p>
-                    <button onClick={handlePaymentRedirect} className="pay-button">Продлить подписку</button>
+                    <p>Подписка истекла или отсутствует. Оформите подписку, чтобы продолжить.</p>
+                    <button onClick={handlePaymentRedirect} className="pay-button">Оформить подписку</button>
                 </>
             )}
         </div>
     );
 };
+
 
 export default SubscriptionStatus;
