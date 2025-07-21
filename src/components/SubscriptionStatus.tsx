@@ -1,4 +1,4 @@
-import './SubscriptionStatus.css';
+import '../styles/SubscriptionStatus.css';
 import { useEffect, useState } from 'react';
 import api from '../api';
 import axios from "axios";
