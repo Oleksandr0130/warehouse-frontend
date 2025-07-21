@@ -22,8 +22,7 @@ import DownloadExcelButton from './components/DownloadExelButton.tsx';
 import { toast } from 'react-toastify'; // Импортируем toast
 import 'react-toastify/dist/ReactToastify.css';
 import api from "./api.ts";
-import AboutApp from "./components/AboutApp.tsx";
-import SubscriptionStatus from "./components/SubscriptionStatus.tsx"; // Подключение стилей toast
+import AboutApp from "./components/AboutApp.tsx"; // Подключение стилей toast
 
 function App() {
   // Управление состоянием режима авторизации
@@ -31,7 +30,6 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   // Основные состояния
-  const [userId, setUserId] = useState<number | null>(null); // ID текущего пользователя
   const [items, setItems] = useState<Item[]>([]);
   const [reservedItems, setReservedItems] = useState<ReservedItem[]>([]);
   const [showScanner, setShowScanner] = useState<boolean>(false);
@@ -48,18 +46,7 @@ function App() {
       if (isValid) {
         setIsAuthenticated(true);
         setAuthStage('confirmed');
-
-        // Имитация получения ID текущего пользователя из токена
-        const storedUserId = localStorage.getItem('userId');
-        if (storedUserId) {
-          setUserId(Number(storedUserId));
-          fetchData(); // Загружаем соответствующие данные
-        } else {
-          toast.error('Ошибка получения информации о пользователе.');
-          setIsAuthenticated(false);
-          setAuthStage('login');
-
-        }
+        fetchData(); // Загружаем соответствующие данные
       } else {
         setIsAuthenticated(false);
       }
@@ -70,24 +57,18 @@ function App() {
 // Обновление данных при изменении activeMenu или sortCriteria
   useEffect(() => {
     fetchData();
-  }, [sortCriteria, activeMenu, isAuthenticated]);
+  }, [sortCriteria, activeMenu]);
 
 // Универсальная функция для загрузки данных
   const fetchData = () => {
-    if (!isAuthenticated) {
-      console.log('Пользователь не авторизован. Данные не загружаются.');
-      return; // Убедитесь, что данные не загружаются, если пользователь не авторизован
-    }
-
     if (activeMenu === 'inventory') {
-      fetchItems(sortCriteria); // Загрузка товаров из инвентаря
+      fetchItems(sortCriteria);
     } else if (activeMenu === 'reserve') {
-      fetchReservedItems(); // Загрузка зарезервированных товаров
+      fetchReservedItems();
     } else if (activeMenu === 'sold') {
-      fetchSoldReservations(); // Загрузка проданных резерваций
+      fetchSoldReservations();
     }
   };
-
 
 
   // // Проверка токена при загрузке
@@ -260,8 +241,7 @@ function App() {
   };
 
   // Авторизация
-  const handleAuthSuccess = (userId: number) => {
-    localStorage.setItem('userId', userId.toString());
+  const handleAuthSuccess = () => {
     setIsAuthenticated(true);
     setAuthStage('confirmed');
     fetchData();
@@ -351,9 +331,6 @@ function App() {
         </aside>
         <main className="app-main">
           {loading && <div className="loading-overlay">Laden...</div>}
-
-          {/* Вставка нового компонента подписки */}
-          {userId && <SubscriptionStatus userId={userId} />}
 
           {activeMenu === 'inventory' && (
               <>
