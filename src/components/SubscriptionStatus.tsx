@@ -52,20 +52,20 @@ const SubscriptionStatus = ({ userId }: { userId: number }) => {
 
     const handlePaymentRedirect = async () => {
         try {
-            console.log('Создание сессии оплаты для userId:', userId); // Лог перед запросом
+            console.log('Создание сессии оплаты для userId:', userId);
             const { data: checkoutUrl } = await api.get(`/payment/create-checkout-session`, {
                 params: { userId },
             });
-            console.log('URL оплаты:', checkoutUrl); // Лог успешного URL
-            window.location.href = checkoutUrl; // Перенаправление на URL Stripe
+            console.log('URL оплаты:', checkoutUrl);
+            window.location.href = checkoutUrl;
         } catch (e) {
-            console.error('Ошибка создания сессии оплаты:', e); // Лог ошибки
+            console.error('Ошибка создания сессии оплаты:', e);
             setError('Не удалось создать сессию оплаты.');
         }
     };
 
     if (error) {
-        console.error('Ошибка в компоненте SubscriptionStatus:', error); // Лог ошибки
+        console.error('Ошибка в компоненте SubscriptionStatus:', error);
         return <div className="subscription-status error">{error}</div>;
     }
 
@@ -77,19 +77,20 @@ const SubscriptionStatus = ({ userId }: { userId: number }) => {
                 <>
                     <p className="info">{message}</p>
                     <p>Пробный период действует до: {trialEndDate || 'нет информации'}</p>
-                    {console.log('Rendering trial block with message:', message, 'trialEndDate:', trialEndDate)}
                 </>
             )}
-            {status === 'expired' && (
+            {(status === 'trial_ending_soon' || status === 'expired') && (
                 <>
-                    <p className="error">{message}</p>
-                    <p>Подписка истекла или отсутствует. Оформите подписку, чтобы продолжить.</p>
+                    <p className={status === 'expired' ? 'error' : 'info'}>{message}</p>
+                    <p>
+                        {status === 'trial_ending_soon'
+                            ? `Пробный период действует до: ${trialEndDate || 'нет информации'}`
+                            : 'Подписка истекла или отсутствует. Оформите подписку, чтобы продолжить.'}
+                    </p>
                     <button onClick={handlePaymentRedirect} className="pay-button">Оформить подписку</button>
-                    {console.log('Rendering expired block with message:', message, 'trialEndDate:', trialEndDate)}
                 </>
             )}
         </div>
     );
 };
-
 export default SubscriptionStatus;
