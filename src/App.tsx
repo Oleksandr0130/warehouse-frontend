@@ -104,6 +104,10 @@ function App() {
 
   // Загрузка товаров
   const fetchItems = async (sortCriteria?: string) => {
+    if (!isAuthenticated){
+      console.warn('Пользователь не авторизован. Эндпоинт /items не будет вызван.');
+      return;
+    }
     try {
       setLoading(true);
       const endpoint = sortCriteria ? '/items/sorted' : '/items';
