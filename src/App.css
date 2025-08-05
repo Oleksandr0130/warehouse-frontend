@@ -192,22 +192,3 @@
   display: block; /* Гарантируем, что текст занимает новую строку */
   color: #666; /* Меняем цвет нижней строки для визуального выделения */
 }
-
-.user-info-header {
-  background-color: #f9f9f9;
-  padding: 10px 20px;
-  border-bottom: 1px solid #ddd;
-  text-align: center;
-  font-size: 14px;
-  font-weight: bold;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.user-info-header p {
-  margin: 4px 0;
-  color: #555;
-}
-
-.user-info-header p strong {
-  color: #333;
-}

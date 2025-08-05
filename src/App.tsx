@@ -38,24 +38,6 @@ function App() {
   const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold' | 'files' | 'about'>('inventory');
   const [sortCriteria, setSortCriteria] = useState<string>('');
   const [soldReservations, setSoldReservations] = useState<SoldReservation[]>([]);
-  const [currentUser, setCurrentUser] = useState<{ companyName: string; username: string } | null>(null);
-
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const response = await api.get('/api/users/current'); // Эндпоинт для получения текущего пользователя
-        setCurrentUser({
-          companyName: response.data.companyName,
-          username: response.data.username,
-        });
-      } catch (error) {
-        console.error('Ошибка при получении данных пользователя:', error);
-      }
-    };
-
-    fetchCurrentUser();
-  }, []);
-
 
   // Проверка токена при загрузке
   useEffect(() => {
@@ -353,13 +335,6 @@ function App() {
         </aside>
         <main className="app-main">
           {loading && <div className="loading-overlay">Laden...</div>}
-
-          {currentUser && (
-              <div className="user-info-header">
-                <p>Текущий аккаунт: <strong>{currentUser.username}</strong></p>
-                <p>Компания: <strong>{currentUser.companyName}</strong></p>
-              </div>
-          )}
 
           {activeMenu === 'inventory' && (
               <>
