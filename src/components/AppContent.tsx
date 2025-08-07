@@ -15,6 +15,7 @@ import { Item } from '../types/Item';
 import { ReservedItem } from '../types/ReservedItem';
 import { ReservationData } from '../types/ReservationData';
 import { SoldReservation } from '../types/SoldReservation';
+import {Header} from "./Header.tsx";
 
 interface AppContentProps {
     onLogout: () => void;
@@ -172,6 +173,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
 
     return (
         <div className="app-container">
+            <Header />
             <aside className="fixed-sidebar">
                 <h2 className="sidebar-title">Warehouse QR</h2>
                 <ul className="sidebar-menu">
