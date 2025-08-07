@@ -1,20 +1,17 @@
 import { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import AppContent from './components/AppContent';
-import Login from './components/Login';
-import Register from './components/Register';
-import Confirmation from './components/Confirmation';
-import { logout, validateTokens } from './types/AuthManager';
 import './App.css';
-import './styles/App.css';
+import 'react-toastify/dist/ReactToastify.css';
+import Register from './components/Register';
+import Login from './components/Login';
+import Confirmation from './components/Confirmation';
+import AppContent from './components/AppContent';
+import { validateTokens, logout } from './types/AuthManager';
+import { toast } from 'react-toastify';
 
 function App() {
-  // Управление состоянием авторизации
   const [authStage, setAuthStage] = useState<'login' | 'register' | 'confirmed'>('login');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  // Проверяем токены при загрузке
   useEffect(() => {
     const initializeAuth = async () => {
       const isValid = await validateTokens();
@@ -41,7 +38,6 @@ function App() {
     toast.info('Вы вышли из системы.');
   };
 
-  // Если пользователь не авторизован, покажем экран авторизации
   if (!isAuthenticated) {
     return (
         <div className="auth-container">
@@ -58,7 +54,8 @@ function App() {
               <>
                 <Register onSuccess={() => setAuthStage('login')} />
                 <p>
-                  Hast du schon ein Konto? <button onClick={() => setAuthStage('login')}>Einloggen</button>
+                  Hast du schon ein Konto?{' '}
+                  <button onClick={() => setAuthStage('login')}>Einloggen</button>
                 </p>
               </>
           )}
@@ -67,7 +64,6 @@ function App() {
     );
   }
 
-  // Пользователь авторизован — отображаем контент приложения
   return <AppContent onLogout={handleLogout} />;
 }
 

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import '../App.css';
 import ItemList from './ItemList';
 import ReservedItemsList from './ReservedItemsList';
 import AddItemForm from './AddItemForm';
@@ -14,14 +15,12 @@ import { Item } from '../types/Item';
 import { ReservedItem } from '../types/ReservedItem';
 import { ReservationData } from '../types/ReservationData';
 import { SoldReservation } from '../types/SoldReservation';
-import '../styles/App.css'
-import '../App.css'
 
 interface AppContentProps {
     onLogout: () => void;
 }
 
-function AppContent({ onLogout }: AppContentProps) {
+const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     const [items, setItems] = useState<Item[]>([]);
     const [reservedItems, setReservedItems] = useState<ReservedItem[]>([]);
     const [soldReservations, setSoldReservations] = useState<SoldReservation[]>([]);
@@ -31,9 +30,9 @@ function AppContent({ onLogout }: AppContentProps) {
     const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold' | 'files' | 'about'>('inventory');
     const [sortCriteria, setSortCriteria] = useState('');
 
-    // Загрузка данных при изменении меню или сортировки
     useEffect(() => {
         fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortCriteria, activeMenu]);
 
     const fetchData = () => {
@@ -47,12 +46,9 @@ function AppContent({ onLogout }: AppContentProps) {
             case 'sold':
                 fetchSoldReservations();
                 break;
-            default:
-                break;
         }
     };
 
-    // Загрузка товаров
     const fetchItems = async (sortBy?: string) => {
         setLoading(true);
         try {
@@ -62,12 +58,12 @@ function AppContent({ onLogout }: AppContentProps) {
         } catch (err) {
             console.error(err);
             toast.error('Ошибка при загрузке товаров.');
+            setItems([]);
         } finally {
             setLoading(false);
         }
     };
 
-    // Загрузка зарезервированных товаров
     const fetchReservedItems = async () => {
         setLoading(true);
         try {
@@ -91,7 +87,6 @@ function AppContent({ onLogout }: AppContentProps) {
         }
     };
 
-    // Загрузка проданных резерваций
     const fetchSoldReservations = async () => {
         setLoading(true);
         try {
@@ -100,12 +95,12 @@ function AppContent({ onLogout }: AppContentProps) {
         } catch (err) {
             console.error(err);
             toast.error('Ошибка при загрузке проданных товаров.');
+            setSoldReservations([]);
         } finally {
             setLoading(false);
         }
     };
 
-    // Обработчик добавления товара
     const handleAddItem = async (item: Item) => {
         setLoading(true);
         try {
@@ -120,12 +115,13 @@ function AppContent({ onLogout }: AppContentProps) {
         }
     };
 
-    // Обработчик сканера для изменения количества
     const handleScan = async (id: string) => {
         setShowScanner(false);
         if (!scannerAction) return;
 
-        const input = prompt(`Введите количество для ${scannerAction === 'add' ? 'добавления' : 'удаления'}:`);
+        const input = prompt(
+            `Введите количество для ${scannerAction === 'add' ? 'добавления' : 'удаления'}:`
+        );
         const quantity = Number(input);
         if (!input || isNaN(quantity) || quantity <= 0) {
             toast.error('Введите корректное число.');
@@ -145,7 +141,6 @@ function AppContent({ onLogout }: AppContentProps) {
         }
     };
 
-    // Обработчик сканирования резервации
     const handleReservedItemScan = async (orderNumber: string) => {
         if (!orderNumber) {
             toast.error('Некорректный QR-код.');
@@ -164,10 +159,11 @@ function AppContent({ onLogout }: AppContentProps) {
         }
     };
 
-    // Обработчик удаления резервации
     const handleReservationRemoved = (updatedItemId: string, returnedQuantity: number) => {
         setItems((prev) =>
-            prev.map((it) => (it.id === updatedItemId ? { ...it, quantity: it.quantity + returnedQuantity } : it))
+            prev.map((it) =>
+                it.id === updatedItemId ? { ...it, quantity: it.quantity + returnedQuantity } : it
+            )
         );
         fetchReservedItems();
         fetchItems(sortCriteria);
@@ -179,14 +175,42 @@ function AppContent({ onLogout }: AppContentProps) {
             <aside className="fixed-sidebar">
                 <h2 className="sidebar-title">Warehouse QR</h2>
                 <ul className="sidebar-menu">
-                    <li className={activeMenu === 'inventory' ? 'active' : ''} onClick={() => setActiveMenu('inventory')}>Lagerbestand</li>
-                    <li className={activeMenu === 'reserve' ? 'active' : ''} onClick={() => setActiveMenu('reserve')}>Reservierte Artikel</li>
-                    <li className={activeMenu === 'sold' ? 'active' : ''} onClick={() => setActiveMenu('sold')}>Verkaufte Artikel</li>
-                    <li className={activeMenu === 'files' ? 'active' : ''} onClick={() => setActiveMenu('files')}>Dateibetrachter</li>
-                    <li className={activeMenu === 'about' ? 'active' : ''} onClick={() => setActiveMenu('about')}>Über die App</li>
-                    <li className="logout-item" onClick={onLogout}>Abmelden</li>
+                    <li
+                        className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('inventory')}
+                    >
+                        Lagerbestand
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('reserve')}
+                    >
+                        Reservierte Artikel
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('sold')}
+                    >
+                        Verkaufte Artikel
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('files')}
+                    >
+                        Dateibetrachter
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'about' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('about')}
+                    >
+                        Über die App
+                    </li>
+                    <li className="logout-item" onClick={onLogout}>
+                        Abmelden
+                    </li>
                 </ul>
             </aside>
+
             <main className="app-main">
                 {loading && <div className="loading-overlay">Загрузка...</div>}
 
@@ -194,13 +218,36 @@ function AppContent({ onLogout }: AppContentProps) {
                     <>
                         <AddItemForm onAdd={handleAddItem} />
                         <div className="scanner-buttons">
-                            <button className="btn btn-add" onClick={() => { setScannerAction('add'); setShowScanner(true); }} disabled={loading}>Zum Hinzufügen scannen</button>
-                            <button className="btn btn-remove" onClick={() => { setScannerAction('remove'); setShowScanner(true); }} disabled={loading}>Zum Entfernen scannen</button>
+                            <button
+                                className="btn btn-add"
+                                onClick={() => {
+                                    setScannerAction('add');
+                                    setShowScanner(true);
+                                }}
+                                disabled={loading}
+                            >
+                                Zum Hinzufügen scannen
+                            </button>
+                            <button
+                                className="btn btn-remove"
+                                onClick={() => {
+                                    setScannerAction('remove');
+                                    setShowScanner(true);
+                                }}
+                                disabled={loading}
+                            >
+                                Zum Entfernen scannen
+                            </button>
                         </div>
                         {showScanner && <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />}
                         <div className="sort-dropdown">
                             <label htmlFor="sort-menu">Sortieren nach:</label>
-                            <select id="sort-menu" value={sortCriteria} onChange={(e) => setSortCriteria(e.target.value)}>
+                            <select
+                                id="sort-menu"
+                                className="sort-select"
+                                value={sortCriteria}
+                                onChange={(e) => setSortCriteria(e.target.value)}
+                            >
                                 <option value="">Standard</option>
                                 <option value="name">Name</option>
                                 <option value="quantity">Menge</option>
@@ -212,8 +259,14 @@ function AppContent({ onLogout }: AppContentProps) {
                         </div>
                         <ItemList
                             items={items}
-                            onScanAdd={() => { setScannerAction('add'); setShowScanner(true); }}
-                            onScanRemove={() => { setScannerAction('remove'); setShowScanner(true); }}
+                            onScanAdd={() => {
+                                setScannerAction('add');
+                                setShowScanner(true);
+                            }}
+                            onScanRemove={() => {
+                                setScannerAction('remove');
+                                setShowScanner(true);
+                            }}
                         />
                     </>
                 )}
@@ -223,7 +276,11 @@ function AppContent({ onLogout }: AppContentProps) {
                         <ReserveForm
                             items={items}
                             onReserveComplete={fetchReservedItems}
-                            onUpdateItems={(id, qty) => setItems((prev) => prev.map((it) => (it.id === id ? { ...it, quantity: it.quantity - qty } : it)))}
+                            onUpdateItems={(id, qty) =>
+                                setItems((prev) =>
+                                    prev.map((it) => (it.id === id ? { ...it, quantity: it.quantity - qty } : it))
+                                )
+                            }
                         />
                         <ReservedItemsList
                             reservedItems={reservedItems}
@@ -232,15 +289,24 @@ function AppContent({ onLogout }: AppContentProps) {
                             onWeekFilter={async (week) => {
                                 setLoading(true);
                                 try {
-                                    const response = await api.get<ReservationData[]>('/reservations/sorted', { params: { reservationWeek: week } });
+                                    const response = await api.get<ReservationData[]>('/reservations/sorted', {
+                                        params: { reservationWeek: week },
+                                    });
                                     const data = response.data
                                         .filter((it) => !it.isSold)
-                                        .map((it) => ({ id: it.id?.toString() ?? '', name: it.itemName ?? '', quantity: it.reservedQuantity ?? 0, orderNumber: it.orderNumber ?? '', week: it.reservationWeek ?? '' }));
+                                        .map((it) => ({
+                                            id: it.id?.toString() ?? '',
+                                            name: it.itemName ?? '',
+                                            quantity: it.reservedQuantity ?? 0,
+                                            orderNumber: it.orderNumber ?? '',
+                                            week: it.reservationWeek ?? '',
+                                        }));
                                     setReservedItems(data);
                                     toast.success(`Отфильтровано по неделе ${week}`);
                                 } catch (err) {
                                     console.error(err);
                                     toast.error('Не удалось отфильтровать.');
+                                    setReservedItems([]);
                                 } finally {
                                     setLoading(false);
                                 }
@@ -257,6 +323,6 @@ function AppContent({ onLogout }: AppContentProps) {
             </main>
         </div>
     );
-}
+};
 
 export default AppContent;
