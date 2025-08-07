@@ -15,6 +15,7 @@ import { ReservedItem } from '../types/ReservedItem';
 import { ReservationData } from '../types/ReservationData';
 import { SoldReservation } from '../types/SoldReservation';
 import '../styles/App.css'
+import '../App.css'
 
 interface AppContentProps {
     onLogout: () => void;

@@ -6,6 +6,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Confirmation from './components/Confirmation';
 import { logout, validateTokens } from './types/AuthManager';
+import './App.css';
 import './styles/App.css';
 
 function App() {
