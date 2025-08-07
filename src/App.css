@@ -192,3 +192,19 @@
   display: block; /* Гарантируем, что текст занимает новую строку */
   color: #666; /* Меняем цвет нижней строки для визуального выделения */
 }
+/* Стили для кнопки «Выйти» в боковом меню */
+.logout-item {
+  margin-top: auto;           /* прижмёт кнопку к низу меню */
+  width: 100%;                /* растянет на всю ширину */
+  padding: 12px 0;            /* вертикальные отступы */
+  background-color: #c0392b;  /* фон в красных тонах */
+  color: #ffffff;             /* белый текст */
+  text-align: center;         /* центрируем текст */
+  border-radius: 4px;         /* скруглённые углы */
+  cursor: pointer;            /* курсор «рука» */
+  transition: background-color 0.2s ease;
+}
+
+.logout-item:hover {
+  background-color: #e74c3c;  /* чуть светлее при наведении */
+}
