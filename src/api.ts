@@ -24,7 +24,7 @@ export const fetchReservationsByOrderPrefix = async (prefix: string): Promise<Re
 
 
 // Функции для регистрации пользователя, входа, подтверждения email
-export const registerUser = (data: { username: string; email: string; password: string; role: string }) =>
+export const registerUser = (data: { username: string; email: string; password: string; companyName: string }) =>
     api.post('/auth/register', data);
 
 export const loginUser = (data: { username: string; password: string }) =>
@@ -37,6 +37,23 @@ export const confirmEmail = (code: string) =>
 export const deleteQRCode = async (orderNumber: string): Promise<void> => {
     await api.delete(`/reservations/${orderNumber}/qrcode`);
 };
+
+export const fetchBillingStatus = async () => {
+    const resp = await api.get('/billing/status');
+    return resp.data as {
+        status: 'TRIAL'|'ACTIVE'|'EXPIRED'|'ANON'|'NO_COMPANY';
+        trialEnd?: string;
+        currentPeriodEnd?: string;
+        daysLeft?: number;
+        isAdmin?: boolean;
+    };
+};
+
+export const createCheckout = async () => {
+    const resp = await api.post('/billing/checkout');
+    return resp.data as { checkoutUrl: string };
+};
+
 
 // Интерцептор запросов: добавляем заголовок Authorization, если токен доступен
 api.interceptors.request.use(

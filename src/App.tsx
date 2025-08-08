@@ -7,6 +7,7 @@ import Confirmation from './components/Confirmation';
 import AppContent from './components/AppContent';
 import { validateTokens, logout } from './types/AuthManager';
 import { toast } from 'react-toastify';
+import SubscriptionBanner from "./components/SubscriptionBanner.tsx";
 
 function App() {
   const [authStage, setAuthStage] = useState<'login' | 'register' | 'confirmed'>('login');
@@ -64,7 +65,11 @@ function App() {
     );
   }
 
-  return <AppContent onLogout={handleLogout} />;
+  return (
+  <>
+    <SubscriptionBanner />
+  <AppContent onLogout={handleLogout} />;
+  </>)
 }
 
 export default App;
