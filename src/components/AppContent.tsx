@@ -15,6 +15,7 @@ import { Item } from '../types/Item';
 import { ReservedItem } from '../types/ReservedItem';
 import { ReservationData } from '../types/ReservationData';
 import { SoldReservation } from '../types/SoldReservation';
+import SubscriptionBanner from "./SubscriptionBanner.tsx";
 
 interface AppContentProps {
     onLogout: () => void;
@@ -321,6 +322,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                 {activeMenu === 'files' && <FileViewer />}
                 {activeMenu === 'about' && <AboutApp />}
             </main>
+            <SubscriptionBanner />
         </div>
     );
 };
