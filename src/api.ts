@@ -125,4 +125,29 @@ api.interceptors.response.use(
     }
 );
 
+// --- Профиль текущего пользователя
+export interface MeDto {
+    username: string;
+    email: string;
+    companyName: string | null;
+    admin: boolean;
+}
+
+export async function fetchMe(): Promise<MeDto> {
+    const { data } = await api.get<MeDto>('/users/me');
+    return data;
+}
+
+// --- Создать пользователя (админ)
+export interface AdminCreateUserRequest {
+    username: string;
+    email: string;
+    password: string;
+}
+
+export async function adminCreateUser(req: AdminCreateUserRequest): Promise<MeDto> {
+    const { data } = await api.post<MeDto>('/admin/users', req);
+    return data;
+}
+
 export default api;

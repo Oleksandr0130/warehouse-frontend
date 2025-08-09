@@ -16,6 +16,7 @@ import { ReservedItem } from '../types/ReservedItem';
 import { ReservationData } from '../types/ReservationData';
 import { SoldReservation } from '../types/SoldReservation';
 import SubscriptionBanner from "./SubscriptionBanner.tsx";
+import Account from "./Account.tsx";
 
 interface AppContentProps {
     onLogout: () => void;
@@ -28,7 +29,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     const [showScanner, setShowScanner] = useState(false);
     const [scannerAction, setScannerAction] = useState<'add' | 'remove' | null>(null);
     const [loading, setLoading] = useState(false);
-    const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold' | 'files' | 'about'>('inventory');
+    const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold' | 'files' | 'about' | 'account'>('inventory');
     const [sortCriteria, setSortCriteria] = useState('');
 
     useEffect(() => {
@@ -206,6 +207,12 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                     >
                         Über die App
                     </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'account' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('account')}
+                    >
+                        Личный кабинет
+                    </li>
                     <li className="logout-item" onClick={onLogout}>
                         Abmelden
                     </li>
@@ -321,6 +328,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                 {activeMenu === 'sold' && <SoldItemsList reservations={soldReservations} />}
                 {activeMenu === 'files' && <FileViewer />}
                 {activeMenu === 'about' && <AboutApp />}
+                {activeMenu === 'account' && <Account />}
             </main>
             <SubscriptionBanner />
         </div>

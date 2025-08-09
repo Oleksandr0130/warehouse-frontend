@@ -1,0 +1,60 @@
+.account-wrap {
+    display: grid;
+    gap: 16px;
+}
+
+.account-card {
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.06);
+}
+
+.account-card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #f1f3f5;
+}
+
+.row:last-child {
+    border-bottom: none;
+}
+
+.admin-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.admin-form input {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 10px 12px;
+    outline: none;
+}
+
+.admin-form input:focus {
+    border-color: #74c0fc;
+    box-shadow: 0 0 0 3px rgba(116, 192, 252, 0.25);
+}
+
+.admin-form button {
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    background: #0d6efd;
+    color: #fff;
+    cursor: pointer;
+}
+
+.admin-form button[disabled] {
+    opacity: .6;
+    cursor: default;
+}
