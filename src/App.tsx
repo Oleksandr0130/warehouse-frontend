@@ -66,7 +66,7 @@ function App() {
 
   return (
   <>
-  <AppContent onLogout={handleLogout} />;
+  <AppContent onLogout={handleLogout} />
   </>)
 }
 
