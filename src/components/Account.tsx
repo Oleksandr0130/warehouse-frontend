@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchMe, adminCreateUser, AdminCreateUserRequest, MeDto } from '../api';
 import { toast } from 'react-toastify';
-import './Account.css';
+import '../styles/Account.css'
 
 const Account: React.FC = () => {
     const [me, setMe] = useState<MeDto | null>(null);
