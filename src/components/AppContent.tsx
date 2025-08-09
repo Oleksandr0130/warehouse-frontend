@@ -15,7 +15,6 @@ import { Item } from '../types/Item';
 import { ReservedItem } from '../types/ReservedItem';
 import { ReservationData } from '../types/ReservationData';
 import { SoldReservation } from '../types/SoldReservation';
-import SubscriptionBanner from "./SubscriptionBanner.tsx";
 import Account from "./Account.tsx";
 
 interface AppContentProps {
@@ -330,7 +329,6 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                 {activeMenu === 'about' && <AboutApp />}
                 {activeMenu === 'account' && <Account />}
             </main>
-            <SubscriptionBanner />
         </div>
     );
 };

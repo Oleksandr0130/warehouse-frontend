@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchMe, adminCreateUser, AdminCreateUserRequest, MeDto } from '../api';
 import { toast } from 'react-toastify';
 import '../styles/Account.css'
+import SubscriptionBanner from "./SubscriptionBanner.tsx";
 
 const Account: React.FC = () => {
     const [me, setMe] = useState<MeDto | null>(null);
@@ -47,6 +48,8 @@ const Account: React.FC = () => {
     return (
         <div className="account-wrap">
             <h2>Личный кабинет</h2>
+
+            <SubscriptionBanner embedded />
 
             {!me ? (
                 <div className="account-card">Загрузка...</div>
