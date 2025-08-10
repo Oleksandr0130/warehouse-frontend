@@ -1,9 +1,7 @@
 /* Центрирование всего приложения и бокового меню */
 #root {
-  display: flex;
   justify-content: center; /* Центруем содержимое */
   align-items: center;
-  margin: 0 auto;
 }
 
 /* Контейнер всего приложения */
