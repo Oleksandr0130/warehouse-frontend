@@ -3,6 +3,7 @@ import { fetchMe, adminCreateUser, AdminCreateUserRequest, MeDto } from '../api'
 import { toast } from 'react-toastify';
 import '../styles/Account.css';
 import SubscriptionBanner from "./SubscriptionBanner.tsx";
+import '../styles/SubscriptionStatus.css'
 
 const Account: React.FC = () => {
     const [me, setMe] = useState<MeDto | null>(null);
