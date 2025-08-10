@@ -1,34 +1,39 @@
+/* Полный фон на весь экран */
 .auth-page {
     min-height: 100vh;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     background:
             radial-gradient(1200px 600px at 20% 10%, #d9c8ab 0%, rgba(217,200,171,0) 60%),
             linear-gradient(140deg, #d2b892 0%, #c7a87e 40%, #b9946a 100%);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     color: #fff;
 }
 
-/* Убираем белую карточку */
+/* Контейнер с формой */
 .auth-card {
     width: 100%;
     max-width: 420px;
     padding: 28px 24px 18px;
-    text-align: left;
     background: transparent;
     box-shadow: none;
+    text-align: center;
 }
 
-/* Логотип без фона, без рамок и теней */
+/* Логотип */
 .app-logo {
     width: 180px;
     height: auto;
+    margin: 0 auto 32px;
     display: block;
-    margin-bottom: 32px;
 }
 
-/* Поля */
+/* Поля формы */
 .auth-form {
     display: flex;
     flex-direction: column;
@@ -68,6 +73,7 @@
     cursor: pointer;
 }
 
+/* Ссылки-переключатели */
 .auth-alt {
     margin-top: 22px;
     font-weight: 700;
@@ -78,4 +84,43 @@
     margin-top: 28px;
     font-size: 12px;
     color: rgba(255,255,255,0.85);
+}
+
+/* 📱 Адаптив для маленьких экранов */
+@media (max-width: 480px) {
+    .app-logo {
+        width: 140px;
+        margin-bottom: 24px;
+    }
+
+    .auth-card {
+        padding: 20px 16px;
+    }
+
+    .auth-form input {
+        height: 50px;
+        font-size: 15px;
+    }
+
+    .auth-button {
+        height: 52px;
+        font-size: 15px;
+    }
+
+    .auth-alt {
+        font-size: 14px;
+    }
+
+    .auth-footer {
+        font-size: 11px;
+    }
+
+    /* Фон на телефоне — градиенты меньше и центрированы */
+    .auth-page {
+        background:
+                radial-gradient(800px 400px at center, #d9c8ab 0%, rgba(217,200,171,0) 60%),
+                linear-gradient(140deg, #d2b892 0%, #c7a87e 40%, #b9946a 100%);
+        background-size: cover;
+        background-position: center;
+    }
 }
