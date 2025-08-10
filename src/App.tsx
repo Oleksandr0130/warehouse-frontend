@@ -7,20 +7,11 @@ import Confirmation from './components/Confirmation';
 import AppContent from './components/AppContent';
 import { validateTokens, logout } from './types/AuthManager';
 import { toast } from 'react-toastify';
-import LanguageSwitchInline  from "./components/LanguageSwitchInline.tsx";
-import {initTranslator, setLanguageImmediate} from "./types/translate.ts";
 
 function App() {
   const [authStage, setAuthStage] = useState<'login' | 'register' | 'confirmed'>('login');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  // Применим язык из localStorage ещё до проверки логина
-  useEffect(() => {
-    const lang = localStorage.getItem('preferredLang') || 'en';
-    initTranslator('gt_widget_global').then(() => {
-      setLanguageImmediate(lang);
-    });
-  }, []);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -51,7 +42,6 @@ function App() {
   if (!isAuthenticated) {
     return (
         <div className="auth-container">
-          <LanguageSwitchInline compact />
           {authStage === 'login' && (
               <>
                 <Login onSuccess={handleAuthSuccess} />
