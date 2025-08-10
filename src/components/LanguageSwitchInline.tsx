@@ -1,7 +1,7 @@
 // src/components/LanguageSwitchInline.tsx
 import { useEffect, useState } from 'react';
-import { applyLanguage, initTranslator } from '../types/translate.ts';
-import '../styles/AppTranslate.css'
+import { initTranslator, setLanguageImmediate, applyLanguageCookie } from '../types/translate.ts';
+import '../styles/LanguageSwitchInline.css';
 
 const langs = [
     { code: 'en', label: 'EN' },
@@ -11,26 +11,23 @@ const langs = [
     { code: 'uk', label: 'UA' },
 ];
 
-interface Props {
-    compact?: boolean;
-}
-
-export default function LanguageSwitchInline({ compact = true }: Props) {
+export default function LanguageSwitchInline({ compact = true }: { compact?: boolean }) {
     const [lang, setLang] = useState<string>(() => localStorage.getItem('preferredLang') || 'en');
 
     useEffect(() => {
-        // Инициализируем виджет (контейнер рендерим невидимым)
-        initTranslator('gt_widget_silent').catch(() => {});
-        // применим сохранённый язык
-        applyLanguage(lang);
+        // инициализация виджета и мгновенное применение сохранённого языка
+        initTranslator('gt_widget_silent').then(() => {
+            setLanguageImmediate(lang);
+        }).catch(() => {
+            // в крайнем случае хотя бы куку поставим
+            applyLanguageCookie(lang);
+        });
     }, []);
 
-    const onChange = (code: string) => {
+    const onChange = async (code: string) => {
         setLang(code);
         localStorage.setItem('preferredLang', code);
-        applyLanguage(code);
-        // некоторые комбинации требуют лёгкой перезагрузки,
-        // но чаще виджет сам подхватывает изменения cookie.
+        await setLanguageImmediate(code); // применяем без перезагрузки
     };
 
     return (
@@ -48,7 +45,6 @@ export default function LanguageSwitchInline({ compact = true }: Props) {
                     </button>
                 ))}
             </div>
-            {/* Невидимый контейнер для Google Translate Element */}
             <div id="gt_widget_silent" style={{ width: 0, height: 0, overflow: 'hidden' }} />
         </div>
     );

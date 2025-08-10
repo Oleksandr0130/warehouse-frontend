@@ -8,7 +8,7 @@ import AppContent from './components/AppContent';
 import { validateTokens, logout } from './types/AuthManager';
 import { toast } from 'react-toastify';
 import LanguageSwitchInline  from "./components/LanguageSwitchInline.tsx";
-import {applyLanguage, initTranslator} from "./types/translate.ts";
+import {initTranslator, setLanguageImmediate} from "./types/translate.ts";
 
 function App() {
   const [authStage, setAuthStage] = useState<'login' | 'register' | 'confirmed'>('login');
@@ -17,8 +17,9 @@ function App() {
   // Применим язык из localStorage ещё до проверки логина
   useEffect(() => {
     const lang = localStorage.getItem('preferredLang') || 'en';
-    applyLanguage(lang);
-    initTranslator('gt_widget_global').catch(() => {});
+    initTranslator('gt_widget_global').then(() => {
+      setLanguageImmediate(lang);
+    });
   }, []);
 
   useEffect(() => {

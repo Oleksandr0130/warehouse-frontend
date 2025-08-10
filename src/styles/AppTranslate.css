@@ -26,3 +26,20 @@
     color: #fff;
     border-color: #0d6efd;
 }
+/* --- Hide Google Website Translator top bar and badges --- */
+.goog-te-banner-frame,
+.goog-te-balloon-frame,
+.goog-te-gadget-icon,
+.goog-logo-link,
+.goog-te-combo + .goog-te-gadget-simple,
+.VIpgJd-ZVi9od-ORHb-OEVmcd,
+.skiptranslate > iframe,
+.skiptranslate span {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    line-height: 0 !important;
+    font-size: 0 !important;
+}
+body { top: 0 !important; } /* панель не «сдвигает» страницу вниз */
