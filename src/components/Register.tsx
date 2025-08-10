@@ -1,9 +1,8 @@
-// src/components/Register.tsx
 import React, { useState } from 'react';
 import { registerUser } from '../api';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../styles/Register.css';
+import '../styles/AuthLoginAndRegister.css';
 
 interface RegisterProps {
     onSuccess: () => void;
@@ -24,22 +23,16 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
         companyName: '',
     });
 
-    const handleChange = (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (
-        event: React.FormEvent<HTMLFormElement>
-    ) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            await registerUser(form); // backend теперь ждёт companyName
-            toast.success(
-                'Registration successfully sent. Please check your email for confirmation.'
-            );
+            await registerUser(form);
+            toast.success('Registration successful! Please check your email.');
             onSuccess();
         } catch (err) {
             console.error(err);
@@ -48,49 +41,49 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
     };
 
     return (
-        <div className="register-container">
-            <h2>FlowQR</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    name="username"
-                    placeholder="User"
-                    value={form.username}
-                    onChange={handleChange}
-                    required
-                />
-                <input
-                    name="email"
-                    type="email"
-                    placeholder="Email"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                />
-                <input
-                    name="password"
-                    type="password"
-                    placeholder="Password"
-                    value={form.password}
-                    onChange={handleChange}
-                    required
-                />
-                <input
-                    name="companyName"
-                    placeholder="Company name"
-                    value={form.companyName}
-                    onChange={handleChange}
-                    required
-                />
-                {/* Раньше здесь был select роли — мы его убрали */}
-                <button type="submit">Registration</button>
-            </form>
+        <div className="auth-page">
+            <div className="auth-card">
+                <h1 className="app-title">FlowQR</h1>
+                <p className="app-subtitle">Create your account</p>
 
-            <footer className="register-footer">
-                <p>
-                    © 2025 Aleksander Starikov. <br />
-                    <span>All rights reserved.</span>
-                </p>
-            </footer>
+                <form className="auth-form" onSubmit={handleSubmit}>
+                    <input
+                        name="username"
+                        placeholder="User"
+                        value={form.username}
+                        onChange={handleChange}
+                        required
+                    />
+                    <input
+                        name="email"
+                        type="email"
+                        placeholder="Email"
+                        value={form.email}
+                        onChange={handleChange}
+                        required
+                    />
+                    <input
+                        name="password"
+                        type="password"
+                        placeholder="Password"
+                        value={form.password}
+                        onChange={handleChange}
+                        required
+                    />
+                    <input
+                        name="companyName"
+                        placeholder="Company name"
+                        value={form.companyName}
+                        onChange={handleChange}
+                        required
+                    />
+                    <button type="submit">Registration</button>
+                </form>
+
+                <footer className="auth-footer">
+                    © 2025 Aleksander Starikov. <span>All rights reserved.</span>
+                </footer>
+            </div>
         </div>
     );
 };
