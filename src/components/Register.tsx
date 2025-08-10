@@ -3,6 +3,7 @@ import { registerUser } from '../api';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/AuthLoginAndRegister.css';
+import logo from '../assets/flowqr-logo.png';
 
 interface RegisterProps {
     onSuccess: () => void;
@@ -32,7 +33,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
         event.preventDefault();
         try {
             await registerUser(form);
-            toast.success('Registration successful! Please check your email.');
+            toast.success('Registration successfully sent. Please check your email for confirmation.');
             onSuccess();
         } catch (err) {
             console.error(err);
@@ -43,8 +44,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
     return (
         <div className="auth-page">
             <div className="auth-card">
-                <img src="/flowqr-logo.png" alt="FlowQR Logo" className="app-logo" />
-                <p className="app-subtitle">Create your account</p>
+                <img src={logo} alt="FlowQR" className="app-logo" />
 
                 <form className="auth-form" onSubmit={handleSubmit}>
                     <input
@@ -77,7 +77,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
                         onChange={handleChange}
                         required
                     />
-                    <button type="submit">Registration</button>
+                    <button type="submit" className="auth-button">SIGN UP</button>
                 </form>
 
                 <footer className="auth-footer">
