@@ -7,6 +7,7 @@ import logo from '../assets/flowqr-logo.png';
 
 interface RegisterProps {
     onSuccess: () => void;
+    onSwitch: () => void; // переключить на логин
 }
 
 interface RegisterForm {
@@ -16,7 +17,7 @@ interface RegisterForm {
     companyName: string;
 }
 
-const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
+const Register: React.FC<RegisterProps> = ({ onSuccess, onSwitch }) => {
     const [form, setForm] = useState<RegisterForm>({
         username: '',
         email: '',
@@ -26,7 +27,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
+        setForm(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -79,6 +80,11 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
                     />
                     <button type="submit" className="auth-button">SIGN UP</button>
                 </form>
+
+                <div className="auth-alt">
+                    ALREADY HAVE AN ACCOUNT?{' '}
+                    <button type="button" onClick={onSwitch}>LOGIN</button>
+                </div>
 
                 <footer className="auth-footer">
                     © 2025 Aleksander Starikov. <span>All rights reserved.</span>

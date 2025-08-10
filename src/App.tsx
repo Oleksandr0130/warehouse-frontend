@@ -43,25 +43,18 @@ function App() {
     return (
         <div className="auth-container">
           {authStage === 'login' && (
-              <>
-                <Login onSuccess={handleAuthSuccess} />
-                <p>
-                  New account{' '}
-                  <button onClick={() => setAuthStage('register')}>Register</button>
-                </p>
-              </>
+              <Login
+                  onSuccess={handleAuthSuccess}
+                  onSwitch={() => setAuthStage('register')}
+              />
           )}
           {authStage === 'register' && (
-              <>
-                <Register onSuccess={() => setAuthStage('login')} />
-                <p>
-                  Do you already have an account?{' '}
-                  <button onClick={() => setAuthStage('login')}>Log in</button>
-                </p>
-              </>
+              <Register
+                  onSuccess={() => setAuthStage('login')}
+                  onSwitch={() => setAuthStage('login')}
+              />
           )}
           {authStage === 'confirmed' && <Confirmation />}
-          {/* Невидимый глобальный контейнер для виджета */}
           <div id="gt_widget_global" style={{ width: 0, height: 0, overflow: 'hidden' }} />
         </div>
     );

@@ -4,7 +4,6 @@
   justify-content: center; /* Центруем содержимое */
   align-items: center;
   margin: 0 auto;
-  min-height: 100vh;
 }
 
 /* Контейнер всего приложения */

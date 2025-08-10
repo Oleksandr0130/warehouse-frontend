@@ -8,9 +8,10 @@ import logo from '../assets/flowqr-logo.png';
 
 interface LoginProps {
     onSuccess: () => void;
+    onSwitch: () => void; // переключить на регистрацию
 }
 
-const Login: React.FC<LoginProps> = ({ onSuccess }) => {
+const Login: React.FC<LoginProps> = ({ onSuccess, onSwitch }) => {
     const [credentials, setCredentials] = useState({ username: '', password: '' });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,7 +66,11 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                     />
                     <button type="submit" className="auth-button">LOGIN</button>
                 </form>
-                <div className="auth-alt">DON'T HAVE AN ACCOUNT? <span className="underline">SIGN UP</span></div>
+
+                <div className="auth-alt">
+                    DON’T HAVE AN ACCOUNT?{' '}
+                    <button type="button" onClick={onSwitch}>SIGN UP</button>
+                </div>
 
                 <footer className="auth-footer">
                     © 2025 Aleksander Starikov. <span>All rights reserved.</span>
