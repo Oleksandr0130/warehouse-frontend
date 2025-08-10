@@ -174,7 +174,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     return (
         <div className="app-container">
             <aside className="fixed-sidebar">
-                <h2 className="sidebar-title">Warehouse QR</h2>
+                <h2 className="sidebar-title">FlowQR</h2>
                 <ul className="sidebar-menu">
                     <li
                         className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`}
