@@ -1,34 +1,184 @@
-@import './theme.css';
-
-.file-viewer-container{
-    composes: card from './theme.css';
-    padding:18px; max-width:980px; margin:18px auto; color:#fff;
+/* Контейнер для компонента FileViewer */
+.file-viewer-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    max-width: 800px;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-.file-viewer-title{
-    composes: h2 from './theme.css';
-    border-bottom:1px dashed rgba(255,255,255,.35); padding-bottom:8px; margin-bottom:12px;
-}
-.search-input{ composes: input from './theme.css'; width:100%; }
 
-.print-button{ composes: btn btn-success from './theme.css'; margin-bottom:14px; }
-
-/* список */
-.file-list{ list-style:none; margin:0; padding:0; }
-.file-item{
-    display:flex; align-items:center; gap:14px; color:#fff;
-    padding:12px; border:1px solid rgba(255,255,255,.25);
-    border-radius:12px; background: rgba(255,255,255,.06); margin-bottom:10px;
+/* Заголовки секций */
+.file-viewer-title {
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
 }
-.qr-image{
-    width:140px; height:140px; object-fit:contain; border-radius:10px;
-    border:1px solid rgba(255,255,255,.25); background:#fff;
-}
-.file-name{ font-size:15px; flex:1; }
-.download-button{ composes: btn btn-primary from './theme.css'; height:42px; }
 
-.select-checkbox{ transform: scale(1.25); cursor:pointer; }
-.modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.8); display:flex; align-items:center; justify-content:center; z-index:1000; }
-.modal-content{ background:#fff; color:#222; border-radius:14px; padding:18px; max-width:90%; max-height:90%; box-shadow: var(--shadow-strong); }
-.modal-image{ max-width:100%; max-height:70vh; margin-bottom:16px; }
-.close-button{ background:#f44336; color:#fff; border:none; border-radius:10px; padding:10px 16px; cursor:pointer; }
-.close-button:hover{ background:#d32f2f; }
+/* Поле поиска */
+.search-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Кнопка для печати */
+.print-button {
+    display: block;
+    margin-bottom: 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+.print-button:hover {
+    background-color: #45a045;
+}
+
+/* Стили для печати */
+
+/*.print-body {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    align-items: center;*/
+/*}*/
+
+.print-item {
+    page-break-after: always;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/*.print-item h2 {*/
+/*    margin: 10px 0;*/
+/*    font-size: 18px;*/
+/*    font-weight: bold;*/
+/*    color: #333;*/
+/*}*/
+
+/*.print-image {*/
+/*    margin: 10px;*/
+/*    width: 200px;*/
+/*    height: 200px;*/
+/*    object-fit: contain;*/
+/*    border: 1px solid #ddd;*/
+/*    border-radius: 5px;*/
+/*}*/
+
+/* Список файлов */
+.file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Элемент списка */
+.file-item {
+    display: flex;
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Изображение QR кода */
+.qr-image {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Название файла/товара */
+.file-name {
+    font-size: 14px;
+    margin-left: 15px;
+    flex-grow: 1; /* Заполняет оставшееся пространство */
+}
+
+/* Кнопка для скачивания */
+.download-button {
+    margin-left: 15px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.download-button:hover {
+    background-color: #0056b3;
+}
+
+/* Чекбокс выбора */
+.select-checkbox {
+    margin-right: 15px;
+    transform: scale(1.5); /* Увеличение размера чекбокса */
+    cursor: pointer;
+}
+
+/* Модальное окно */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 90%;
+    max-height: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.modal-image {
+    max-width: 100%;
+    max-height: 80vh;
+    margin-bottom: 20px;
+}
+
+/* Кнопка закрытия модального окна */
+.close-button {
+    background-color: #f44336;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    align-self: flex-end;
+}
+.close-button:hover {
+    background-color: #d32f2f;
+}
