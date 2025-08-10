@@ -10,9 +10,9 @@ interface ItemListProps {
 const ItemList: React.FC<ItemListProps> = ({ items }) => {
     return (
         <div className="item-list">
-            <h3>Lager</h3>
+            <h3>Stock</h3>
             {items.length === 0 ? (
-                <p className="empty-message">Keine Artikel im Inventar gefunden.</p>
+                <p className="empty-message">No items found in stock.</p>
             ) : (
                 <ul className="item-list-ul">
                     {items.map((item) => (
@@ -27,10 +27,10 @@ const ItemList: React.FC<ItemListProps> = ({ items }) => {
                   <strong>{item.name}</strong>
                 </span>
                                 <span className="item-quantity">
-                  Verfügbar: {item.quantity}
+                  Available: {item.quantity}
                 </span>
                                 <span className="item-sold">
-                  Verkauft: {item.sold}
+                  Sold: {item.sold}
                 </span>
                             </div>
                         </li>

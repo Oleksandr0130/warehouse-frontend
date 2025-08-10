@@ -38,22 +38,22 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
         try {
             await registerUser(form); // backend теперь ждёт companyName
             toast.success(
-                'Registrierung erfolgreich gesendet. Bitte überprüfen Sie Ihre E-Mail zur Bestätigung.'
+                'Registration successfully sent. Please check your email for confirmation.'
             );
             onSuccess();
         } catch (err) {
             console.error(err);
-            toast.error('Registrierungsfehler');
+            toast.error('Registration error');
         }
     };
 
     return (
         <div className="register-container">
-            <h2>Warehouse-QR</h2>
+            <h2>FlowQR</h2>
             <form onSubmit={handleSubmit}>
                 <input
                     name="username"
-                    placeholder="Benutzername"
+                    placeholder="User"
                     value={form.username}
                     onChange={handleChange}
                     required
@@ -69,26 +69,26 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
                 <input
                     name="password"
                     type="password"
-                    placeholder="Passwort"
+                    placeholder="Password"
                     value={form.password}
                     onChange={handleChange}
                     required
                 />
                 <input
                     name="companyName"
-                    placeholder="Firmenname"
+                    placeholder="Company name"
                     value={form.companyName}
                     onChange={handleChange}
                     required
                 />
                 {/* Раньше здесь был select роли — мы его убрали */}
-                <button type="submit">Registrieren</button>
+                <button type="submit">Registration</button>
             </form>
 
             <footer className="register-footer">
                 <p>
-                    © 2025 Alexander Starikov. <br />
-                    <span>Alle Rechte vorbehalten.</span>
+                    © 2025 Aleksander Starikov. <br />
+                    <span>All rights reserved.</span>
                 </p>
             </footer>
         </div>

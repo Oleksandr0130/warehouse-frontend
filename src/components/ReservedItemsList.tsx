@@ -35,7 +35,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
     const handleFilterByOrderPrefix = async (event: React.FormEvent) => {
         event.preventDefault();
         if (!orderPrefix.trim()) {
-            toast.error('Введите корректный префикс заказа.');
+            toast.error('Please enter a valid order.');
             return;
         }
 
@@ -57,10 +57,10 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
 
             setReservedItems(mappedReservations); // Устанавливаем преобразованный список резерваций
 
-            toast.success(`Auftragsnummer "${orderPrefix}" gefunden.`);
+            toast.success(`Order number "${orderPrefix}" found.`);
         } catch (error) {
-            console.error('Ошибка фильтрации резерваций:', error);
-            toast.error('Auftragsnummer nicht gefunden.');
+            console.error('Error filtering reservations:', error);
+            toast.error('Order number not found.');
         } finally {
             setLoading(false);
         }
@@ -69,7 +69,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
     const handleShowAllReservations = () => {
         setOrderPrefix('');
         onShowAll(); // Загружаем полный список резерваций через родительский метод
-        toast.success('Фильтр сброшен. Показаны все резервации.');
+        toast.success('Filter reset. Showing all reservations.');
     };
 
 
@@ -81,24 +81,24 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
     const handleFilterSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         if (filterWeek.trim() === '') {
-            toast.error('Bitte geben Sie einen gültigen Wert für die Woche ein.');
+            toast.error('Please enter a valid value for the week.');
             return;
         }
         onWeekFilter(filterWeek);
-        toast.success(`Gefiltert nach Woche: ${filterWeek}`);
+        toast.success(`Filtered by week: ${filterWeek}`);
     };
 
     const handleShowAll = () => {
         setFilterWeek('');
         onShowAll();
-        toast.success('Alle Artikel werden angezeigt.');
+        toast.success('All articles are displayed.');
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Möchten Sie diese Reservierung wirklich löschen?')) return; // Подтверждение удаления
+        if (!confirm('Do you really want to delete this reservation?')) return; // Подтверждение удаления
 
         try {
-            console.log("Удаление резервации с ID:", id);
+            console.log("Deleting a reservation with ID:", id);
 
             // Выполняем DELETE запрос
             const response = await api.delete(`/reservations/${id}`);
@@ -114,34 +114,34 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
             // Вызываем callback для обновления в App.tsx
             onReservationRemoved(itemId, returnedQuantity);
             // Уведомление об успехе
-            toast.success('Reservierung erfolgreich gelöscht.');
+            toast.success('Reservation successfully deleted.');
 
             // Обновление списка
             onShowAll();
         } catch (err) {
-            toast.error('Das Löschen der Reservierung ist fehlgeschlagen.');
+            toast.error('Deleting the reservation failed.');
             console.error(err);
         }
     };
 
     return (
         <div className="reserved-items-list">
-            <h3>Reservierungen</h3>
+            <h3>Reservations</h3>
 
             {/* Форма для фильтрации по префиксу заказа */}
             <form onSubmit={handleFilterByOrderPrefix} className="filter-form">
-                <label htmlFor="order-prefix">Filtern nach Auftragsnummer:</label>
+                <label htmlFor="order-prefix">Filter by order number:</label>
                 <input
                     type="text"
                     id="order-prefix"
-                    placeholder="Geben Sie das Auftragsnummer ein (z. B. 2516024)"
+                    placeholder="Enter the order number"
                     value={orderPrefix}
                     onChange={(e) => setOrderPrefix(e.target.value)}
                     disabled={loading}
                 />
                 <div className="btn-group">
                     <button type="submit" className="btn btn-filter" disabled={loading}>
-                        Anwenden
+                        Apply
                     </button>
                     <button
                         type="button"
@@ -149,7 +149,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                         onClick={handleShowAllReservations}
                         disabled={loading}
                     >
-                        Zurücksetzen
+                        Reset
                     </button>
                 </div>
             </form>
@@ -157,44 +157,44 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
 
             {/* Форма для фильтрации по неделе */}
             <form onSubmit={handleFilterSubmit} className="filter-form">
-                <label htmlFor="week-filter">Filtern nach Woche:</label>
+                <label htmlFor="week-filter">Filter by week:</label>
                 <input
                     type="text"
                     id="week-filter"
-                    placeholder="Woche eingeben (z. B. KW42)"
+                    placeholder="Enter week"
                     value={filterWeek}
                     onChange={(e) => setFilterWeek(e.target.value)}
                 />
                 <button type="submit" className="btn btn-filter">
-                    Filter anwenden
+                    Apply filter
                 </button>
                 <button type="button" className="btn btn-check-all" onClick={handleShowAll}>
-                    Alle anzeigen
+                    Show all
                 </button>
             </form>
 
             {/* Список зарезервированных предметов */}
             {reservedItems.length === 0 ? (
-                <p>Keine reservierten Artikel gefunden.</p>
+                <p>No reserved items found.</p>
             ) : (
                 <ul>
                     {reservedItems.map((item) => (
                         <li key={item.id} className="reserved-item">
                             <div className="reserved-item-details">
-                                <strong>{item.name}</strong> - Auftragsnummer # {item.orderNumber}, KW: {item.week}, Menge: {item.quantity}
+                                <strong>{item.name}</strong> - Order number # {item.orderNumber}, Week: {item.week}, Amount: {item.quantity}
                             </div>
                             <div className="reserved-item-actions">
                                 <button
                                     onClick={() => setShowScanner(true)}
                                     className="btn btn-scan"
                                 >
-                                    Reservierung per QR abschließen
+                                    Complete reservation via QR code
                                 </button>
                                 <button
                                     onClick={() => handleDelete(item.id)}
                                     className="btn btn-delete"
                                 >
-                                    Entfernen
+                                    Remove
                                 </button>
                             </div>
                         </li>
@@ -208,7 +208,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                     onScan={(orderNumber) => {
                         setShowScanner(false);
                         onScan(orderNumber);
-                        toast.success('Reservierung über QR erfolgreich abgeschlossen.');
+                        toast.success('Reservation via QR code successfully completed.');
                     }}
                     onClose={handleScanClose}
                 />

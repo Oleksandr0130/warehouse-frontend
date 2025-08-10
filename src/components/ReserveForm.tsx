@@ -182,13 +182,13 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
         event.preventDefault();
 
         if (!selectedItemId || !week || quantity <= 0 || !orderNumber) {
-            toast.error('Bitte füllen Sie alle Felder korrekt aus.');
+            toast.error('Please fill in all fields correctly.');
             return;
         }
 
         const selectedItem = items.find(item => item.id === selectedItemId);
         if (!selectedItem) {
-            toast.error('Der ausgewählte Artikel wurde nicht gefunden.');
+            toast.error('The selected article was not found.');
             return;
         }
 
@@ -206,7 +206,7 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
 
             onUpdateItems(selectedItemId, quantity);
             onReserveComplete();
-            toast.success('Reservierung erfolgreich erstellt!');
+            toast.success('Reservation successfully created!');
 
             setInputValue('');
             setSelectedItemId('');
@@ -214,8 +214,8 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
             setWeek('');
             setOrderNumber('');
         } catch (error) {
-            console.error('Fehler beim Erstellen der Reservierung:', error);
-            toast.error('Fehler beim Erstellen der Reservierung.');
+            console.error('Error creating reservation:', error);
+            toast.error('Error creating reservation.');
         }
     };
 
@@ -223,13 +223,13 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
         <form onSubmit={handleSubmit} className="reserve-form">
             <h3>Create a Reservation</h3>
             <div className="form-group">
-                <label htmlFor="item-input">Artikel auswählen oder eingeben:</label>
+                <label htmlFor="item-input">Select or enter item:</label>
                 <input
                     type="text"
                     id="item-input"
                     value={inputValue}
                     onChange={handleInputChange}
-                    placeholder="Artikelname eingeben"
+                    placeholder="Enter article name"
                 />
                 {suggestions.length > 0 && (
                     <ul className="suggestions">
@@ -243,7 +243,7 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
             </div>
 
             <div className="form-group">
-                <label htmlFor="quantity-input">Menge:</label>
+                <label htmlFor="quantity-input">Amount:</label>
                 <input
                     type="number"
                     id="quantity-input"
@@ -254,29 +254,29 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
             </div>
 
             <div className="form-group">
-                <label htmlFor="week-input">Reservierung KW:</label>
+                <label htmlFor="week-input">Reservation week:</label>
                 <input
                     type="text"
                     id="week-input"
-                    placeholder="KW eingeben (z. B. 42)"
+                    placeholder="Enter week number"
                     value={week}
                     onChange={(e) => setWeek(e.target.value)}
                 />
             </div>
 
             <div className="form-group">
-                <label htmlFor="order-number-input">Auftragsnummer:</label>
+                <label htmlFor="order-number-input">Order number:</label>
                 <input
                     type="text"
                     id="order-number-input"
-                    placeholder="Auftragsnummer eingeben"
+                    placeholder="Enter order numbern"
                     value={orderNumber}
                     onChange={(e) => setOrderNumber(e.target.value)}
                 />
             </div>
 
             <button type="submit" className="btn btn-submit">
-                Reservierung erstellen
+                Create reservation
             </button>
         </form>
     );

@@ -308,7 +308,7 @@ const FileViewer: React.FC = () => {
                 }));
                 setQrFiles(qrBase64Files);
             } catch (error) {
-                console.error('Ошибка при загрузке QR-кодов товаров:', error);
+                console.error('Error loading QR codes for products:', error);
             }
         };
 
@@ -322,7 +322,7 @@ const FileViewer: React.FC = () => {
                 }));
                 setReservationFiles(reservationFiles);
             } catch (error) {
-                console.error('Ошибка при загрузке QR-кодов резерваций:', error);
+                console.error('Error loading reservation QR codes:', error);
             }
         };
 
@@ -344,8 +344,8 @@ const FileViewer: React.FC = () => {
             link.click();
             document.body.removeChild(link);
         } catch (error) {
-            console.error('Ошибка при скачивании QR-кода:', error);
-            alert(`Не удалось скачать QR-код с ID: ${id}`);
+            console.error('Error downloading QR code:', error);
+            alert(`Failed to download QR code with ID: ${id}`);
         }
     };
 
@@ -382,7 +382,7 @@ const FileViewer: React.FC = () => {
 
     const handlePrintSelected = () => {
         if (selectedFiles.length === 0 && selectedReservations.length === 0) {
-            alert('Вы не выбрали ни одного QR-кода для печати.');
+            alert('You have not selected any QR codes to print.');
             return;
         }
 
@@ -459,7 +459,7 @@ const FileViewer: React.FC = () => {
             {/* Поле для поиска */}
             <input
                 type="text"
-                placeholder="Suche nach Namen..."
+                placeholder="Search by name..."
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className="search-input"
@@ -467,10 +467,10 @@ const FileViewer: React.FC = () => {
 
             {/* Кнопка для печати выбранных QR-кодов */}
             <button className="print-button" onClick={handlePrintSelected}>
-                Drucken
+                Print
             </button>
 
-            <h1 className="file-viewer-title">Lager QR</h1>
+            <h1 className="file-viewer-title">Warehouse QR</h1>
             <ul className="file-list">
                 {filteredQrFiles.map((file) => (
                     <li className="file-item" key={file.id}>
@@ -488,7 +488,7 @@ const FileViewer: React.FC = () => {
                         />
                         <span className="file-name">{file.id}</span>
                         <button className="download-button" onClick={() => handleDownloadQRCode(file.id, 'item')}>
-                            Laden
+                            Load
                         </button>
                     </li>
                 ))}
@@ -506,13 +506,13 @@ const FileViewer: React.FC = () => {
                         />
                         <img
                             src={`data:image/png;base64,${file.qrCode}`}
-                            alt={`QR код резервации ${file.orderNumber}`}
+                            alt={`QR code for reservation ${file.orderNumber}`}
                             className="qr-image"
                             onClick={() => handleImageClick(file.qrCode)}
                         />
-                        <span className="file-name">Auftragsnummer: {file.orderNumber}</span>
+                        <span className="file-name">Order number: {file.orderNumber}</span>
                         <button className="download-button" onClick={() => handleDownloadQRCode(file.id, 'reservation')}>
-                            Laden
+                            Load
                         </button>
                     </li>
                 ))}
@@ -523,7 +523,7 @@ const FileViewer: React.FC = () => {
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <img src={`data:image/png;base64,${activeQrCode}`} alt="QR Code" className="modal-image" />
                         <button className="close-button" onClick={handleCloseModal}>
-                            Schließen
+                            Close
                         </button>
                     </div>
                 </div>

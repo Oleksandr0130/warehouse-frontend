@@ -19,14 +19,14 @@ const DownloadExcelButton: React.FC = () => {
             link.click();
             link.parentNode?.removeChild(link);
         } catch (error) {
-            console.error('Ошибка при скачивании Excel-файла:', error);
-            alert('Не удалось скачать файл. Попробуйте позже.');
+            console.error('Error downloading Excel file:', error);
+            alert('Failed to download file. Try again later.');
         }
     };
 
     return (
         <button className="download-excel-button" onClick={handleDownload}>
-            📊 Excel herunterladen
+            📊 Download Excel
         </button>
     );
 };

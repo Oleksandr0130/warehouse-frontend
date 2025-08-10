@@ -58,7 +58,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             setItems(response.data);
         } catch (err) {
             console.error(err);
-            toast.error('Ошибка при загрузке товаров.');
+            toast.error('Error loading products.');
             setItems([]);
         } finally {
             setLoading(false);
@@ -81,7 +81,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             setReservedItems(data);
         } catch (err) {
             console.error(err);
-            toast.error('Ошибка при загрузке зарезервированных товаров.');
+            toast.error('Error loading reserved items.');
             setReservedItems([]);
         } finally {
             setLoading(false);
@@ -95,7 +95,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             setSoldReservations(response.data ?? []);
         } catch (err) {
             console.error(err);
-            toast.error('Ошибка при загрузке проданных товаров.');
+            toast.error('Error loading sold items.');
             setSoldReservations([]);
         } finally {
             setLoading(false);
@@ -107,10 +107,10 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         try {
             await api.post('/items', item);
             fetchItems(sortCriteria);
-            toast.success('Товар успешно добавлен!');
+            toast.success('Product added successfully!');
         } catch (err) {
             console.error(err);
-            toast.error('Ошибка добавления товара.');
+            toast.error('Error adding product.');
         } finally {
             setLoading(false);
         }
@@ -121,22 +121,22 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         if (!scannerAction) return;
 
         const input = prompt(
-            `Введите количество для ${scannerAction === 'add' ? 'добавления' : 'удаления'}:`
+            `Enter quantity for ${scannerAction === 'add' ? 'add' : 'remove'}:`
         );
         const quantity = Number(input);
         if (!input || isNaN(quantity) || quantity <= 0) {
-            toast.error('Введите корректное число.');
+            toast.error('Please enter a valid number.');
             return;
         }
 
         setLoading(true);
         try {
             await api.put(`/items/${id}/${scannerAction}`, null, { params: { quantity } });
-            toast.success(`Операция ${scannerAction} выполнена. Количество: ${quantity}`);
+            toast.success(`Operation ${scannerAction} completed. Quantity: ${quantity}`);
             fetchItems(sortCriteria);
         } catch (err) {
             console.error(err);
-            toast.error('Ошибка при выполнении операции.');
+            toast.error('Operation error.');
         } finally {
             setLoading(false);
         }
@@ -144,17 +144,17 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
 
     const handleReservedItemScan = async (orderNumber: string) => {
         if (!orderNumber) {
-            toast.error('Некорректный QR-код.');
+            toast.error('Incorrect QR code.');
             return;
         }
         setLoading(true);
         try {
             await api.post('/reservations/scan', null, { params: { orderNumber } });
             fetchReservedItems();
-            toast.success('Резерв обработан!');
+            toast.success('Reservation processed!');
         } catch (err) {
             console.error(err);
-            toast.error('Ошибка при обработке резерва.');
+            toast.error('Error processing reserve.');
         } finally {
             setLoading(false);
         }
@@ -168,7 +168,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         );
         fetchReservedItems();
         fetchItems(sortCriteria);
-        toast.success('Резервация удалена.');
+        toast.success('Reservation deleted.');
     };
 
     return (
@@ -180,46 +180,46 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                         className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`}
                         onClick={() => setActiveMenu('inventory')}
                     >
-                        Lagerbestand
+                        Inventory
                     </li>
                     <li
                         className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`}
                         onClick={() => setActiveMenu('reserve')}
                     >
-                        Reservierte Artikel
+                        Reserved items
                     </li>
                     <li
                         className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`}
                         onClick={() => setActiveMenu('sold')}
                     >
-                        Verkaufte Artikel
+                        Sold items
                     </li>
                     <li
                         className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`}
                         onClick={() => setActiveMenu('files')}
                     >
-                        Dateibetrachter
+                        QR-Codes
                     </li>
                     <li
                         className={`menu-item ${activeMenu === 'about' ? 'active' : ''}`}
                         onClick={() => setActiveMenu('about')}
                     >
-                        Über die App
+                        About App
                     </li>
                     <li
                         className={`menu-item ${activeMenu === 'account' ? 'active' : ''}`}
                         onClick={() => setActiveMenu('account')}
                     >
-                        Личный кабинет
+                        Personal account
                     </li>
                     <li className="logout-item" onClick={onLogout}>
-                        Abmelden
+                        Log out
                     </li>
                 </ul>
             </aside>
 
             <main className="app-main">
-                {loading && <div className="loading-overlay">Загрузка...</div>}
+                {loading && <div className="loading-overlay">Loading...</div>}
 
                 {activeMenu === 'inventory' && (
                     <>
@@ -233,7 +233,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                                 }}
                                 disabled={loading}
                             >
-                                Zum Hinzufügen scannen
+                                Scan to add
                             </button>
                             <button
                                 className="btn btn-remove"
@@ -243,12 +243,12 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                                 }}
                                 disabled={loading}
                             >
-                                Zum Entfernen scannen
+                                Scan to remove
                             </button>
                         </div>
                         {showScanner && <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />}
                         <div className="sort-dropdown">
-                            <label htmlFor="sort-menu">Sortieren nach:</label>
+                            <label htmlFor="sort-menu">Sort by:</label>
                             <select
                                 id="sort-menu"
                                 className="sort-select"
@@ -257,8 +257,8 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                             >
                                 <option value="">Standard</option>
                                 <option value="name">Name</option>
-                                <option value="quantity">Menge</option>
-                                <option value="sold">Verkauft</option>
+                                <option value="quantity">Amount</option>
+                                <option value="sold">Sold</option>
                             </select>
                         </div>
                         <div className="excel-button-wrapper">
@@ -309,10 +309,10 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                                             week: it.reservationWeek ?? '',
                                         }));
                                     setReservedItems(data);
-                                    toast.success(`Отфильтровано по неделе ${week}`);
+                                    toast.success(`Sorted by week ${week}`);
                                 } catch (err) {
                                     console.error(err);
-                                    toast.error('Не удалось отфильтровать.');
+                                    toast.error('Failed to filter.');
                                     setReservedItems([]);
                                 } finally {
                                     setLoading(false);

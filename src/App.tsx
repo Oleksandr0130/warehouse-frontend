@@ -29,14 +29,14 @@ function App() {
   const handleAuthSuccess = () => {
     setIsAuthenticated(true);
     setAuthStage('confirmed');
-    toast.success('Вы успешно вошли в систему!');
+    toast.success('Successful Login!');
   };
 
   const handleLogout = () => {
     logout();
     setIsAuthenticated(false);
     setAuthStage('login');
-    toast.info('Вы вышли из системы.');
+    toast.info('Successful Logout!');
   };
 
   if (!isAuthenticated) {
@@ -46,8 +46,8 @@ function App() {
               <>
                 <Login onSuccess={handleAuthSuccess} />
                 <p>
-                  Neues Konto{' '}
-                  <button onClick={() => setAuthStage('register')}>Registrieren</button>
+                  New account{' '}
+                  <button onClick={() => setAuthStage('register')}>Register</button>
                 </p>
               </>
           )}
@@ -55,8 +55,8 @@ function App() {
               <>
                 <Register onSuccess={() => setAuthStage('login')} />
                 <p>
-                  Hast du schon ein Konto?{' '}
-                  <button onClick={() => setAuthStage('login')}>Einloggen</button>
+                  Do you already have an account?{' '}
+                  <button onClick={() => setAuthStage('login')}>Log in</button>
                 </p>
               </>
           )}

@@ -17,15 +17,15 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
     e.preventDefault();
     const quantityNum = parseInt(quantity);
     if (!id.trim()) {
-      toast.error('ID darf nicht leer sein.'); // Используем toast.error
+      toast.error('ID must not be empty.'); // Используем toast.error
       return;
     }
     if (!name.trim()) {
-      toast.error('Name darf nicht leer sein.'); // Используем toast.error
+      toast.error('Name cannot be empty.'); // Используем toast.error
       return;
     }
     if (isNaN(quantityNum) || quantityNum <= 0) {
-      toast.error('Die Menge muss eine positive Zahl sein.'); // Используем toast.error
+      toast.error('The quantity must be a positive number.'); // Используем toast.error
       return;
     }
 
@@ -35,12 +35,12 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
     setId('');
     setName('');
     setQuantity('');
-    toast.success('Artikel erfolgreich hinzugefügt!'); // Используем toast.success
+    toast.success('Item successfully added!'); // Используем toast.success
   };
 
   return (
       <form className="add-item-form" onSubmit={handleSubmit}>
-        <h2>Neues Element hinzufügen</h2>
+        <h2>Add new item</h2>
         <div className="form-group">
           <label htmlFor="id">Name QR</label>
           <input
@@ -60,23 +60,23 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              placeholder="Name Ware"
+              placeholder="Item name"
           />
         </div>
         <div className="form-group">
-          <label htmlFor="quantity">Menge</label>
+          <label htmlFor="quantity">Amount</label>
           <input
               type="number"
               id="quantity"
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
               required
-              placeholder="Menge eingeben"
+              placeholder="Enter amount"
               min="0"
           />
         </div>
         <button type="submit" className="submit-btn">
-          Element hinzufügen
+          Add item
         </button>
       </form>
   );

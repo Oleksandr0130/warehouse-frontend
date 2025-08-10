@@ -48,19 +48,19 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
 
     const label =
         data.status === 'TRIAL'
-            ? `Пробный период: осталось ${daysLeft} дн.`
+            ? `Trial period: remaining ${daysLeft} days left.`
             : data.status === 'EXPIRED'
-                ? 'Подписка истекла'
+                ? 'Subscription has expired'
                 : data.status === 'NO_COMPANY'
-                    ? 'Нет привязки к компании'
-                    : 'Гость';
+                    ? 'No company affiliation'
+                    : 'Guest';
 
     const onPay = async () => {
         try {
             const { checkoutUrl } = await createCheckout();
             window.location.href = checkoutUrl;
         } catch {
-            toast.error('Не удалось создать оплату');
+            toast.error('Failed to create payment');
         }
     };
 
@@ -86,10 +86,10 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
             <div className="sub-actions">
                 {isAdmin ? (
                     <button className="sub-btn" onClick={onPay}>
-                        Продлить подписку
+                        Subscribe
                     </button>
                 ) : (
-                    <div className="sub-hint">Продление доступно администратору компании</div>
+                    <div className="sub-hint">Extension is available to the company administrator</div>
                 )}
             </div>
         </div>

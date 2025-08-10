@@ -21,7 +21,7 @@ const Account: React.FC = () => {
                 const data = await fetchMe();
                 setMe(data);
             } catch {
-                toast.error('Не удалось получить профиль');
+                toast.error('Failed to get account');
             }
         })();
     }, []);
@@ -36,10 +36,10 @@ const Account: React.FC = () => {
         setLoading(true);
         try {
             await adminCreateUser(newUser);
-            toast.success('Пользователь создан');
+            toast.success('User created');
             setNewUser({ username: '', email: '', password: '' });
         } catch {
-            toast.error('Не удалось создать пользователя');
+            toast.error('Failed to create user');
         } finally {
             setLoading(false);
         }
@@ -52,23 +52,23 @@ const Account: React.FC = () => {
             <SubscriptionBanner embedded />
 
             {!me ? (
-                <div className="account-card">Загрузка...</div>
+                <div className="account-card">Loading...</div>
             ) : (
                 <>
                     <div className="account-card">
-                        <div className="row"><span>Ник:</span><b>{me.username}</b></div>
+                        <div className="row"><span>User:</span><b>{me.username}</b></div>
                         <div className="row"><span>Email:</span><b>{me.email}</b></div>
-                        <div className="row"><span>Компания:</span><b>{me.companyName ?? '—'}</b></div>
-                        <div className="row"><span>Роль:</span><b>{me.admin ? 'Администратор' : 'Пользователь'}</b></div>
+                        <div className="row"><span>Company:</span><b>{me.companyName ?? '—'}</b></div>
+                        <div className="row"><span>Role:</span><b>{me.admin ? 'Admin' : 'User'}</b></div>
                     </div>
 
                     {me.admin && (
                         <div className="account-card">
-                            <h3>Создать пользователя</h3>
+                            <h3>Create User</h3>
                             <form className="admin-form" onSubmit={handleCreate}>
                                 <input
                                     name="username"
-                                    placeholder="Имя пользователя"
+                                    placeholder="User"
                                     value={newUser.username}
                                     onChange={handleChange}
                                     required
@@ -84,13 +84,13 @@ const Account: React.FC = () => {
                                 <input
                                     name="password"
                                     type="password"
-                                    placeholder="Пароль"
+                                    placeholder="Password"
                                     value={newUser.password}
                                     onChange={handleChange}
                                     required
                                 />
                                 <button type="submit" disabled={loading}>
-                                    {loading ? 'Создаю...' : 'Создать'}
+                                    {loading ? 'Add...' : 'Create'}
                                 </button>
                             </form>
                         </div>

@@ -22,7 +22,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
         try {
             const response = await loginUser({ username: credentials.username, password: credentials.password });
             localStorage.setItem('token', response.data.token);
-            toast.success('Erfolgreiche Anmeldung!');
+            toast.success('Successful registration!');
             onSuccess();
 
         } catch (err) {
@@ -32,10 +32,10 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 console.error('API Данные ошибки:', err.response.data);
                 alert(`Ошибка входа: ${err.response.status} - ${err.response.data?.message || 'Неопределенная ошибка'}`);
             } else {
-                console.error('Ошибка:', err);
-                alert('Произошла неизвестная ошибка при входе.');
+                console.error('Error:', err);
+                alert('Unknown error login.');
             }
-            toast.error('Falscher Benutzername/Passwort!');
+            toast.error('Incorrect username/password!');
         }
     };
 
@@ -47,7 +47,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 <input
                     type="text"          // поменял тип на text, логин обычно не email
                     name="username"
-                    placeholder="Benutzername"
+                    placeholder="User"
                     value={credentials.username}
                     onChange={handleChange}
                     required
@@ -55,18 +55,18 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 <input
                     type="password"
                     name="password"
-                    placeholder="Passwort"
+                    placeholder="Password"
                     value={credentials.password}
                     onChange={handleChange}
                     required
                 />
-                <button type="submit" className="login-btn">Einloggen</button>
+                <button type="submit" className="login-btn">Log in</button>
             </form>
 
             {/* Блок с информацией об авторских правах */}
             <footer className="login-footer">
-                <p>© 2025 Alexander Starikov. <br/>
-                    <span>Alle Rechte vorbehalten.</span>
+                <p>© 2025 Aleksander Starikov. <br/>
+                    <span>All rights reserved.</span>
                 </p>
             </footer>
         </div>
