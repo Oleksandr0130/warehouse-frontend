@@ -1,4 +1,3 @@
-/* Общий фон */
 .auth-page {
     display: flex;
     justify-content: center;
@@ -8,7 +7,6 @@
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Карточка формы */
 .auth-card {
     background: white;
     padding: 40px 30px;
@@ -19,22 +17,18 @@
     text-align: center;
 }
 
-/* Заголовок */
-.app-title {
-    font-size: 28px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 5px;
+.app-logo {
+    width: 120px;
+    height: auto;
+    margin-bottom: 15px;
 }
 
-/* Подзаголовок */
 .app-subtitle {
     font-size: 14px;
     color: #666;
     margin-bottom: 25px;
 }
 
-/* Форма */
 .auth-form {
     display: flex;
     flex-direction: column;
@@ -55,7 +49,6 @@
     outline: none;
 }
 
-/* Кнопка */
 .auth-form button {
     padding: 12px;
     background: linear-gradient(135deg, #4facfe, #00f2fe);
@@ -73,7 +66,6 @@
     transform: translateY(-2px);
 }
 
-/* Футер */
 .auth-footer {
     margin-top: 20px;
     font-size: 12px;

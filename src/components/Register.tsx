@@ -43,7 +43,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
     return (
         <div className="auth-page">
             <div className="auth-card">
-                <h1 className="app-title">FlowQR</h1>
+                <img src="/flowqr-logo.png" alt="FlowQR Logo" className="app-logo" />
                 <p className="app-subtitle">Create your account</p>
 
                 <form className="auth-form" onSubmit={handleSubmit}>
