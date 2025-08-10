@@ -1,47 +1,13 @@
-.add-item-form {
-  max-width: 400px;
-  margin: 0 auto 20px;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: #f9f9f9;
-}
+@import './theme.css';
 
-.add-item-form h2 {
-  text-align: center;
-  margin-bottom: 20px;
+.add-item-form{
+  max-width: 560px; margin:0 auto 22px; padding:20px;
+  composes: card from './theme.css';
 }
+.add-item-form h2{ composes: h2 from './theme.css'; text-align:center; }
 
-.add-item-form .form-group {
-  margin-bottom: 15px;
-}
+.add-item-form .form-group{ margin-bottom:14px; }
+.add-item-form .form-group label{ color:#fff; font-weight:700; margin-bottom:6px; display:block; }
+.add-item-form .form-group input{ composes: input from './theme.css'; width:100%; }
 
-.add-item-form .form-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
-.add-item-form .form-group input {
-  width: 100%;
-  padding: 8px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.add-item-form .submit-btn {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-}
-
-.add-item-form .submit-btn:hover {
-  background-color: #0056b3;
-}
+.add-item-form .submit-btn{ composes: btn btn-primary from './theme.css'; width:100%; }

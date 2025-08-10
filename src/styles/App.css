@@ -1,142 +1,70 @@
-/* Общие стили для приложения */
-.app-container {
-  display: flex;
-  height: 100vh;
-  background-color: #f5f5f5;
+@import './theme.css';
+
+/* каркас приложения */
+.app-container{
+  display:flex;
+  min-height:100vh;
+}
+.app-main{
+  flex:1;
+  padding:24px;
+  overflow-y:auto;
+  background:
+          radial-gradient(1200px 600px at 20% 10%, #d9c8ab 0%, rgba(217,200,171,0) 60%),
+          linear-gradient(140deg, var(--bg1) 0%, var(--bg2) 40%, var(--bg3) 100%);
 }
 
-/* Стили для фиксированного бокового меню */
-.fixed-sidebar {
-  width: 250px;
-  background-color: #12232E; /* Тёмно-синий фон */
-  color: #ffffff; /* Белый текст */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 0;
-  box-shadow: inset -1px 0 5px rgba(0, 0, 0, 0.2);
+/* сайдбар */
+.fixed-sidebar{
+  width:260px;
+  background: rgba(25,24,22,.55);
+  border-right:1.5px solid rgba(255,255,255,.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color:#fff;
+  box-shadow: var(--shadow);
+  display:flex; flex-direction:column; align-items:center; padding:18px 10px;
+}
+.sidebar-title{
+  font-size:22px; font-weight:800; letter-spacing:.4px;
+  width:100%; text-align:center; padding-bottom:12px; margin-bottom:16px;
+  border-bottom:1px dashed rgba(255,255,255,.4);
+}
+.sidebar-menu{ list-style:none; padding:0; margin:0; width:100%; }
+.menu-item{
+  padding:12px 14px; margin:4px 10px; text-align:left; border-radius:12px;
+  color:#fff; cursor:pointer; transition:.2s background,.2s transform;
+}
+.menu-item:hover{ background: rgba(255,255,255,.12); transform: translateX(2px); }
+.menu-item.active{ background: rgba(255,255,255,.18); }
+
+/* кнопки сканера и др. */
+.btn{ composes: btn from './theme.css'; }
+.btn.btn-add{ composes: btn-success from './theme.css'; }
+.btn.btn-remove{ composes: btn-danger from './theme.css'; }
+.btn:disabled{ opacity:.6; cursor:not-allowed; }
+
+.scanner-buttons{ margin: 18px 0; }
+
+.loading-overlay{
+  position: fixed; inset:0; z-index:1000;
+  background: rgba(0,0,0,.35);
+  color:#fff; font-size:20px;
+  display:flex; align-items:center; justify-content:center;
 }
 
-.sidebar-title {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #ffffff;
-  padding-bottom: 10px;
-  text-align: center;
-  width: 80%;
+.sort-dropdown{ display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+.sort-dropdown label{ color:#fff; font-weight:700; }
+.sort-select{
+  height:44px; border-radius:12px; padding:0 12px;
+  border:1.5px solid var(--stroke); background: var(--glass); color:#fff;
 }
+.sort-select:focus{ outline:none; border-color:var(--stroke-strong); box-shadow:0 0 0 3px rgba(255,255,255,.15); }
 
-.sidebar-menu {
-  list-style: none;
-  width: 100%;
-  padding: 0;
-  margin: 0;
+@media (max-width: 992px){
+  .fixed-sidebar{ position:sticky; top:0; width:230px; }
 }
-
-.menu-item {
-  font-size: 1rem;
-  padding: 15px;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 0.3s;
+@media (max-width: 768px){
+  .fixed-sidebar{ display:none; }
+  .app-main{ padding:16px; }
 }
-
-.menu-item:hover {
-  background-color: #007CC7; /* Слегка светлее при наведении */
-}
-
-.menu-item.active {
-  background-color: #4DA8DA; /* Цвет активного пункта меню */
-}
-.logout-item {
-  /* если нужно, можно добавить особый стиль, например, красный цвет */
-  color: red;
-}
-
-/* Стили для основного контента */
-.app-main {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.scanner-buttons {
-  margin: 20px 0;
-}
-
-/* Стили кнопок */
-.btn {
-  padding: 10px 15px;
-  font-size: 14px;
-  border-radius: 4px;
-  margin-right: 10px;
-  border: none;
-  color: white;
-  cursor: pointer;
-}
-
-.btn.btn-add {
-  background-color: #28a745;
-}
-
-.btn.btn-remove {
-  background-color: #dc3545;
-}
-
-.btn:disabled {
-  background-color: grey;
-  cursor: not-allowed;
-}
-
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 24px;
-  color: #555;
-}
-
-.sort-dropdown {
-  margin-bottom: 20px; /* Отступ от соседних элементов */
-  display: flex;
-  align-items: center;
-  gap: 10px; /* Расстояние между текстом "Sort Items By:" и выпадающим списком */
-}
-
-.sort-dropdown label {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #555;
-}
-
-.sort-select {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-  background-color: #fff;
-  cursor: pointer;
-  appearance: none; /* Убирает стандартный стиль браузера на выпадающем меню */
-  transition: border-color 0.2s ease;
-}
-
-.sort-select:focus {
-  outline: none;
-  border-color: #007bff; /* Подсвечиваем границу при фокусе */
-}
-
-
-
-
-
-
-
-
-
-

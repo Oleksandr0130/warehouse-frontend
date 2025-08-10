@@ -1,28 +1,19 @@
+@import './theme.css';
+
 .subscription-banner {
-    padding: 12px;
-    background: #fff3cd;
-    border: 1px solid #ffeeba;
-    border-radius: 8px;
-    margin: 8px 0;
+    composes: card from './theme.css';
+    padding: 16px;
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.08);
 }
 
-.subscription-banner b {
-    color: #856404;
+.subscription-text {
+    color: #fff;
+    font-size: 15px;
 }
 
-.subscription-banner button {
-    margin-left: 12px;
-    background: #ffc107;
-    color: #212529;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.subscription-banner button:hover {
-    background: #e0a800;
+.subscription-button {
+    composes: btn btn-success from './theme.css';
 }
