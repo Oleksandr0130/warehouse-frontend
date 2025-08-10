@@ -65,7 +65,6 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                     />
                     <button type="submit" className="auth-button">LOGIN</button>
                 </form>
-
                 <div className="auth-alt">DON'T HAVE AN ACCOUNT? <span className="underline">SIGN UP</span></div>
 
                 <footer className="auth-footer">
