@@ -1,14 +1,21 @@
 @import './theme.css';
 
 .sold-items-container {
-    composes: card from './theme.css';
+    background: var(--glass);
+    border: 1.5px solid var(--stroke);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
     padding: 18px;
     margin-bottom: 18px;
     color: #fff;
+    backdrop-filter: blur(8px);
 }
 
 .sold-items-container h2 {
-    composes: h2 from './theme.css';
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: #fff;
 }
 
 .sold-items-list {
@@ -19,19 +26,43 @@
 
 .sold-item {
     padding: 12px 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.25);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    transition: background 0.2s ease;
 }
 
 .sold-item:last-child {
     border-bottom: none;
 }
 
-.sold-item-name {
-    font-weight: 700;
+.sold-item:hover {
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.sold-item-quantity {
-    color: rgba(255,255,255,0.85);
+.item-order-number,
+.item-name,
+.item-quantity,
+.item-sold-week,
+.item-sale-date {
+    flex: 1 1 45%;
+    min-width: 150px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.item-name {
+    font-weight: 700;
+    color: #fff;
+}
+
+.item-quantity {
+    font-weight: 600;
+}
+
+.empty-message {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.85);
+    font-style: italic;
+    padding: 12px;
 }

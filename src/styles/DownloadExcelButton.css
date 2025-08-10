@@ -1,6 +1,25 @@
 @import './theme.css';
 
-.download-excel-button{
-    composes: btn btn-success from './theme.css';
-    display:inline-flex; align-items:center; gap:10px; font-weight:800; height:46px;
+.download-excel-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    height: 46px;
+    padding: 0 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--stroke);
+    background: var(--accent-green);
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.download-excel-button:hover {
+    transform: scale(1.03);
+    background: #45a049; /* чуть темнее зелёного */
+}
+
+.download-excel-button:active {
+    transform: scale(0.97);
 }

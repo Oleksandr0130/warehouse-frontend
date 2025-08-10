@@ -1,19 +1,41 @@
 @import './theme.css';
 
 .subscription-banner {
-    composes: card from './theme.css';
+    background: var(--glass);
+    border: 1.5px solid var(--stroke);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
     padding: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255,255,255,0.08);
-}
-
-.subscription-text {
+    margin-bottom: 16px;
+    text-align: center;
     color: #fff;
-    font-size: 15px;
+    backdrop-filter: blur(8px);
 }
 
-.subscription-button {
-    composes: btn btn-success from './theme.css';
+.subscription-banner h3 {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.subscription-banner p {
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.subscription-banner .btn-subscribe {
+    background: var(--accent-green);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.subscription-banner .btn-subscribe:hover {
+    background: #43a047;
+    transform: scale(1.03);
 }

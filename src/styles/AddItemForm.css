@@ -1,13 +1,24 @@
 @import './theme.css';
 
-.add-item-form{
-  max-width: 560px; margin:0 auto 22px; padding:20px;
-  composes: card from './theme.css';
+.add-item-form {
+  max-width: 560px;
+  margin: 0 auto 22px;
+  padding: 20px;
 }
-.add-item-form h2{ composes: h2 from './theme.css'; text-align:center; }
 
-.add-item-form .form-group{ margin-bottom:14px; }
-.add-item-form .form-group label{ color:#fff; font-weight:700; margin-bottom:6px; display:block; }
-.add-item-form .form-group input{ composes: input from './theme.css'; width:100%; }
+.add-item-form h2 {
+  text-align: center;
+}
 
-.add-item-form .submit-btn{ composes: btn btn-primary from './theme.css'; width:100%; }
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* Инпуты и кнопка используют глобальные классы .input и .btn */

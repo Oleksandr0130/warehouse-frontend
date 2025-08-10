@@ -1,26 +1,81 @@
 @import './theme.css';
 
-.item-list{
-  composes: card from './theme.css';
-  padding:18px; color:#fff;
+.item-list {
+  background: var(--glass);
+  border: 1.5px solid var(--stroke);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  color: #fff;
+  backdrop-filter: blur(8px);
 }
-.item-list h2{ composes: h2 from './theme.css'; }
-.empty-message{ color: rgba(255,255,255,.85); font-style:italic; }
 
-.item-list-ul{ list-style:none; margin:0; padding:0; }
-.item-list-item{
-  display:grid; gap:12px; padding:12px 10px;
-  border-bottom:1px solid rgba(255,255,255,.25);
+.item-list h3 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  color: #fff;
 }
-.item-list-item:last-child{ border-bottom:none; }
 
-.item-low-stock{ background: rgba(244,67,54,.18); border-radius:12px; }
-.item-green-stock{ background: rgba(76,175,80,.18); border-radius:12px; }
+.empty-message {
+  color: rgba(255, 255, 255, .85);
+  font-style: italic;
+  text-align: center;
+  padding: 12px;
+}
 
-.item-details{ display:flex; flex-wrap:wrap; gap:8px; }
-.item-name{ font-weight:800; font-size:1.1rem; color:#fff; }
-.item-quantity,.item-sold{ color: rgba(255,255,255,.9); }
+.item-list-ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 
-@media (max-width:600px){
-  .item-list{ padding:14px; }
+.item-list-item {
+  display: grid;
+  gap: 12px;
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, .25);
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.item-list-item:last-child {
+  border-bottom: none;
+}
+
+.item-list-item:hover {
+  transform: scale(1.01);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.item-low-stock {
+  background: rgba(244, 67, 54, .18);
+  border-radius: var(--radius-md);
+}
+
+.item-green-stock {
+  background: rgba(76, 175, 80, .18);
+  border-radius: var(--radius-md);
+}
+
+.item-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.item-name {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.item-quantity,
+.item-sold {
+  color: rgba(255, 255, 255, .9);
+}
+
+@media (max-width: 600px) {
+  .item-list {
+    padding: 14px;
+  }
 }

@@ -1,33 +1,113 @@
 @import './theme.css';
 
-.reserve-form{
-    max-width: 720px; margin:0 auto; padding:22px;
-    composes: card from './theme.css';
+.reserve-form {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 22px;
+    background: var(--glass);
+    border: 1.5px solid var(--stroke);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(8px);
     position: relative;
 }
-.reserve-form h3{ composes: h2 from './theme.css'; text-align:center; }
 
-.reserve-form .form-group{ margin-bottom:14px; position:relative; }
-.reserve-form .form-group label{ color:#fff; font-weight:700; margin-bottom:6px; display:block; }
+.reserve-form h3 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.reserve-form .form-group {
+    margin-bottom: 14px;
+    position: relative;
+}
+
+.reserve-form .form-group label {
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: block;
+}
 
 .reserve-form .form-group select,
-.reserve-form .form-group input{ composes: input from './theme.css'; width:100%; }
-.reserve-form .form-group input.error{ border-color: rgba(244,67,54,.8); }
+.reserve-form .form-group input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius-md);
+    color: #fff;
+    padding: 10px 12px;
+    font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
 
-.reserve-form .btn-submit{ composes: btn btn-success from './theme.css'; width:100%; }
+.reserve-form .form-group input:focus,
+.reserve-form .form-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(0, 132, 255, 0.3);
+}
+
+.reserve-form .form-group input.error {
+    border-color: rgba(244, 67, 54, .8);
+}
+
+.reserve-form .btn-submit {
+    width: 100%;
+    background: var(--accent-green);
+    color: #fff;
+    border: none;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.reserve-form .btn-submit:hover {
+    background: #43a047;
+    transform: scale(1.02);
+}
 
 /* автоподсказки */
-.suggestions{
-    list-style:none; margin:6px 0 0; padding:0; width:100%;
-    position:absolute; z-index:10; left:0;
-    background: rgba(255,255,255,.95); color:#222;
-    border-radius:12px; border:1px solid rgba(0,0,0,.08);
-    box-shadow: 0 12px 28px rgba(0,0,0,.18);
-    max-height: 220px; overflow-y:auto;
+.suggestions {
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 0;
+    width: 100%;
+    position: absolute;
+    z-index: 10;
+    left: 0;
+    background: rgba(255, 255, 255, .95);
+    color: #222;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, .08);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .18);
+    max-height: 220px;
+    overflow-y: auto;
 }
-.suggestions li{ padding:10px 12px; cursor:pointer; transition:.15s background; }
-.suggestions li:hover{ background:#f3eee6; }
-.suggestions li.no-results{ text-align:center; color:#888; font-style:italic; }
-@media (max-width:600px){
-    .reserve-form{ padding:16px; }
+
+.suggestions li {
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.suggestions li:hover {
+    background: #f3eee6;
+}
+
+.suggestions li.no-results {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+}
+
+@media (max-width: 600px) {
+    .reserve-form {
+        padding: 16px;
+    }
 }

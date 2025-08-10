@@ -7,17 +7,17 @@ const DownloadExcelButton: React.FC = () => {
         try {
             // Отправляем GET-запрос на backend для скачивания файла
             const response = await api.get('/items/download/excel', {
-                responseType: 'blob', // Тип ответа blob для обработки файлов
+                responseType: 'blob', // blob для файлов
             });
 
-            // Генерируем ссылку для скачивания файла
+            // Генерация ссылки для скачивания
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', 'items.xlsx'); // Имя файла
+            link.setAttribute('download', 'items.xlsx');
             document.body.appendChild(link);
             link.click();
-            link.parentNode?.removeChild(link);
+            link.remove();
         } catch (error) {
             console.error('Error downloading Excel file:', error);
             alert('Failed to download file. Try again later.');
@@ -25,7 +25,11 @@ const DownloadExcelButton: React.FC = () => {
     };
 
     return (
-        <button className="download-excel-button" onClick={handleDownload}>
+        <button
+            type="button"
+            className="download-excel-button"
+            onClick={handleDownload}
+        >
             📊 Download Excel
         </button>
     );

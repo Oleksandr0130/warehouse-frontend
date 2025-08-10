@@ -1,28 +1,140 @@
 @import './theme.css';
 
-.success-message, .error-message{
-    padding:10px 12px; border-radius:12px; margin-bottom:14px; font-weight:600;
+.success-message,
+.error-message {
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    margin-bottom: 14px;
+    font-weight: 600;
 }
-.success-message{ background: rgba(76,175,80,.2); color:#eaffea; border:1px solid rgba(76,175,80,.55); }
-.error-message{ background: rgba(244,67,54,.2); color:#ffecec; border:1px solid rgba(244,67,54,.55); }
-
-.reserved-item{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.25); color:#fff;
+.success-message {
+    background: rgba(76, 175, 80, .2);
+    color: #eaffea;
+    border: 1px solid rgba(76, 175, 80, .55);
 }
-.reserved-item:last-child{ border-bottom:none; }
-.reserved-item-details{ flex:1; }
-
-.reserved-item-actions button{ margin-left:10px; }
-.btn-delete{ composes: btn btn-danger from './theme.css'; padding:6px 12px; height:40px; }
-.btn-scan{ composes: btn btn-primary from './theme.css'; padding:6px 12px; height:40px; }
-
-.filter-form{
-    composes: card from './theme.css';
-    margin-bottom:18px; padding:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+.error-message {
+    background: rgba(244, 67, 54, .2);
+    color: #ffecec;
+    border: 1px solid rgba(244, 67, 54, .55);
 }
-.filter-form label{ color:#fff; font-weight:700; }
-.filter-form input{ composes: input from './theme.css'; flex:1; min-width:220px; }
-.filter-form .btn-group{ display:flex; gap:10px; }
-.filter-form .btn-filter{ composes: btn btn-primary from './theme.css'; }
-.filter-form .btn-check-all{ composes: btn btn-success from './theme.css'; }
+
+/* Элемент списка */
+.reserved-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, .25);
+    color: #fff;
+    transition: background 0.2s ease;
+}
+.reserved-item:last-child {
+    border-bottom: none;
+}
+.reserved-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.reserved-item-details {
+    flex: 1;
+}
+
+/* Кнопки действий */
+.reserved-item-actions button {
+    margin-left: 10px;
+}
+.btn-delete {
+    background: var(--accent-red);
+    border: none;
+    color: #fff;
+    padding: 6px 12px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+.btn-delete:hover {
+    background: #e53935;
+    transform: scale(1.03);
+}
+
+.btn-scan {
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    padding: 6px 12px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+.btn-scan:hover {
+    background: var(--accent-hover);
+    transform: scale(1.03);
+}
+
+/* Форма фильтрации */
+.filter-form {
+    background: var(--glass);
+    border: 1.5px solid var(--stroke);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    margin-bottom: 18px;
+    padding: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    backdrop-filter: blur(8px);
+}
+.filter-form label {
+    color: #fff;
+    font-weight: 700;
+}
+.filter-form input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius-md);
+    color: #fff;
+    padding: 8px 10px;
+    flex: 1;
+    min-width: 220px;
+}
+.filter-form input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(0, 132, 255, 0.3);
+}
+
+.filter-form .btn-group {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-form .btn-filter {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+.filter-form .btn-filter:hover {
+    background: var(--accent-hover);
+    transform: scale(1.03);
+}
+
+.filter-form .btn-check-all {
+    background: var(--accent-green);
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+.filter-form .btn-check-all:hover {
+    background: #43a047;
+    transform: scale(1.03);
+}

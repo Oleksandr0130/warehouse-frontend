@@ -1,23 +1,10 @@
 @import './styles/theme.css';
 
-.app-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background:
-          radial-gradient(1400px 700px at 20% 10%, #d9c8ab 0%, rgba(217,200,171,0) 60%),
-          linear-gradient(140deg, var(--bg1) 0%, var(--bg2) 40%, var(--bg3) 100%);
-  background-size: cover;
-  background-attachment: fixed;
-}
-
 .app-main {
   flex: 1;
   padding: 24px;
 }
 
 @media (max-width: 768px) {
-  .app-main {
-    padding: 16px;
-  }
+  .app-main { padding: 16px; }
 }
