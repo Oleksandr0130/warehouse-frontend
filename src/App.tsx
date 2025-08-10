@@ -7,7 +7,6 @@ import Confirmation from './components/Confirmation';
 import AppContent from './components/AppContent';
 import { validateTokens, logout } from './types/AuthManager';
 import { toast } from 'react-toastify';
-import './styles/theme.css';
 
 function App() {
   const [authStage, setAuthStage] = useState<'login' | 'register' | 'confirmed'>('login');

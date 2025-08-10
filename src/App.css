@@ -1,10 +1,207 @@
-@import './styles/theme.css';
-
-.app-main {
-  flex: 1;
-  padding: 24px;
+/* Центрирование всего приложения и бокового меню */
+#root {
+  justify-content: center; /* Центруем содержимое */
+  align-items: center;
 }
 
+/* Контейнер всего приложения */
+.app-container {
+  display: flex;
+  width: 100%;
+  background-color: #f5f5f5;
+  /* Позволяем прокручивать содержимое */
+  overflow: auto; /* Разрешаем прокрутку */
+  min-height: 100vh; /* Обеспечиваем минимальную высоту */
+  height: auto; /* Убрали фиксированную высоту */
+}
+
+/* Убедитесь, что для основного блока `.app-main` содержимое также корректно */
+.app-main {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto; /* Прокрутка по вертикали внутри этого блока */
+}
+
+
+/* Исправление непреднамеренного отступа */
+.fixed-sidebar {
+  flex-shrink: 0; /* Отключаем сжатие */
+  width: 250px;
+  background-color: #12232E; /* Темно-синий фон */
+  color: #ffffff; /* Цвет текста */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  box-shadow: inset -1px 0 5px rgba(0, 0, 0, 0.2);
+  height: 100vh; /* Меню занимает всю высоту видимой страницы */
+  position: sticky; /* Фиксируем меню при прокрутке */
+  top: 0; /* Верхнее выравнивание */
+}
+
+
+.sidebar-title {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ffffff;
+  padding-bottom: 10px;
+  text-align: center;
+  width: 80%;
+}
+
+/* Стили меню */
+.sidebar-menu {
+  list-style: none;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  font-size: 1rem;
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.menu-item:hover {
+  background-color: #007CC7; /* Цвет при наведении */
+}
+
+.menu-item.active {
+  background-color: #4DA8DA; /* Цвет активного пункта меню */
+}
+
+.logout-item {
+  color: red;
+}
+
+/* Стили для кнопок */
+.btn {
+  padding: 10px 15px;
+  font-size: 14px;
+  border-radius: 4px;
+  margin-right: 10px;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.btn.btn-add {
+  background-color: #28a745;
+}
+
+.btn.btn-remove {
+  background-color: #dc3545;
+}
+
+.btn:disabled {
+  background-color: grey;
+  cursor: not-allowed;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: #555;
+}
+
+/* Дропдаун сортировки */
+.sort-dropdown {
+  margin-bottom: 20px; /* Отступ от соседних элементов */
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Расстояние между текстом "Sort Items By:" и выпадающим списком */
+}
+
+.sort-dropdown label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.sort-select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #fff;
+  cursor: pointer;
+  appearance: none;
+  transition: border-color 0.2s ease;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: #007bff; /* Подсвечиваем границу при фокусе */
+}
+
+/* Медиазапросы для адаптивности */
 @media (max-width: 768px) {
-  .app-main { padding: 16px; }
+  .app-container {
+    flex-direction: column; /* Контейнер становится вертикальным */
+    overflow: auto; /* Прокрутка включена */
+  }
+
+  .fixed-sidebar {
+    width: 100%; /* Боковое меню растягивается на всю ширину экрана */
+    height: auto;
+  }
+
+  .app-main {
+    padding: 10px;
+    overflow-y: auto; /* Прокрутка основного блока (на случай большого контента) */
+  }
+}
+
+.sidebar-footer {
+  margin-top: auto; /* Размещаем блок внизу */
+  text-align: center; /* Центрируем текст */
+  padding: 15px 15px 30px; /* Добавляем внутренние отступы */
+  font-size: 14px; /* Размер текста */
+  color: #888; /* Бледный цвет текста */
+  cursor: pointer; /* Делаем текст кликабельным */
+  border-top: 1px solid #ddd; /* Разделительная линия сверху */
+  transition: color 0.3s ease, background-color 0.3s ease; /* Плавные переходы для эффектов */
+}
+
+.sidebar-footer:hover {
+  color: #555; /* Более тёмный цвет при наведении */
+  background-color: #eaeaea; /* Лёгкий светлый фон при наведении */
+}
+
+.sidebar-footer p {
+  margin: 0; /* Убираем внешние отступы вокруг параграфа */
+  line-height: 1.5; /* Увеличиваем межстрочный интервал */
+}
+
+.sidebar-footer span {
+  font-weight: bold; /* Делаем вторую строку жирной */
+  display: block; /* Гарантируем, что текст занимает новую строку */
+  color: #666; /* Меняем цвет нижней строки для визуального выделения */
+}
+/* Стили для кнопки «Выйти» в боковом меню */
+.logout-item {
+  margin-top: auto;           /* прижмёт кнопку к низу меню */
+  width: 100%;                /* растянет на всю ширину */
+  padding: 12px 0;            /* вертикальные отступы */
+  background-color: #c0392b;  /* фон в красных тонах */
+  color: #ffffff;             /* белый текст */
+  text-align: center;         /* центрируем текст */
+  border-radius: 4px;         /* скруглённые углы */
+  cursor: pointer;            /* курсор «рука» */
+  transition: background-color 0.2s ease;
+}
+
+.logout-item:hover {
+  background-color: #e74c3c;  /* чуть светлее при наведении */
 }

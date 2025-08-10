@@ -1,36 +1,39 @@
-@import './theme.css';
-
 .confirmation-container {
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    text-align: center;
-    background:
-            radial-gradient(1200px 600px at 20% 10%, #d9c8ab 0%, rgba(217,200,171,0) 60%),
-            linear-gradient(140deg, var(--bg1) 0%, var(--bg2) 40%, var(--bg3) 100%);
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #4caf50, #81c784);
     color: #fff;
+    font-family: 'Arial', sans-serif;
+    text-align: center;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 .confirmation-container h2 {
-    font-size: 26px;
-    font-weight: 800;
-    margin: 12px 0;
+    font-size: 2.2em;
+    margin-bottom: 20px;
 }
 
 .confirmation-container p {
-    background: var(--glass);
-    border: 1.5px solid var(--stroke);
-    border-radius: var(--radius-md);
-    padding: 14px 18px;
-    box-shadow: var(--shadow);
-    max-width: 420px;
+    font-size: 1.2em;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 15px 25px;
+    border-radius: 8px;
+    display: inline-block;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.confirmation-container svg {
-    margin-bottom: 12px;
-}
+/* Адаптивные настройки */
+@media (max-width: 600px) {
+    .confirmation-container h2 {
+        font-size: 1.8em;
+    }
 
-/* Цвета иконок берутся из самого компонента через props color="#4caf50" и color="#f44336" */
+    .confirmation-container p {
+        font-size: 1em;
+        padding: 10px 15px;
+    }
+}

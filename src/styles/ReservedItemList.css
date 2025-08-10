@@ -1,109 +1,97 @@
-@import './theme.css';
-
-.success-message,
-.error-message {
-    padding: 10px 12px;
-    border-radius: var(--radius-md);
-    margin-bottom: 14px;
-    font-weight: 600;
-}
+/* Сообщения об успехе или ошибке */
 .success-message {
-    background: rgba(76, 175, 80, .2);
-    color: #eaffea;
-    border: 1px solid rgba(76, 175, 80, .55);
-}
-.error-message {
-    background: rgba(244, 67, 54, .2);
-    color: #ffecec;
-    border: 1px solid rgba(244, 67, 54, .55);
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    margin-bottom: 15px;
 }
 
-/* Элемент списка */
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* Зарезервированный элемент */
 .reserved-item {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 12px 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, .25);
-    color: #fff;
-    transition: background 0.2s ease;
-}
-.reserved-item:last-child {
-    border-bottom: none;
-}
-.reserved-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
 }
 
 .reserved-item-details {
-    flex: 1;
+    flex-grow: 1;
 }
 
-/* Кнопки действий */
 .reserved-item-actions button {
     margin-left: 10px;
 }
+
+/* Кнопка удаления */
 .btn-delete {
-    background: var(--accent-red);
-    border: none;
+    background-color: #dc3545;
     color: #fff;
-    padding: 6px 12px;
-    height: 40px;
-    border-radius: var(--radius-md);
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
-    transition: transform 0.15s ease, background 0.2s ease;
 }
+
 .btn-delete:hover {
-    background: #e53935;
-    transform: scale(1.03);
+    background-color: #c82333;
 }
 
+/* Кнопка сканирования */
 .btn-scan {
-    background: var(--accent);
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
     border: none;
-    color: #fff;
-    padding: 6px 12px;
-    height: 40px;
-    border-radius: var(--radius-md);
+    border-radius: 5px;
     cursor: pointer;
-    transition: transform 0.15s ease, background 0.2s ease;
-}
-.btn-scan:hover {
-    background: var(--accent-hover);
-    transform: scale(1.03);
 }
 
-/* Форма фильтрации */
+.btn-scan:hover {
+    background-color: #0056b3;
+}
+
 .filter-form {
-    background: var(--glass);
-    border: 1.5px solid var(--stroke);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    margin-bottom: 18px;
-    padding: 14px;
     display: flex;
-    gap: 10px;
     align-items: center;
-    flex-wrap: wrap;
-    backdrop-filter: blur(8px);
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    flex-wrap: wrap; /* Адаптация для узких экранов */
 }
+
 .filter-form label {
-    color: #fff;
-    font-weight: 700;
+    font-weight: bold;
+    color: #555;
 }
+
 .filter-form input {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid var(--stroke);
-    border-radius: var(--radius-md);
-    color: #fff;
-    padding: 8px 10px;
-    flex: 1;
-    min-width: 220px;
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s ease;
 }
+
 .filter-form input:focus {
+    border-color: #007bff;
     outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(0, 132, 255, 0.3);
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 .filter-form .btn-group {
@@ -112,29 +100,31 @@
 }
 
 .filter-form .btn-filter {
-    background: var(--accent);
-    color: #fff;
+    padding: 10px 15px;
+    font-size: 14px;
+    color: white;
+    background-color: #007bff;
     border: none;
-    padding: 8px 14px;
-    border-radius: var(--radius-md);
+    border-radius: 4px;
     cursor: pointer;
-    transition: transform 0.15s ease, background 0.2s ease;
+    transition: background-color 0.3s ease;
 }
+
 .filter-form .btn-filter:hover {
-    background: var(--accent-hover);
-    transform: scale(1.03);
+    background-color: #0056b3;
 }
 
 .filter-form .btn-check-all {
-    background: var(--accent-green);
-    color: #fff;
+    padding: 10px 15px;
+    font-size: 14px;
+    color: white;
+    background-color: #28a745;
     border: none;
-    padding: 8px 14px;
-    border-radius: var(--radius-md);
+    border-radius: 4px;
     cursor: pointer;
-    transition: transform 0.15s ease, background 0.2s ease;
+    transition: background-color 0.3s ease;
 }
+
 .filter-form .btn-check-all:hover {
-    background: #43a047;
-    transform: scale(1.03);
+    background-color: #218838;
 }

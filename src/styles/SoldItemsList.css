@@ -1,68 +1,39 @@
-@import './theme.css';
-
-.sold-items-container {
-    background: var(--glass);
-    border: 1.5px solid var(--stroke);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    padding: 18px;
-    margin-bottom: 18px;
-    color: #fff;
-    backdrop-filter: blur(8px);
-}
-
-.sold-items-container h2 {
-    font-size: 22px;
-    font-weight: 800;
-    margin-bottom: 14px;
-    color: #fff;
-}
-
 .sold-items-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa;
 }
 
 .sold-item {
-    padding: 12px 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    transition: background 0.2s ease;
+    flex-direction: row;
+    gap: 50px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
 }
 
-.sold-item:last-child {
-    border-bottom: none;
-}
-
-.sold-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.item-order-number,
-.item-name,
-.item-quantity,
-.item-sold-week,
-.item-sale-date {
-    flex: 1 1 45%;
-    min-width: 150px;
-    color: rgba(255, 255, 255, 0.9);
-}
-
-.item-name {
-    font-weight: 700;
-    color: #fff;
-}
-
-.item-quantity {
-    font-weight: 600;
+.sold-item > span {
+    margin: 5px 0;
 }
 
 .empty-message {
+    color: #999;
+    font-size: 16px;
     text-align: center;
-    color: rgba(255, 255, 255, 0.85);
-    font-style: italic;
-    padding: 12px;
+    margin-top: 20px;
+}
+
+/* Адаптивные настройки */
+@media (max-width: 768px) {
+    .sold-item {
+        flex-direction: column; /* Изменяем на колонку на мелких экранах */
+        gap: 20px;
+    }
+
+    .sold-items-list {
+        padding: 10px;
+    }
 }

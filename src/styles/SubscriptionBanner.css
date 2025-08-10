@@ -1,41 +1,28 @@
-@import './theme.css';
-
 .subscription-banner {
-    background: var(--glass);
-    border: 1.5px solid var(--stroke);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    padding: 16px;
-    margin-bottom: 16px;
-    text-align: center;
-    color: #fff;
-    backdrop-filter: blur(8px);
+    padding: 12px;
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 8px;
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.subscription-banner h3 {
-    font-size: 20px;
-    font-weight: 800;
-    margin-bottom: 8px;
+.subscription-banner b {
+    color: #856404;
 }
 
-.subscription-banner p {
-    margin-bottom: 12px;
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.85);
-}
-
-.subscription-banner .btn-subscribe {
-    background: var(--accent-green);
-    color: #fff;
+.subscription-banner button {
+    margin-left: 12px;
+    background: #ffc107;
+    color: #212529;
     border: none;
-    padding: 8px 16px;
-    border-radius: var(--radius-md);
-    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.15s ease;
 }
 
-.subscription-banner .btn-subscribe:hover {
-    background: #43a047;
-    transform: scale(1.03);
+.subscription-banner button:hover {
+    background: #e0a800;
 }

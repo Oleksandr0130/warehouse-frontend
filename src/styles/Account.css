@@ -1,52 +1,146 @@
-@import './theme.css';
-
 .account-wrap {
     display: grid;
     gap: 16px;
-    max-width: 760px;
-    margin: 0 auto;
-}
-
-.account-title {
-    font-size: 22px;
-    font-weight: 800;
-    color: #fff;
-    text-align: center;
-    margin: 0 0 8px;
-}
-
-.account-subtitle {
-    font-size: 18px;
-    font-weight: 800;
-    color: #fff;
-    margin: 0 0 12px;
-    text-align: left;
 }
 
 .account-card {
-    background: var(--glass);
-    border: 1.5px solid var(--stroke);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    color: #fff;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
     padding: 16px;
+    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.06);
+}
+
+.account-card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
 }
 
 .row {
     display: flex;
     justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px dashed rgba(255,255,255,0.25);
+    padding: 8px 0;
+    border-bottom: 1px dashed #f1f3f5;
 }
-.row:last-child { border-bottom: none; }
-.row-label { color: rgba(255,255,255,0.9); }
+
+.row:last-child {
+    border-bottom: none;
+}
 
 .admin-form {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 10px;
 }
 
-/* Кнопка/инпуты берут стили из theme.css через классы .btn / .input */
+.admin-form input {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 10px 12px;
+    outline: none;
+}
+
+.admin-form input:focus {
+    border-color: #74c0fc;
+    box-shadow: 0 0 0 3px rgba(116, 192, 252, 0.25);
+}
+
+.admin-form button {
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    background: #0d6efd;
+    color: #fff;
+    cursor: pointer;
+}
+
+.admin-form button[disabled] {
+    opacity: .6;
+    cursor: default;
+}
+/* === Subscription (embedded) === */
+.sub-card {
+    background: linear-gradient(180deg, #fff7e6 0%, #fff 100%);
+    border: 1px solid #ffe7ba;
+    border-radius: 14px;
+    padding: 16px;
+    display: grid;
+    gap: 10px;
+    box-shadow: 0 4px 14px rgba(255, 193, 7, 0.12);
+}
+
+.sub-header {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.sub-pill {
+    font-size: 12px;
+    line-height: 1;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: #fffbe6;
+}
+
+.sub-pill.trial { background: #e7f5ff; }
+.sub-pill.expired { background: #fff1f0; }
+.sub-pill.anon, .sub-pill.no_company { background: #f8f9fa; }
+
+.sub-dates {
+    font-size: 12px;
+    color: #667085;
+}
+
+.sub-title {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.sub-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sub-btn {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 0;
+    background: #0d6efd;
+    color: #fff;
+    cursor: pointer;
+}
+
+.sub-btn:hover { opacity: .95; }
+
+.sub-hint {
+    font-size: 13px;
+    color: #6c757d;
+}
+
+/* Skeleton */
+.sub-skeleton {
+    position: relative;
+    overflow: hidden;
+}
+
+.sub-skel-line {
+    height: 14px;
+    background: #f1f3f5;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.sub-skel-line.short {
+    width: 40%;
+}
+
+/* Вариант на всю ширину (если когда-то решите показывать вне аккаунта) */
+.sub-banner {
+    padding: 14px 16px;
+    border: 1px dashed #ffe7ba;
+    border-radius: 12px;
+    background: #fffdf5;
+}
