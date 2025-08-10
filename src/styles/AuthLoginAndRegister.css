@@ -1,21 +1,22 @@
-/* Экран авторизации заполняет ВСЮ высоту на всех браузерах */
+/* Экран авторизации — занимает весь экран и центрирует форму */
 .auth-page {
     position: relative;
     width: 100%;
-    min-height: 100svh;   /* новые «безопасные» вьюпорт-единицы */
-    height: 100dvh;       /* для моб. браузеров с адресной строкой */
+    min-height: 100vh; /* всегда на всю высоту экрана */
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 20px; /* немного воздуха по краям */
+    box-sizing: border-box;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     color: #fff;
-    overflow: hidden;     /* на всякий случай убираем возможный скролл-артефакт */
+    overflow-x: hidden;
 }
 
-/* Фон переносим в псевдо-элемент, фиксируем и растягиваем на весь экран */
+/* Фон через псевдоэлемент */
 .auth-page::before {
     content: "";
-    position: fixed;      /* фиксируем к вьюпорту, а не к контенту */
+    position: fixed;
     inset: 0;
     z-index: -1;
     background:
@@ -34,7 +35,7 @@
     background: transparent;
     box-shadow: none;
     text-align: center;
-    display: flex;            /* гарантированно центрируем содержимое */
+    display: flex;
     flex-direction: column;
     align-items: center;
 }
@@ -65,7 +66,10 @@
     font-size: 16px;
 }
 
-.auth-form input::placeholder { color: rgba(255,255,255,0.9); }
+.auth-form input::placeholder {
+    color: rgba(255,255,255,0.9);
+}
+
 .auth-form input:focus {
     border-color: rgba(255,255,255,0.95);
     background: rgba(255,255,255,0.16);
@@ -85,7 +89,7 @@
     cursor: pointer;
 }
 
-/* Низ страницы */
+/* Ссылки-переключатели */
 .auth-alt {
     margin-top: 22px;
     font-weight: 700;
@@ -98,16 +102,36 @@
     color: rgba(255,255,255,0.85);
 }
 
-/* Мобильная адаптация */
+/* 📱 Мобильная адаптация */
 @media (max-width: 480px) {
-    .app-logo { width: 140px; margin-bottom: 24px; }
-    .auth-card { padding: 20px 16px; }
-    .auth-form input { height: 50px; font-size: 15px; }
-    .auth-button { height: 52px; font-size: 15px; }
-    .auth-alt { font-size: 14px; }
-    .auth-footer { font-size: 11px; }
+    .app-logo {
+        width: 140px;
+        margin-bottom: 24px;
+    }
 
-    /* Чуть компактнее радиал на мобилке, но всё равно на весь экран */
+    .auth-card {
+        padding: 20px 16px;
+    }
+
+    .auth-form input {
+        height: 50px;
+        font-size: 15px;
+    }
+
+    .auth-button {
+        height: 52px;
+        font-size: 15px;
+    }
+
+    .auth-alt {
+        font-size: 14px;
+    }
+
+    .auth-footer {
+        font-size: 11px;
+    }
+
+    /* Фон на мобильных — чуть компактнее радиал, но всё равно на весь экран */
     .auth-page::before {
         background:
                 radial-gradient(200% 120% at 50% 40%, #d9c8ab 0%, rgba(217,200,171,0) 70%),
