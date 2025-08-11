@@ -166,32 +166,30 @@ body.no-scroll { overflow: hidden; touch-action: none; }
 @media (prefers-reduced-motion: reduce) {
     .btn, .menu-item, .hamburger-btn, .sort-select, .sidebar { transition: none; }
 }
-/* ===== Blur + Dark scrim: надёжное затемнение на Android/iOS ===== */
 @media (max-width: 1024px) {
-    /* порядок слоёв: topbar(130) > sidebar(120) > scrim(115) > backdrop-blur(110) > контент */
-    .topbar  { z-index: 130; }
-    .sidebar { z-index: 120; }
+    /* порядок слоёв: topbar > sidebar > scrim > backdrop > контент */
+    .topbar  { z-index: 140; }   /* шапка всегда над всем */
+    .sidebar { z-index: 130; }   /* меню над затемнением */
 
-    /* blur-слой (у тебя уже есть .backdrop; оставляем как есть, только z-index) */
+    /* blur-слой: пусть покрывает ВСЮ высоту от самого верха */
     .backdrop {
         position: fixed;
         left: 0; right: 0; bottom: 0;
-        top: calc(var(--topbar-h) + env(safe-area-inset-top));
+        top: 0;                                /* <-- было calc(var(--topbar-h) + env(...)) */
         -webkit-backdrop-filter: blur(3px);
         backdrop-filter: blur(3px);
-        background: transparent; /* цвет даст scrim */
-        z-index: 110;
-        pointer-events: none; /* клики ловит scrim */
+        background: transparent;
+        z-index: 120;
+        pointer-events: none;                  /* клики ловит scrim */
     }
 
-    /* тёмный слой поверх blur — гарантированное затемнение */
+    /* тёмный слой поверх blur — тоже от самого верха */
     .scrim {
         position: fixed;
         left: 0; right: 0; bottom: 0;
-        top: calc(var(--topbar-h) + env(safe-area-inset-top));
-        background: rgba(0,0,0,0.52);   /* при желании 0.45–0.6 */
-        z-index: 115;
+        top: 0;                                /* <-- было calc(var(--topbar-h) + env(...)) */
+        background: rgba(0,0,0,0.52);
+        z-index: 125;                          /* между sidebar и backdrop */
         pointer-events: auto;
     }
 }
-
