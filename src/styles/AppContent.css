@@ -45,7 +45,7 @@
 
 .app-main{ padding:24px; }
 
-/* buttons/selects (локально для этого экрана) */
+/* buttons/selects */
 .btn{ padding:12px 16px; font-size:14px; font-weight:800; border-radius:16px; border:1.5px solid rgba(255,255,255,.65); background:rgba(255,255,255,.12); color:#fff; }
 .btn.btn-add{ background:rgba(40,167,69,.25); }
 .btn.btn-remove{ background:rgba(220,53,69,.28); }
@@ -56,10 +56,10 @@
 
 .loading-overlay{
     position:fixed; inset:0; background:rgba(255,255,255,.7);
-    display:flex; justify-content:center; align-items:center; font-size:22px; color:#555; z-index:99990;
+    display:flex; justify-content:center; align-items:center; font-size:22px; color:#555; z-index:9990;
 }
 
-/* ===== Hamburger ===== */
+/* hamburger */
 .hamburger-btn{
     display:inline-flex; width:42px; height:42px; align-items:center; justify-content:center;
     border-radius:12px; border:1.5px solid rgba(255,255,255,.65);
@@ -69,7 +69,6 @@
 .hamburger-btn.is-open span:nth-child(1){ transform:translateY(4.5px) rotate(45deg); }
 .hamburger-btn.is-open span:nth-child(2){ opacity:0; }
 .hamburger-btn.is-open span:nth-child(3){ transform:translateY(-4.5px) rotate(-45deg); }
-
 .topbar-title{ margin:0 0 0 12px; font-size:18px; font-weight:800; color:#fff; text-transform:uppercase; }
 
 /* ===== Mobile / Tablet ===== */
@@ -84,7 +83,6 @@ body.no-scroll{ overflow:hidden; touch-action:none; }
         overflow-x:hidden;
     }
 
-    /* фикс-хедер (можно оставить под затемнением) */
     .topbar{
         display:flex;
         position:fixed; top:0; left:0; right:0;
@@ -94,43 +92,59 @@ body.no-scroll{ overflow:hidden; touch-action:none; }
         backdrop-filter:saturate(140%) blur(6px);
         background:rgba(255,255,255,.18);
         border-bottom:1px solid rgba(255,255,255,.45);
-        z-index:99996; /* ниже scrim */
+        z-index:1000; /* ниже тёмного слоя */
     }
 
-    /* меню поверх всего затемнения */
     .sidebar{
-        position:fixed; left:0; top:0;
-        height:100%; width:86%; max-width:320px;
+        position:fixed; left:0; top:0; height:100%;
+        width:86%; max-width:320px;
         transform:translateX(-100%); transition:transform .25s ease;
-        z-index:99999; /* САМЫЙ верх */
+        z-index:1003; /* поверх оверлея */
         background:rgba(18,35,46,.28);
         border-right:1.5px solid rgba(255,255,255,.75);
         will-change:transform;
     }
     .sidebar.open{ transform:translateX(0); }
 
-    /* слой blur — на весь экран */
-    .backdrop{
-        position:fixed; inset:0;
-        -webkit-backdrop-filter:blur(3px);
-        backdrop-filter:blur(3px);
-        background:transparent;
-        z-index:99994; /* под scrim */
-        pointer-events:none;
-    }
+    /* ===== overlay: universal + fallback ===== */
 
-    /* тёмный слой — тоже на весь экран */
+    /* ТЁМНЫЙ слой — всегда есть и накрывает всё */
     .scrim{
         position:fixed; inset:0;
         background:rgba(0,0,0,.52);
-        z-index:99995; /* над топбаром, под меню */
+        z-index:1002;           /* под меню, над шапкой */
         pointer-events:auto;
+    }
+
+    /* BLUR — если поддерживается фильтр */
+    @supports (backdrop-filter: blur(3px)) or (-webkit-backdrop-filter: blur(3px)) {
+        .backdrop{
+            position:fixed; inset:0;
+            -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+            background:transparent;
+            z-index:1001;
+            pointer-events:none;
+        }
+    }
+
+    /* ФОЛБЭК: если blur не поддерживается — мягкая подложка */
+    @supports not (backdrop-filter: blur(3px)) {
+        .backdrop{
+            position:fixed; inset:0;
+            background:rgba(0,0,0,.25);
+            z-index:1001;
+            pointer-events:none;
+        }
+    }
+
+    /* На всякий случай: если JS уже определил отсутствие blur */
+    body.no-blur .backdrop{
+        background:rgba(0,0,0,.25) !important;
     }
 
     .app-main{ padding:calc(var(--topbar-h) + env(safe-area-inset-top) + 8px) 16px 16px; }
 }
 
-/* доступность */
 @media (prefers-reduced-motion:reduce){
     .sidebar, .scrim, .backdrop, .hamburger-btn{ transition:none; }
 }

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import '../styles/AppContent.css';
-// ↑ в импортах добавь
 import { createPortal } from 'react-dom';
+import './AppContent.css';
 
 import ItemList from './ItemList';
 import ReservedItemsList from './ReservedItemsList';
@@ -21,11 +20,16 @@ import { ReservedItem } from '../types/ReservedItem';
 import { ReservationData } from '../types/ReservationData';
 import { SoldReservation } from '../types/SoldReservation';
 
+type MenuKey = 'inventory' | 'reserve' | 'sold' | 'files' | 'about' | 'account';
+
+// тип без any для проверки CSS.supports
+type CSSWithSupports = {
+    supports?: (prop: string, value?: string) => boolean;
+};
+
 interface AppContentProps {
     onLogout: () => void;
 }
-
-type MenuKey = 'inventory' | 'reserve' | 'sold' | 'files' | 'about' | 'account';
 
 const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     const [items, setItems] = useState<Item[]>([]);
@@ -37,61 +41,57 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     const [activeMenu, setActiveMenu] = useState<MenuKey>('inventory');
     const [sortCriteria, setSortCriteria] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [supportsBlur, setSupportsBlur] = useState<boolean>(true);
 
-    // блокируем прокрутку фона, когда меню открыто
+    // аккуратная проверка поддержки backdrop-filter, без any
+    useEffect(() => {
+        const cssObj = (window as Window & { CSS?: CSSWithSupports }).CSS;
+        const ok =
+            !!cssObj?.supports &&
+            (cssObj.supports('backdrop-filter', 'blur(3px)') ||
+                cssObj.supports('-webkit-backdrop-filter', 'blur(3px)'));
+
+        setSupportsBlur(ok);
+        document.body.classList.toggle('no-blur', !ok);
+    }, []);
+
+    // блокируем скролл фона под меню
     useEffect(() => {
         document.body.classList.toggle('no-scroll', isMenuOpen);
         return () => document.body.classList.remove('no-scroll');
     }, [isMenuOpen]);
 
-    // закрываем выезжающее меню после выбора пункта
-    useEffect(() => {
-        setIsMenuOpen(false);
-    }, [activeMenu]);
+    // закрываем меню после выбора пункта
+    useEffect(() => { setIsMenuOpen(false); }, [activeMenu]);
 
-    useEffect(() => {
-        fetchData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sortCriteria, activeMenu]);
+    useEffect(() => { fetchData(); }, [sortCriteria, activeMenu]);
 
     const fetchData = () => {
-        switch (activeMenu) {
-            case 'inventory':
-                fetchItems(sortCriteria);
-                break;
-            case 'reserve':
-                fetchReservedItems();
-                break;
-            case 'sold':
-                fetchSoldReservations();
-                break;
-            default:
-                break;
-        }
+        if (activeMenu === 'inventory') fetchItems(sortCriteria);
+        if (activeMenu === 'reserve')   fetchReservedItems();
+        if (activeMenu === 'sold')      fetchSoldReservations();
     };
 
     const fetchItems = async (sortBy?: string) => {
         setLoading(true);
         try {
             const endpoint = sortBy ? '/items/sorted' : '/items';
-            const response = await api.get<Item[]>(endpoint, { params: sortBy ? { sortBy } : {} });
-            setItems(response.data);
+            const res = await api.get<Item[]>(endpoint, { params: sortBy ? { sortBy } : {} });
+            setItems(res.data);
         } catch (e) {
             console.error(e);
             toast.error('Error loading products.');
             setItems([]);
-        } finally {
-            setLoading(false);
-        }
+        } finally { setLoading(false); }
     };
 
     const fetchReservedItems = async () => {
         setLoading(true);
         try {
-            const response = await api.get<ReservationData[]>('/reservations');
-            const data: ReservedItem[] = response.data
-                .filter((it) => !it.isSold)
-                .map((it) => ({
+            const res = await api.get<ReservationData[]>('/reservations');
+            const data: ReservedItem[] = res.data
+                .filter(it => !it.isSold)
+                .map(it => ({
                     id: it.id?.toString() ?? '',
                     name: it.itemName ?? '',
                     quantity: it.reservedQuantity ?? 0,
@@ -103,23 +103,19 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             console.error(e);
             toast.error('Error loading reserved items.');
             setReservedItems([]);
-        } finally {
-            setLoading(false);
-        }
+        } finally { setLoading(false); }
     };
 
     const fetchSoldReservations = async () => {
         setLoading(true);
         try {
-            const response = await api.get<SoldReservation[]>('/reservations/sold');
-            setSoldReservations(response.data ?? []);
+            const res = await api.get<SoldReservation[]>('/reservations/sold');
+            setSoldReservations(res.data ?? []);
         } catch (e) {
             console.error(e);
             toast.error('Error loading sold items.');
             setSoldReservations([]);
-        } finally {
-            setLoading(false);
-        }
+        } finally { setLoading(false); }
     };
 
     const handleAddItem = async (item: Item) => {
@@ -131,9 +127,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         } catch (e) {
             console.error(e);
             toast.error('Error adding product.');
-        } finally {
-            setLoading(false);
-        }
+        } finally { setLoading(false); }
     };
 
     const handleScan = async (id: string) => {
@@ -142,7 +136,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
 
         const input = prompt(`Enter quantity for ${scannerAction === 'add' ? 'add' : 'remove'}:`);
         const quantity = Number(input);
-        if (!input || isNaN(quantity) || quantity <= 0) {
+        if (!input || Number.isNaN(quantity) || quantity <= 0) {
             toast.error('Please enter a valid number.');
             return;
         }
@@ -155,9 +149,17 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         } catch (e) {
             console.error(e);
             toast.error('Operation error.');
-        } finally {
-            setLoading(false);
-        }
+        } finally { setLoading(false); }
+    };
+
+    // >>> важно: оставить и использовать как в исходнике
+    const handleReservationRemoved = (updatedItemId: string, returnedQuantity: number) => {
+        setItems(prev =>
+            prev.map(it => (it.id === updatedItemId ? { ...it, quantity: it.quantity + returnedQuantity } : it))
+        );
+        fetchReservedItems();
+        fetchItems(sortCriteria);
+        toast.success('Reservation deleted.');
     };
 
     const handleReservedItemScan = async (orderNumber: string) => {
@@ -173,36 +175,25 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         } catch (e) {
             console.error(e);
             toast.error('Error processing reserve.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleReservationRemoved = (updatedItemId: string, returnedQuantity: number) => {
-        setItems((prev) =>
-            prev.map((it) => (it.id === updatedItemId ? { ...it, quantity: it.quantity + returnedQuantity } : it))
-        );
-        fetchReservedItems();
-        fetchItems(sortCriteria);
-        toast.success('Reservation deleted.');
+        } finally { setLoading(false); }
     };
 
     return (
         <div className="app-container">
-            {/* topbar (виден на телефонах/планшетах) */}
+            {/* фиксированный topbar (на мобилке виден, на десктопе скрыт) */}
             <header className="topbar">
                 <button
                     className={`hamburger-btn ${isMenuOpen ? 'is-open' : ''}`}
                     aria-label="Toggle menu"
                     aria-expanded={isMenuOpen}
-                    onClick={() => setIsMenuOpen((v) => !v)}
+                    onClick={() => setIsMenuOpen(v => !v)}
                 >
                     <span /><span /><span />
                 </button>
                 <h1 className="topbar-title">FLOWQR</h1>
             </header>
 
-            {/* sidebar: фикс, поверх контента */}
+            {/* sidebar: десктоп — колонка; мобайл — выездная панель поверх */}
             <aside className={`sidebar ${isMenuOpen ? 'open' : ''}`}>
                 <h2 className="sidebar-title">FLOWQR</h2>
                 <ul className="sidebar-menu">
@@ -216,10 +207,10 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                 </ul>
             </aside>
 
-            {/* затемнение под меню */}
+            {/* overlay в body через портал: blur (если поддерживается) + тёмный слой */}
             {isMenuOpen && createPortal(
                 <>
-                    <div className="backdrop" />
+                    <div className={`backdrop ${supportsBlur ? '' : 'backdrop-fallback'}`} />
                     <div className="scrim" onClick={() => setIsMenuOpen(false)} />
                 </>,
                 document.body
@@ -231,18 +222,21 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                 {activeMenu === 'inventory' && (
                     <>
                         <AddItemForm onAdd={handleAddItem} />
+
                         <div className="scanner-buttons">
                             <button
                                 className="btn btn-add"
                                 onClick={() => { setScannerAction('add'); setShowScanner(true); }}
                                 disabled={loading}
                             >Scan to add</button>
+
                             <button
                                 className="btn btn-remove"
                                 onClick={() => { setScannerAction('remove'); setShowScanner(true); }}
                                 disabled={loading}
                             >Scan to remove</button>
                         </div>
+
                         {showScanner && <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />}
 
                         <div className="sort-dropdown">
@@ -278,22 +272,23 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                             items={items}
                             onReserveComplete={fetchReservedItems}
                             onUpdateItems={(id, qty) =>
-                                setItems((prev) =>
-                                    prev.map((it) => (it.id === id ? { ...it, quantity: it.quantity - qty } : it))
-                                )
+                                setItems(prev => prev.map(it => (it.id === id ? { ...it, quantity: it.quantity - qty } : it)))
                             }
                         />
+
                         <ReservedItemsList
                             reservedItems={reservedItems}
                             setReservedItems={setReservedItems}
                             onScan={handleReservedItemScan}
+                            /* <<< важное изменение: используем готовый обработчик, чтобы не было warn/unused */
+                            onReservationRemoved={handleReservationRemoved}
                             onWeekFilter={async (week) => {
                                 setLoading(true);
                                 try {
-                                    const response = await api.get<ReservationData[]>('/reservations/sorted', { params: { reservationWeek: week } });
-                                    const data = response.data
-                                        .filter((it) => !it.isSold)
-                                        .map((it) => ({
+                                    const res = await api.get<ReservationData[]>('/reservations/sorted', { params: { reservationWeek: week } });
+                                    const data = res.data
+                                        .filter(it => !it.isSold)
+                                        .map(it => ({
                                             id: it.id?.toString() ?? '',
                                             name: it.itemName ?? '',
                                             quantity: it.reservedQuantity ?? 0,
@@ -311,7 +306,6 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                                 }
                             }}
                             onShowAll={fetchReservedItems}
-                            onReservationRemoved={handleReservationRemoved}
                         />
                     </>
                 )}
