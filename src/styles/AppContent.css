@@ -166,29 +166,32 @@ body.no-scroll { overflow: hidden; touch-action: none; }
 @media (prefers-reduced-motion: reduce) {
     .btn, .menu-item, .hamburger-btn, .sort-select, .sidebar { transition: none; }
 }
-/* ===== Dark overlay fix (Android/Safari): блюр + отдельная тень ===== */
+/* ===== Blur + Dark scrim: надёжное затемнение на Android/iOS ===== */
 @media (max-width: 1024px) {
-    /* гарантируем порядок слоёв: хедер > меню > тёмный слой > контент */
+    /* порядок слоёв: topbar(130) > sidebar(120) > scrim(115) > backdrop-blur(110) > контент */
     .topbar  { z-index: 130; }
     .sidebar { z-index: 120; }
 
+    /* blur-слой (у тебя уже есть .backdrop; оставляем как есть, только z-index) */
     .backdrop {
         position: fixed;
         left: 0; right: 0; bottom: 0;
         top: calc(var(--topbar-h) + env(safe-area-inset-top));
-        /* сам элемент отвечает за блюр */
         -webkit-backdrop-filter: blur(3px);
         backdrop-filter: blur(3px);
-        background: transparent !important; /* фон дадим через ::before */
+        background: transparent; /* цвет даст scrim */
         z-index: 110;
-        pointer-events: auto;
+        pointer-events: none; /* клики ловит scrim */
     }
 
-    /* а это — реальное притемнение (всегда видно даже без backdrop-filter) */
-    .backdrop::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: rgba(0,0,0,0.52); /* при желании отрегулируй плотность */
+    /* тёмный слой поверх blur — гарантированное затемнение */
+    .scrim {
+        position: fixed;
+        left: 0; right: 0; bottom: 0;
+        top: calc(var(--topbar-h) + env(safe-area-inset-top));
+        background: rgba(0,0,0,0.52);   /* при желании 0.45–0.6 */
+        z-index: 115;
+        pointer-events: auto;
     }
 }
+

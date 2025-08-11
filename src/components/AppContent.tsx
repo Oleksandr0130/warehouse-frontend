@@ -215,8 +215,12 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             </aside>
 
             {/* затемнение под меню */}
-            {isMenuOpen && <div className="backdrop" onClick={() => setIsMenuOpen(false)} />}
-
+            {isMenuOpen && (
+                <>
+                    <div className="backdrop" />  {/* blur-слой */}
+                    <div className="scrim" onClick={() => setIsMenuOpen(false)} /> {/* тёмный слой поверх */}
+                </>
+            )}
             <main className="app-main">
                 {loading && <div className="loading-overlay">Loading...</div>}
 
