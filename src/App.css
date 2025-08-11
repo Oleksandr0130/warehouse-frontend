@@ -1,15 +1,33 @@
-:root { --radius: 16px; }
+:root {
+  --radius: 16px;
+  --topbar-h: 56px;
+}
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-html, body, #root { height: 100%; margin: 0; }
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
 
-#root { display: block; }
+body.no-scroll {
+  overflow: hidden;
+  touch-action: none;
+}
 
-/* общие утилиты */
-.hidden { display: none !important; }
+#root {
+  display: block;
+}
 
-/* подстраховка: если где-то остался старый .fixed-sidebar — не пускаем его на мобилках */
+.hidden {
+  display: none !important;
+}
+
+/* Скрываем старое фиксированное меню на мобилках, если где-то осталось */
 @media (max-width: 1024px) {
-  .fixed-sidebar { display: none !important; }
+  .fixed-sidebar {
+    display: none !important;
+  }
 }

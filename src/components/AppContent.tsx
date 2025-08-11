@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/AppContent.css';
+// ↑ в импортах добавь
+import { createPortal } from 'react-dom';
 
 import ItemList from './ItemList';
 import ReservedItemsList from './ReservedItemsList';
@@ -215,12 +217,14 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             </aside>
 
             {/* затемнение под меню */}
-            {isMenuOpen && (
+            {isMenuOpen && createPortal(
                 <>
-                    <div className="backdrop" />  {/* blur-слой */}
-                    <div className="scrim" onClick={() => setIsMenuOpen(false)} /> {/* тёмный слой поверх */}
-                </>
+                    <div className="backdrop" />
+                    <div className="scrim" onClick={() => setIsMenuOpen(false)} />
+                </>,
+                document.body
             )}
+
             <main className="app-main">
                 {loading && <div className="loading-overlay">Loading...</div>}
 

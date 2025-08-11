@@ -1,4 +1,4 @@
-/* ===== Desktop layout ===== */
+/* ===== Desktop ===== */
 .app-container{
     display:grid;
     grid-template-columns:260px 1fr;
@@ -7,11 +7,10 @@
             radial-gradient(150% 80% at 50% 50%, #d9c8ab 0%, rgba(217,200,171,0) 70%),
             linear-gradient(140deg,#d2b892 0%,#c7a87e 40%,#b9946a 100%);
     background-attachment:fixed;
-    color:#1f1f1f;
     font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
 }
 
-.topbar{ display:none; grid-column:1 / -1; }
+.topbar{ display:none; }
 
 .sidebar{
     position:sticky; top:0; height:100vh; padding:22px 0;
@@ -19,79 +18,59 @@
     border-right:1.5px solid rgba(255,255,255,.55);
     box-shadow:inset -1px 0 8px rgba(0,0,0,.18);
     backdrop-filter:blur(10px) saturate(150%);
-    display:flex; flex-direction:column; align-items:center; z-index:10;
+    display:flex; flex-direction:column; align-items:center;
 }
 
 .sidebar-title{
-    font-size:20px; font-weight:900; letter-spacing:1px; text-transform:uppercase;
+    font-size:20px; font-weight:900; text-transform:uppercase;
     padding-bottom:12px; margin:0 0 14px; width:80%; text-align:center;
     border-bottom:2px solid rgba(255,255,255,.8);
 }
 
-.sidebar-menu{ list-style:none; width:100%; padding:0; margin:8px 0 0; }
+.sidebar-menu{ width:100%; list-style:none; margin:8px 0 0; padding:0; }
 
 .menu-item{
     font-size:15px; padding:14px 16px; text-align:center; cursor:pointer;
-    transition:background .25s ease, filter .25s ease, transform .15s ease;
-    border:1.5px solid transparent; margin:8px 14px; border-radius:14px;
+    margin:8px 14px; border-radius:14px;
     color:rgba(255,255,255,.95); background:rgba(255,255,255,.10);
+    border:1.5px solid transparent;
 }
-.menu-item:hover{ background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.7); transform:translateY(-1px); }
-.menu-item.active{ background:rgba(255,255,255,.22); border-color:rgba(255,255,255,.9); box-shadow:0 8px 18px rgba(0,0,0,.22), 0 0 10px rgba(255,255,255,.25); }
+.menu-item.active{ background:rgba(255,255,255,.22); border-color:rgba(255,255,255,.9); }
 
 .logout-item{
     margin-top:auto; width:calc(100% - 28px); align-self:center; padding:12px 0;
     border-radius:14px; text-align:center; background:rgba(192,57,43,.85);
     border:1.5px solid rgba(255,255,255,.75); color:#fff; cursor:pointer;
-    transition:transform .15s ease, box-shadow .25s ease, background .25s ease;
 }
-.logout-item:hover{ background:rgba(231,76,60,.95); box-shadow:0 10px 22px rgba(0,0,0,.25); transform:translateY(-1px); }
 
-.app-main{ padding:24px; overflow:auto; }
+.app-main{ padding:24px; }
 
-/* buttons/selects */
-.btn{
-    padding:12px 16px; font-size:14px; font-weight:800; letter-spacing:.5px;
-    border-radius:16px; border:1.5px solid rgba(255,255,255,.65);
-    background:rgba(255,255,255,.12); color:#fff; cursor:pointer;
-    transition:transform .25s ease, box-shadow .25s ease, background .25s ease, border-color .25s ease, filter .25s ease;
-}
-.btn:hover{ background:rgba(255,255,255,.20); border-color:rgba(255,255,255,.9); box-shadow:0 10px 24px rgba(0,0,0,.25), 0 0 10px rgba(255,255,255,.35); transform:translateY(-2px); }
-.btn:disabled{ opacity:.6; cursor:not-allowed; }
+/* buttons/selects (локально для этого экрана) */
+.btn{ padding:12px 16px; font-size:14px; font-weight:800; border-radius:16px; border:1.5px solid rgba(255,255,255,.65); background:rgba(255,255,255,.12); color:#fff; }
 .btn.btn-add{ background:rgba(40,167,69,.25); }
 .btn.btn-remove{ background:rgba(220,53,69,.28); }
 
 .scanner-buttons{ display:flex; gap:10px; margin:10px 0 18px; }
-
 .sort-dropdown{ margin:12px 0 18px; display:flex; align-items:center; gap:10px; color:#fff; }
-.sort-dropdown label{ font-weight:700; color:rgba(255,255,255,.92); }
-.sort-select{
-    padding:10px 14px; border-radius:16px; border:1.5px solid rgba(255,255,255,.65);
-    background:rgba(255,255,255,.12); color:#fff; font-size:14px; outline:none;
-}
-.sort-select:focus{ border-color:#fff; background:rgba(255,255,255,.16); box-shadow:0 6px 18px rgba(0,0,0,.25), 0 0 10px rgba(255,255,255,.55); }
-
-.excel-button-wrapper{ margin-bottom:16px; }
+.sort-select{ padding:10px 14px; border-radius:16px; border:1.5px solid rgba(255,255,255,.65); background:rgba(255,255,255,.12); color:#fff; }
 
 .loading-overlay{
     position:fixed; inset:0; background:rgba(255,255,255,.7);
-    display:flex; justify-content:center; align-items:center; font-size:22px; color:#555; z-index:1000;
+    display:flex; justify-content:center; align-items:center; font-size:22px; color:#555; z-index:99990;
 }
 
-/* ===== hamburger ===== */
+/* ===== Hamburger ===== */
 .hamburger-btn{
     display:inline-flex; width:42px; height:42px; align-items:center; justify-content:center;
     border-radius:12px; border:1.5px solid rgba(255,255,255,.65);
     background:rgba(255,255,255,.12); cursor:pointer;
-    transition:transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
 }
-.hamburger-btn:hover{ background:rgba(255,255,255,.20); border-color:rgba(255,255,255,.9); box-shadow:0 10px 24px rgba(0,0,0,.25), 0 0 10px rgba(255,255,255,.35); transform:translateY(-1px); }
-.hamburger-btn span{ display:block; width:20px; height:2px; margin:2.5px 0; background:#fff; transition:transform .2s ease, opacity .2s ease; }
+.hamburger-btn span{ display:block; width:20px; height:2px; margin:2.5px 0; background:#fff; }
 .hamburger-btn.is-open span:nth-child(1){ transform:translateY(4.5px) rotate(45deg); }
 .hamburger-btn.is-open span:nth-child(2){ opacity:0; }
 .hamburger-btn.is-open span:nth-child(3){ transform:translateY(-4.5px) rotate(-45deg); }
 
-.topbar-title{ margin:0 0 0 12px; font-size:18px; font-weight:800; letter-spacing:.5px; color:#fff; text-transform:uppercase; }
+.topbar-title{ margin:0 0 0 12px; font-size:18px; font-weight:800; color:#fff; text-transform:uppercase; }
 
 /* ===== Mobile / Tablet ===== */
 :root{ --topbar-h:56px; }
@@ -101,11 +80,11 @@ body.no-scroll{ overflow:hidden; touch-action:none; }
     .app-container{
         grid-template-columns:1fr;
         min-height:100dvh;
-        background-attachment:scroll;   /* Safari fix */
+        background-attachment:scroll; /* Safari fix */
         overflow-x:hidden;
     }
 
-    /* fixed topbar */
+    /* фикс-хедер (можно оставить под затемнением) */
     .topbar{
         display:flex;
         position:fixed; top:0; left:0; right:0;
@@ -115,44 +94,43 @@ body.no-scroll{ overflow:hidden; touch-action:none; }
         backdrop-filter:saturate(140%) blur(6px);
         background:rgba(255,255,255,.18);
         border-bottom:1px solid rgba(255,255,255,.45);
-        z-index:200;                    /* ниже затемнения */
+        z-index:99996; /* ниже scrim */
     }
 
-    /* sidebar ABOVE overlay */
+    /* меню поверх всего затемнения */
     .sidebar{
-        position:fixed; left:0;
-        top:calc(var(--topbar-h) + env(safe-area-inset-top));
-        height:calc(100dvh - (var(--topbar-h) + env(safe-area-inset-top)));
-        width:86%; max-width:320px;
-        transform:translateX(-100%);
-        transition:transform .25s ease;
-        z-index:300;                    /* ВЫШЕ затемнения */
+        position:fixed; left:0; top:0;
+        height:100%; width:86%; max-width:320px;
+        transform:translateX(-100%); transition:transform .25s ease;
+        z-index:99999; /* САМЫЙ верх */
         background:rgba(18,35,46,.28);
         border-right:1.5px solid rgba(255,255,255,.75);
         will-change:transform;
     }
     .sidebar.open{ transform:translateX(0); }
 
-    /* BLUR layer (under dark scrim) */
+    /* слой blur — на весь экран */
     .backdrop{
-        position:fixed; left:0; right:0; bottom:0; top:0;
-        -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+        position:fixed; inset:0;
+        -webkit-backdrop-filter:blur(3px);
+        backdrop-filter:blur(3px);
         background:transparent;
-        z-index:220;                    /* под scrim */
+        z-index:99994; /* под scrim */
         pointer-events:none;
     }
 
-    /* DARK scrim – guaranteed darkening across devices */
+    /* тёмный слой — тоже на весь экран */
     .scrim{
-        position:fixed; left:0; right:0; bottom:0; top:0;
+        position:fixed; inset:0;
         background:rgba(0,0,0,.52);
-        z-index:250;                    /* над topbar, под sidebar */
+        z-index:99995; /* над топбаром, под меню */
         pointer-events:auto;
     }
 
     .app-main{ padding:calc(var(--topbar-h) + env(safe-area-inset-top) + 8px) 16px 16px; }
 }
 
+/* доступность */
 @media (prefers-reduced-motion:reduce){
-    .btn, .menu-item, .hamburger-btn, .sort-select, .sidebar{ transition:none; }
+    .sidebar, .scrim, .backdrop, .hamburger-btn{ transition:none; }
 }
