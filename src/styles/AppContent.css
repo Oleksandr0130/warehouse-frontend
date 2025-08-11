@@ -166,3 +166,29 @@ body.no-scroll { overflow: hidden; touch-action: none; }
 @media (prefers-reduced-motion: reduce) {
     .btn, .menu-item, .hamburger-btn, .sort-select, .sidebar { transition: none; }
 }
+/* ===== Dark overlay fix (Android/Safari): блюр + отдельная тень ===== */
+@media (max-width: 1024px) {
+    /* гарантируем порядок слоёв: хедер > меню > тёмный слой > контент */
+    .topbar  { z-index: 130; }
+    .sidebar { z-index: 120; }
+
+    .backdrop {
+        position: fixed;
+        left: 0; right: 0; bottom: 0;
+        top: calc(var(--topbar-h) + env(safe-area-inset-top));
+        /* сам элемент отвечает за блюр */
+        -webkit-backdrop-filter: blur(3px);
+        backdrop-filter: blur(3px);
+        background: transparent !important; /* фон дадим через ::before */
+        z-index: 110;
+        pointer-events: auto;
+    }
+
+    /* а это — реальное притемнение (всегда видно даже без backdrop-filter) */
+    .backdrop::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.52); /* при желании отрегулируй плотность */
+    }
+}
