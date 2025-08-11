@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import './AppContent.css';
+import '../styles/AppContent.css';
 
 import ItemList from './ItemList';
 import ReservedItemsList from './ReservedItemsList';
