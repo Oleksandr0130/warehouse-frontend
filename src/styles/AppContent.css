@@ -237,7 +237,13 @@
     .app-container {
         grid-template-columns: 1fr; /* меню перестаёт занимать колонку постоянно */
     }
-    .topbar { display: flex; }
+    .topbar {
+        display: flex;
+        position: sticky;
+        top: 0;
+        z-index: 110;
+        min-height: 56px;
+    }
 
     .sidebar {
         position: fixed;
@@ -255,8 +261,7 @@
     }
 
     .app-main {
-        grid-column: 1 / -1;
-        padding: 16px;
+        padding-top: 16px;
     }
 }
 
