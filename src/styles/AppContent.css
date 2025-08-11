@@ -224,68 +224,60 @@
     z-index: 1000;
 }
 
-/* ===== Mobile / Tablet fixes ===== */
-:root {
-    --topbar-h: 56px; /* базовая высота хедера */
+/* Бэкдроп при открытом мобильном меню */
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.38);
+    z-index: 9;
 }
 
-/* iOS/Android: фиксируем хедер, двигаем сайдбар и бэкдроп под него,
-   усиливаем затемнение и отключаем background-attachment:fixed */
+/* Адаптив: планшеты/телефоны — меню выезжает, сверху появляется topbar */
 @media (max-width: 1024px) {
-    /* фон без fixed, чтобы overlay не "пропадал" в Safari */
     .app-container {
-        background-attachment: scroll;
-        min-height: 100dvh;
+        grid-template-columns: 1fr; /* меню перестаёт занимать колонку постоянно */
     }
-
-    /* фиксированный хедер, учитываем «чёлку»/статус-бар */
     .topbar {
         display: flex;
-        position: fixed;
+        position: sticky;
         top: 0;
-        left: 0;
-        right: 0;
         z-index: 110;
-        min-height: var(--topbar-h);
-        padding-top: 0;                 /* fallback для не-iOS */
-        padding-top: env(safe-area-inset-top); /* iOS safe area */
+        min-height: 56px;
     }
 
-    /* выезжающее меню ровно под хедером */
     .sidebar {
         position: fixed;
         left: 0;
-        top: calc(var(--topbar-h) + env(safe-area-inset-top));
-        height: calc(100vh - (var(--topbar-h) + env(safe-area-inset-top)));
-        width: 86%;
-        max-width: 320px;
+        top: 56px; /* высота topbar */
+        height: calc(100vh - 56px);
         transform: translateX(-100%);
         transition: transform .25s ease;
-        z-index: 100;
-        will-change: transform;
+        width: 86%;
+        max-width: 320px;
+        border-right: 1.5px solid rgba(255,255,255,0.75);
     }
-    .sidebar.open { transform: translateX(0); }
-
-    /* затемнение фона под меню — всегда видно на телефоне */
-    .backdrop {
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        top: calc(var(--topbar-h) + env(safe-area-inset-top));
-        background: rgba(0,0,0,0.45);
-        backdrop-filter: blur(2px);
-        -webkit-backdrop-filter: blur(2px);
-        z-index: 99; /* ниже меню, выше контента */
+    .sidebar.open {
+        transform: translateX(0);
     }
 
-    /* контент не прячется под фикс-хедер */
     .app-main {
-        padding-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 8px);
+        padding-top: 16px;
     }
 }
 
-/* если у пользователя включено «уменьшение анимации» — без переходов */
+/* Доступность */
 @media (prefers-reduced-motion: reduce) {
-    .sidebar, .backdrop { transition: none; }
+    .btn, .menu-item, .hamburger-btn, .sort-select, .sidebar {
+        transition: none;
+    }
 }
+/* временный хотфикс для мобилок — сделать оверлей полупрозрачным и ниже по z-index */
+@media (max-width: 1024px) {
+    .loading-overlay {
+        background: rgba(255,255,255,0.6);
+        z-index: 100; /* было 1000 в моём шаблоне/может быть другое у тебя */
+    }
+}
+
+/* и обязательно используем безопасную единицу высоты экрана */
+.app-container { min-height: 100dvh; }
