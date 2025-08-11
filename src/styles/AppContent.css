@@ -150,7 +150,9 @@ body.no-scroll{ overflow:hidden; touch-action:none; }
 
     body.no-blur .backdrop{ background:rgba(0,0,0,.25) !important; }
 
-    .app-main{ padding:calc(var(--topbar-h) + env(safe-area-inset-top) + 8px) 16px 16px; }
+    .app-main {
+        padding-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 16px);
+    }
 }
 
 @media (prefers-reduced-motion:reduce){
