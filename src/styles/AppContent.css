@@ -1,160 +1,269 @@
 /* ===== Desktop ===== */
-.app-container{
-    display:grid;
-    grid-template-columns:260px 1fr;
-    min-height:100vh;
+.app-container {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
     background:
             radial-gradient(150% 80% at 50% 50%, #d9c8ab 0%, rgba(217,200,171,0) 70%),
-            linear-gradient(140deg,#d2b892 0%,#c7a87e 40%,#b9946a 100%);
-    background-attachment:fixed;
-    color:#1f1f1f;
-    font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+            linear-gradient(140deg, #d2b892 0%, #c7a87e 40%, #b9946a 100%);
+    background-attachment: fixed;
+    color: #1f1f1f;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
-.topbar{ display:none; }
+.topbar { display: none; }
 
-.sidebar{
-    position:sticky; top:0; height:100vh; padding:22px 0;
-    color:#fff; background:rgba(18,35,46,.28);
-    border-right:1.5px solid rgba(255,255,255,.55);
-    box-shadow:inset -1px 0 8px rgba(0,0,0,.18);
-    -webkit-backdrop-filter:blur(10px) saturate(150%);
-    backdrop-filter:blur(10px) saturate(150%);
-    display:flex; flex-direction:column; align-items:center;
+.sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding: 22px 0;
+    color: #fff;
+    background: rgba(18,35,46,.28);
+    border-right: 1.5px solid rgba(255,255,255,.55);
+    box-shadow: inset -1px 0 8px rgba(0,0,0,.18);
+    -webkit-backdrop-filter: blur(10px) saturate(150%);
+    backdrop-filter: blur(10px) saturate(150%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.sidebar-title{
-    font-size:20px; font-weight:900; text-transform:uppercase;
-    padding-bottom:12px; margin:0 0 14px; width:80%; text-align:center;
-    border-bottom:2px solid rgba(255,255,255,.8);
+.sidebar-title {
+    font-size: 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    padding-bottom: 12px;
+    margin: 0 0 14px;
+    width: 80%;
+    text-align: center;
+    border-bottom: 2px solid rgba(255,255,255,.8);
 }
 
-.sidebar-menu{ width:100%; list-style:none; margin:8px 0 0; padding:0; }
-
-.menu-item{
-    font-size:15px; padding:14px 16px; text-align:center; cursor:pointer;
-    margin:8px 14px; border-radius:14px;
-    color:rgba(255,255,255,.95); background:rgba(255,255,255,.10);
-    border:1.5px solid transparent;
-}
-.menu-item.active{ background:rgba(255,255,255,.22); border-color:rgba(255,255,255,.9); }
-
-.logout-item{
-    margin-top:auto; width:calc(100% - 28px); align-self:center; padding:12px 0;
-    border-radius:14px; text-align:center; background:rgba(192,57,43,.85);
-    border:1.5px solid rgba(255,255,255,.75); color:#fff; cursor:pointer;
+.sidebar-menu {
+    width: 100%;
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
 }
 
-.app-main{ padding:24px; }
+.menu-item {
+    font-size: 15px;
+    padding: 14px 16px;
+    text-align: center;
+    cursor: pointer;
+    margin: 8px 14px;
+    border-radius: 14px;
+    color: rgba(255,255,255,.95);
+    background: rgba(255,255,255,.10);
+    border: 1.5px solid transparent;
+    transition: all 0.3s ease; /* анимация */
+}
+
+.menu-item:hover {
+    background: rgba(255,255,255,.25);
+    border-color: rgba(255,255,255,.85);
+    transform: translateY(-2px);
+}
+
+.menu-item.active {
+    background: rgba(255,255,255,.22);
+    border-color: rgba(255,255,255,.9);
+}
+
+.logout-item {
+    margin-top: auto;
+    width: calc(100% - 28px);
+    align-self: center;
+    padding: 12px 0;
+    border-radius: 14px;
+    text-align: center;
+    background: rgba(192,57,43,.85);
+    border: 1.5px solid rgba(255,255,255,.75);
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease; /* анимация */
+}
+
+.logout-item:hover {
+    background: rgba(231,76,60,.95);
+    transform: translateY(-2px);
+}
+
+.app-main { padding: 24px; }
 
 /* buttons/selects */
-.btn{ padding:12px 16px; font-size:14px; font-weight:800; border-radius:16px; border:1.5px solid rgba(255,255,255,.65); background:rgba(255,255,255,.12); color:#fff; }
-.btn.btn-add{ background:rgba(40,167,69,.25); }
-.btn.btn-remove{ background:rgba(220,53,69,.28); }
+.btn {
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 800;
+    border-radius: 16px;
+    border: 1.5px solid rgba(255,255,255,.65);
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    transition: all 0.3s ease; /* анимация */
+}
+.btn:hover {
+    background: rgba(255,255,255,.25);
+    transform: translateY(-2px);
+}
 
-.scanner-buttons{ display:flex; gap:10px; margin:10px 0 18px; }
-.sort-dropdown{ margin:12px 0 18px; display:flex; align-items:center; gap:10px; color:#fff; }
-.sort-select{ padding:10px 14px; border-radius:16px; border:1.5px solid rgba(255,255,255,.65); background:rgba(255,255,255,.12); color:#fff; }
+.btn.btn-add { background: rgba(40,167,69,.25); }
+.btn.btn-add:hover { background: rgba(40,167,69,.4); }
 
-.loading-overlay{
-    position:fixed; inset:0; background:rgba(255,255,255,.7);
-    display:flex; justify-content:center; align-items:center; font-size:22px; color:#555; z-index:9990;
+.btn.btn-remove { background: rgba(220,53,69,.28); }
+.btn.btn-remove:hover { background: rgba(220,53,69,.45); }
+
+.scanner-buttons { display: flex; gap: 10px; margin: 10px 0 18px; }
+.sort-dropdown { margin: 12px 0 18px; display: flex; align-items: center; gap: 10px; color: #fff; }
+.sort-select {
+    padding: 10px 14px;
+    border-radius: 16px;
+    border: 1.5px solid rgba(255,255,255,.65);
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    transition: all 0.3s ease; /* анимация */
+}
+.sort-select:hover {
+    background: rgba(255,255,255,.25);
+}
+
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+    color: #555;
+    z-index: 9990;
 }
 
 /* hamburger */
-.hamburger-btn{
-    display:inline-flex; width:42px; height:42px; align-items:center; justify-content:center;
-    border-radius:12px; border:1.5px solid rgba(255,255,255,.65);
-    background:rgba(255,255,255,.12); cursor:pointer;
+.hamburger-btn {
+    display: inline-flex;
+    width: 42px;
+    height: 42px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: 1.5px solid rgba(255,255,255,.65);
+    background: rgba(255,255,255,.12);
+    cursor: pointer;
+    transition: all 0.3s ease; /* анимация */
 }
-.hamburger-btn span{ display:block; width:20px; height:2px; margin:2.5px 0; background:#fff; }
-.hamburger-btn.is-open span:nth-child(1){ transform:translateY(4.5px) rotate(45deg); }
-.hamburger-btn.is-open span:nth-child(2){ opacity:0; }
-.hamburger-btn.is-open span:nth-child(3){ transform:translateY(-4.5px) rotate(-45deg); }
-.topbar-title{ margin:0 0 0 12px; font-size:18px; font-weight:800; color:#fff; text-transform:uppercase; }
+.hamburger-btn:hover {
+    background: rgba(255,255,255,.25);
+    transform: scale(1.05);
+}
+
+.hamburger-btn span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    margin: 2.5px 0;
+    background: #fff;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.hamburger-btn.is-open span:nth-child(1) { transform: translateY(4.5px) rotate(45deg); }
+.hamburger-btn.is-open span:nth-child(2) { opacity: 0; }
+.hamburger-btn.is-open span:nth-child(3) { transform: translateY(-4.5px) rotate(-45deg); }
+
+.topbar-title {
+    margin: 0 0 0 12px;
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+}
 
 /* ===== Mobile / Tablet ===== */
-:root{ --topbar-h:56px; }
-body.no-scroll{ overflow:hidden; touch-action:none; }
+:root { --topbar-h: 56px; }
+body.no-scroll { overflow: hidden; touch-action: none; }
 
-@media (max-width:1024px){
-    /* фон без fixed в WebView */
-    .app-container{
-        grid-template-columns:1fr;
-        min-height:100dvh;
-        background-attachment:scroll;
-        overflow-x:hidden;
+@media (max-width:1024px) {
+    .app-container {
+        grid-template-columns: 1fr;
+        min-height: 100dvh;
+        background-attachment: scroll;
+        overflow-x: hidden;
     }
 
-    /* фикс-хедер */
-    .topbar{
-        display:flex;
-        position:fixed; top:0; left:0; right:0;
-        min-height:var(--topbar-h);
-        padding:12px 16px;
-        padding-top:calc(12px + env(safe-area-inset-top));
-        -webkit-backdrop-filter:saturate(140%) blur(6px);
-        backdrop-filter:saturate(140%) blur(6px);
-        background:rgba(255,255,255,.18);
-        border-bottom:1px solid rgba(255,255,255,.45);
-        z-index:2147483643;
+    .topbar {
+        display: flex;
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+        min-height: var(--topbar-h);
+        padding: 12px 16px;
+        padding-top: calc(12px + env(safe-area-inset-top));
+        -webkit-backdrop-filter: saturate(140%) blur(6px);
+        backdrop-filter: saturate(140%) blur(6px);
+        background: rgba(255, 255, 255, 0.18);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+        z-index: 2147483643;
     }
 
-    /* ----- САМ ФИКС -----
-       растягиваем серый фон sidebar до низа экрана в WebView */
-    .sidebar{
-        position:fixed; left:0; top:0; bottom:0;   /* <— ключ: bottom:0 */
-        height:auto;                                /* пусть тянется за счёт top+bottom */
-        min-height:100vh;                           /* fallback для старых движков */
-        min-height:100dvh;                          /* современный вариант */
-        width:86%; max-width:320px;
-        transform:translateX(-100%);
-        transition:transform .25s ease;
-        z-index:2147483646;
-        background:#12232e47;
-        border-right:1.5px solid rgba(255,255,255,.75);
-        will-change:transform;
-        overflow-y:auto;                             /* если пунктов будет больше экрана */
-        -webkit-overflow-scrolling:touch;
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        width: 86%;
+        max-width: 320px;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        z-index: 2147483646;
+        background: #12232e47;
+        border-right: 1.5px solid rgba(255,255,255,.75);
+        will-change: transform;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
-    .sidebar.open{ transform:translateX(0); }
+    .sidebar.open { transform: translateX(0); }
 
-    /* тёмный фон под меню */
-    .scrim{
-        position:fixed; inset:0;
-        background:rgba(0,0,0,.52);
-        z-index:2147483645;  /* под меню, над шапкой */
-        pointer-events:auto;
+    .scrim {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.52);
+        z-index: 2147483645;
+        pointer-events: auto;
     }
 
-    /* blur если поддерживается */
     @supports (backdrop-filter: blur(3px)) or (-webkit-backdrop-filter: blur(3px)) {
-        .backdrop{
-            position:fixed; inset:0;
-            -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
-            background:transparent;
-            z-index:2147483644;
-            pointer-events:none;
+        .backdrop {
+            position: fixed;
+            inset: 0;
+            -webkit-backdrop-filter: blur(3px);
+            backdrop-filter: blur(3px);
+            background: transparent;
+            z-index: 2147483644;
+            pointer-events: none;
         }
     }
 
-    /* fallback без blur */
     @supports not (backdrop-filter: blur(3px)) {
-        .backdrop{
-            position:fixed; inset:0;
-            background:rgba(0,0,0,.25);
-            z-index:2147483644;
-            pointer-events:none;
+        .backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.25);
+            z-index: 2147483644;
+            pointer-events: none;
         }
     }
 
-    body.no-blur .backdrop{ background:rgba(0,0,0,.25) !important; }
+    body.no-blur .backdrop { background: rgba(0,0,0,.25) !important; }
 
-    .app-main {
-        padding-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 16px);
-    }
+    .app-main { padding-top: 0; }
 }
 
-@media (prefers-reduced-motion:reduce){
-    .sidebar, .scrim, .backdrop, .hamburger-btn{ transition:none; }
+@media (prefers-reduced-motion: reduce) {
+    .sidebar, .scrim, .backdrop, .hamburger-btn, .menu-item, .logout-item, .btn, .sort-select {
+        transition: none;
+    }
 }
