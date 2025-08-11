@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './AppContent.css';
+import '../styles/AppContent.css';
 
 import ItemList from './ItemList';
 import ReservedItemsList from './ReservedItemsList';
