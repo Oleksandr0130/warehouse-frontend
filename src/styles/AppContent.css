@@ -76,13 +76,15 @@
 body.no-scroll{ overflow:hidden; touch-action:none; }
 
 @media (max-width:1024px){
+    /* фон без fixed в WebView */
     .app-container{
         grid-template-columns:1fr;
         min-height:100dvh;
-        background-attachment:scroll; /* Safari fix */
+        background-attachment:scroll;
         overflow-x:hidden;
     }
 
+    /* фикс-хедер (может быть ниже тени — по желанию) */
     .topbar{
         display:flex;
         position:fixed; top:0; left:0; right:0;
@@ -92,59 +94,54 @@ body.no-scroll{ overflow:hidden; touch-action:none; }
         backdrop-filter:saturate(140%) blur(6px);
         background:rgba(255,255,255,.18);
         border-bottom:1px solid rgba(255,255,255,.45);
-        z-index:1000; /* ниже тёмного слоя */
+        z-index:2147483643; /* MAX-уровни для надёжности */
     }
 
+    /* меню — САМЫЙ ВЕРХ */
     .sidebar{
-        position:fixed; left:0; top:0; height:100%;
-        width:86%; max-width:320px;
-        transform:translateX(-100%); transition:transform .25s ease;
-        z-index:1003; /* поверх оверлея */
-        background:rgba(18,35,46,.28);
+        position:fixed; left:0; top:0;
+        height:100%; width:86%; max-width:320px;
+        transform:translateX(-100%);
+        transition:transform .25s ease;
+        z-index:2147483646;        /* выше всего */
+        background:#12232e47;
         border-right:1.5px solid rgba(255,255,255,.75);
         will-change:transform;
     }
-    .sidebar.open{ transform:translateX(0); }
+    .sidebar.open{ transform:translateX(0); }  /* важно: translateX(0) */
 
-    /* ===== overlay: universal + fallback ===== */
-
-    /* ТЁМНЫЙ слой — всегда есть и накрывает всё */
+    /* тёмный слой — ВСЕГДА есть и накрывает весь экран */
     .scrim{
         position:fixed; inset:0;
         background:rgba(0,0,0,.52);
-        z-index:1002;           /* под меню, над шапкой */
+        z-index:2147483645;        /* под меню, над топбаром */
         pointer-events:auto;
     }
 
-    /* BLUR — если поддерживается фильтр */
+    /* blur-слой: если поддерживается фильтр */
     @supports (backdrop-filter: blur(3px)) or (-webkit-backdrop-filter: blur(3px)) {
         .backdrop{
             position:fixed; inset:0;
             -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
             background:transparent;
-            z-index:1001;
+            z-index:2147483644;      /* под scrim */
             pointer-events:none;
         }
     }
 
-    /* ФОЛБЭК: если blur не поддерживается — мягкая подложка */
+    /* fallback: если blur нет — лёгкая подложка, чтобы не было «прозрачности» */
     @supports not (backdrop-filter: blur(3px)) {
         .backdrop{
             position:fixed; inset:0;
             background:rgba(0,0,0,.25);
-            z-index:1001;
+            z-index:2147483644;
             pointer-events:none;
         }
     }
 
-    /* На всякий случай: если JS уже определил отсутствие blur */
-    body.no-blur .backdrop{
-        background:rgba(0,0,0,.25) !important;
-    }
+    /* если JS уже пометил отсутствие blur */
+    body.no-blur .backdrop{ background:rgba(0,0,0,.25) !important; }
 
     .app-main{ padding:calc(var(--topbar-h) + env(safe-area-inset-top) + 8px) 16px 16px; }
 }
 
-@media (prefers-reduced-motion:reduce){
-    .sidebar, .scrim, .backdrop, .hamburger-btn{ transition:none; }
-}
