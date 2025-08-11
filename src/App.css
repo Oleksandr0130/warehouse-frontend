@@ -1,18 +1,15 @@
-/* Глобальные базовые правила, не завязанные на конкретный экран/компонент */
-:root {
-  --radius: 16px;
-}
+:root { --radius: 16px; }
 
 * { box-sizing: border-box; }
 
-html, body, #root {
-  height: 100%;
-  margin: 0;
-}
+html, body, #root { height: 100%; margin: 0; }
 
-#root {
-  display: block;
-}
+#root { display: block; }
 
-/* Можно оставить общие утилити-классы, если используются по всему приложению */
+/* общие утилиты */
 .hidden { display: none !important; }
+
+/* подстраховка: если где-то остался старый .fixed-sidebar — не пускаем его на мобилках */
+@media (max-width: 1024px) {
+  .fixed-sidebar { display: none !important; }
+}

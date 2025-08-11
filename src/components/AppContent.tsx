@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import '../styles/AppContent.css'; // <-- отдельные стили ДЛЯ ЭТОГО ЭКРАНА
+import React, { useEffect, useState } from 'react';
+import './AppContent.css';
+
 import ItemList from './ItemList';
 import ReservedItemsList from './ReservedItemsList';
 import AddItemForm from './AddItemForm';
@@ -9,17 +10,20 @@ import QRScanner from './QRScanner';
 import FileViewer from './FileViewer';
 import AboutApp from './AboutApp';
 import DownloadExcelButton from './DownloadExelButton';
+import Account from './Account';
+
 import { toast } from 'react-toastify';
 import api from '../api';
 import { Item } from '../types/Item';
 import { ReservedItem } from '../types/ReservedItem';
 import { ReservationData } from '../types/ReservationData';
 import { SoldReservation } from '../types/SoldReservation';
-import Account from "./Account.tsx";
 
 interface AppContentProps {
     onLogout: () => void;
 }
+
+type MenuKey = 'inventory' | 'reserve' | 'sold' | 'files' | 'about' | 'account';
 
 const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     const [items, setItems] = useState<Item[]>([]);
@@ -28,19 +32,25 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     const [showScanner, setShowScanner] = useState(false);
     const [scannerAction, setScannerAction] = useState<'add' | 'remove' | null>(null);
     const [loading, setLoading] = useState(false);
-    const [activeMenu, setActiveMenu] = useState<'inventory' | 'reserve' | 'sold' | 'files' | 'about' | 'account'>('inventory');
+    const [activeMenu, setActiveMenu] = useState<MenuKey>('inventory');
     const [sortCriteria, setSortCriteria] = useState('');
-    const [isMenuOpen, setIsMenuOpen] = useState(false); // <-- для гамбургера
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    // блокируем прокрутку фона, когда меню открыто
+    useEffect(() => {
+        document.body.classList.toggle('no-scroll', isMenuOpen);
+        return () => document.body.classList.remove('no-scroll');
+    }, [isMenuOpen]);
+
+    // закрываем выезжающее меню после выбора пункта
+    useEffect(() => {
+        setIsMenuOpen(false);
+    }, [activeMenu]);
 
     useEffect(() => {
         fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortCriteria, activeMenu]);
-
-    // закрывать выдвижное меню при выборе пункта (на мобильных)
-    useEffect(() => {
-        setIsMenuOpen(false);
-    }, [activeMenu]);
 
     const fetchData = () => {
         switch (activeMenu) {
@@ -53,6 +63,8 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             case 'sold':
                 fetchSoldReservations();
                 break;
+            default:
+                break;
         }
     };
 
@@ -62,8 +74,8 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             const endpoint = sortBy ? '/items/sorted' : '/items';
             const response = await api.get<Item[]>(endpoint, { params: sortBy ? { sortBy } : {} });
             setItems(response.data);
-        } catch (err) {
-            console.error(err);
+        } catch (e) {
+            console.error(e);
             toast.error('Error loading products.');
             setItems([]);
         } finally {
@@ -85,8 +97,8 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                     week: it.reservationWeek ?? '',
                 }));
             setReservedItems(data);
-        } catch (err) {
-            console.error(err);
+        } catch (e) {
+            console.error(e);
             toast.error('Error loading reserved items.');
             setReservedItems([]);
         } finally {
@@ -99,8 +111,8 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         try {
             const response = await api.get<SoldReservation[]>('/reservations/sold');
             setSoldReservations(response.data ?? []);
-        } catch (err) {
-            console.error(err);
+        } catch (e) {
+            console.error(e);
             toast.error('Error loading sold items.');
             setSoldReservations([]);
         } finally {
@@ -114,8 +126,8 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             await api.post('/items', item);
             fetchItems(sortCriteria);
             toast.success('Product added successfully!');
-        } catch (err) {
-            console.error(err);
+        } catch (e) {
+            console.error(e);
             toast.error('Error adding product.');
         } finally {
             setLoading(false);
@@ -138,8 +150,8 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             await api.put(`/items/${id}/${scannerAction}`, null, { params: { quantity } });
             toast.success(`Operation ${scannerAction} completed. Quantity: ${quantity}`);
             fetchItems(sortCriteria);
-        } catch (err) {
-            console.error(err);
+        } catch (e) {
+            console.error(e);
             toast.error('Operation error.');
         } finally {
             setLoading(false);
@@ -156,8 +168,8 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             await api.post('/reservations/scan', null, { params: { orderNumber } });
             fetchReservedItems();
             toast.success('Reservation processed!');
-        } catch (err) {
-            console.error(err);
+        } catch (e) {
+            console.error(e);
             toast.error('Error processing reserve.');
         } finally {
             setLoading(false);
@@ -175,46 +187,34 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
 
     return (
         <div className="app-container">
-            {/* ВЕРХНЯЯ ПАНЕЛЬ С ГАМБУРГЕРОМ (видна на планшетах/телефонах) */}
+            {/* topbar (виден на телефонах/планшетах) */}
             <header className="topbar">
                 <button
                     className={`hamburger-btn ${isMenuOpen ? 'is-open' : ''}`}
                     aria-label="Toggle menu"
                     aria-expanded={isMenuOpen}
-                    onClick={() => setIsMenuOpen(v => !v)}
+                    onClick={() => setIsMenuOpen((v) => !v)}
                 >
-                    <span/><span/><span/>
+                    <span /><span /><span />
                 </button>
-                <h1 className="topbar-title">FlowQR</h1>
+                <h1 className="topbar-title">FLOWQR</h1>
             </header>
 
-            {/* БОКОВОЕ МЕНЮ — фикс на десктопе, выезжающее на мобильных */}
+            {/* sidebar: фикс, поверх контента */}
             <aside className={`sidebar ${isMenuOpen ? 'open' : ''}`}>
-                <h2 className="sidebar-title">FlowQR</h2>
+                <h2 className="sidebar-title">FLOWQR</h2>
                 <ul className="sidebar-menu">
-                    <li className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`} onClick={() => setActiveMenu('inventory')}>
-                        Inventory
-                    </li>
-                    <li className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`} onClick={() => setActiveMenu('reserve')}>
-                        Reserved items
-                    </li>
-                    <li className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`} onClick={() => setActiveMenu('sold')}>
-                        Sold items
-                    </li>
-                    <li className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`} onClick={() => setActiveMenu('files')}>
-                        QR-Codes
-                    </li>
-                    <li className={`menu-item ${activeMenu === 'about' ? 'active' : ''}`} onClick={() => setActiveMenu('about')}>
-                        About App
-                    </li>
-                    <li className={`menu-item ${activeMenu === 'account' ? 'active' : ''}`} onClick={() => setActiveMenu('account')}>
-                        Personal account
-                    </li>
+                    <li className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`} onClick={() => setActiveMenu('inventory')}>Inventory</li>
+                    <li className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`} onClick={() => setActiveMenu('reserve')}>Reserved items</li>
+                    <li className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`} onClick={() => setActiveMenu('sold')}>Sold items</li>
+                    <li className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`} onClick={() => setActiveMenu('files')}>QR-Codes</li>
+                    <li className={`menu-item ${activeMenu === 'about' ? 'active' : ''}`} onClick={() => setActiveMenu('about')}>About App</li>
+                    <li className={`menu-item ${activeMenu === 'account' ? 'active' : ''}`} onClick={() => setActiveMenu('account')}>Personal account</li>
                     <li className="logout-item" onClick={onLogout}>Log out</li>
                 </ul>
             </aside>
 
-            {/* затемнение при открытом меню на мобильных */}
+            {/* затемнение под меню */}
             {isMenuOpen && <div className="backdrop" onClick={() => setIsMenuOpen(false)} />}
 
             <main className="app-main">
@@ -228,16 +228,12 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                                 className="btn btn-add"
                                 onClick={() => { setScannerAction('add'); setShowScanner(true); }}
                                 disabled={loading}
-                            >
-                                Scan to add
-                            </button>
+                            >Scan to add</button>
                             <button
                                 className="btn btn-remove"
                                 onClick={() => { setScannerAction('remove'); setShowScanner(true); }}
                                 disabled={loading}
-                            >
-                                Scan to remove
-                            </button>
+                            >Scan to remove</button>
                         </div>
                         {showScanner && <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />}
 

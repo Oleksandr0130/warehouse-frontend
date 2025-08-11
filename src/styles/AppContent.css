@@ -1,4 +1,4 @@
-/* Базовая типографика и палитра — в духе AuthLoginAndRegister */
+/* ====== базовая сетка (desktop) ====== */
 .app-container {
     display: grid;
     grid-template-columns: 260px 1fr;
@@ -11,59 +11,11 @@
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
-/* Верхняя панель (видна на мобильных/планшетах) */
-.topbar {
+.topbar { /* desktop скрыт */
     display: none;
     grid-column: 1 / -1;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    backdrop-filter: saturate(140%) blur(6px);
-    background: rgba(255,255,255,0.18);
-    border-bottom: 1px solid rgba(255,255,255,0.45);
 }
 
-.topbar-title {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    color: #fff;
-    text-transform: uppercase;
-}
-
-/* Гамбургер */
-.hamburger-btn {
-    display: inline-flex;
-    width: 42px;
-    height: 42px;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    border: 1.5px solid rgba(255,255,255,0.65);
-    background: rgba(255,255,255,0.12);
-    cursor: pointer;
-    transition: transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
-}
-.hamburger-btn:hover {
-    background: rgba(255,255,255,0.20);
-    border-color: rgba(255,255,255,0.9);
-    box-shadow: 0 10px 24px rgba(0,0,0,0.25), 0 0 10px rgba(255,255,255,0.35);
-    transform: translateY(-1px);
-}
-.hamburger-btn span {
-    display:block;
-    width: 20px;
-    height: 2px;
-    margin: 2.5px 0;
-    background:#fff;
-    transition: transform .2s ease, opacity .2s ease;
-}
-.hamburger-btn.is-open span:nth-child(1){ transform: translateY(4.5px) rotate(45deg); }
-.hamburger-btn.is-open span:nth-child(2){ opacity:0; }
-.hamburger-btn.is-open span:nth-child(3){ transform: translateY(-4.5px) rotate(-45deg); }
-
-/* Боковое меню (стекло, как на авторизации) */
 .sidebar {
     position: sticky;
     top: 0;
@@ -81,203 +33,136 @@
 }
 
 .sidebar-title {
-    font-size: 20px;
-    font-weight: 900;
-    letter-spacing: 1px;
+    font-size: 20px; font-weight: 900; letter-spacing: 1px;
     text-transform: uppercase;
-    padding-bottom: 12px;
-    margin: 0 0 14px;
-    width: 80%;
-    text-align: center;
+    padding-bottom: 12px; margin: 0 0 14px;
+    width: 80%; text-align: center;
     border-bottom: 2px solid rgba(255,255,255,0.8);
 }
 
-.sidebar-menu {
-    list-style: none;
-    width: 100%;
-    padding: 0;
-    margin: 8px 0 0;
-}
+.sidebar-menu { list-style: none; width: 100%; padding: 0; margin: 8px 0 0; }
 
 .menu-item {
-    font-size: 15px;
-    padding: 14px 16px;
-    text-align: center;
-    cursor: pointer;
+    font-size: 15px; padding: 14px 16px; text-align: center; cursor: pointer;
     transition: background .25s ease, filter .25s ease, transform .15s ease;
-    border: 1.5px solid transparent;
-    margin: 8px 14px;
-    border-radius: 14px;
-    color: rgba(255,255,255,0.95);
-    background: rgba(255,255,255,0.10);
+    border: 1.5px solid transparent; margin: 8px 14px; border-radius: 14px;
+    color: rgba(255,255,255,0.95); background: rgba(255,255,255,0.10);
 }
-.menu-item:hover {
-    background: rgba(255,255,255,0.18);
-    border-color: rgba(255,255,255,0.7);
-    filter: saturate(1.05);
-    transform: translateY(-1px);
-}
-.menu-item.active {
-    background: rgba(255,255,255,0.22);
-    border-color: rgba(255,255,255,0.9);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.22), 0 0 10px rgba(255,255,255,0.25);
-}
+.menu-item:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.7); transform: translateY(-1px); }
+.menu-item.active { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.9); box-shadow: 0 8px 18px rgba(0,0,0,0.22), 0 0 10px rgba(255,255,255,0.25); }
 
 .logout-item {
-    margin-top: auto;
-    width: calc(100% - 28px);
-    align-self: center;
-    padding: 12px 0;
-    border-radius: 14px;
-    text-align: center;
-    background: rgba(192,57,43,0.85);
-    border: 1.5px solid rgba(255,255,255,0.75);
-    color: #fff;
-    cursor: pointer;
+    margin-top: auto; width: calc(100% - 28px); align-self: center; padding: 12px 0;
+    border-radius: 14px; text-align: center; background: rgba(192,57,43,0.85);
+    border: 1.5px solid rgba(255,255,255,0.75); color: #fff; cursor: pointer;
     transition: transform .15s ease, box-shadow .25s ease, background .25s ease;
 }
-.logout-item:hover {
-    background: rgba(231,76,60,0.95);
-    box-shadow: 0 10px 22px rgba(0,0,0,0.25);
-    transform: translateY(-1px);
-}
+.logout-item:hover { background: rgba(231,76,60,0.95); box-shadow: 0 10px 22px rgba(0,0,0,0.25); transform: translateY(-1px); }
 
-/* Контент */
-.app-main {
-    padding: 24px;
-    overflow: auto;
-}
+.app-main { padding: 24px; overflow: auto; }
 
-/* Кнопки и инпуты — в стиле auth */
+/* buttons/selects (используются на этом экране) */
 .btn {
-    padding: 12px 16px;
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    border-radius: 16px;
-    border: 1.5px solid rgba(255,255,255,0.65);
-    background: rgba(255,255,255,0.12);
-    color: #fff;
-    cursor: pointer;
+    padding: 12px 16px; font-size: 14px; font-weight: 800; letter-spacing: 0.5px;
+    border-radius: 16px; border: 1.5px solid rgba(255,255,255,0.65);
+    background: rgba(255,255,255,0.12); color: #fff; cursor: pointer;
     transition: transform .25s ease, box-shadow .25s ease, background .25s ease, border-color .25s ease, filter .25s ease;
-    box-shadow: 0 0 0 rgba(0,0,0,0);
-    will-change: transform, box-shadow, filter;
 }
-.btn:hover {
-    background: rgba(255,255,255,0.20);
-    border-color: rgba(255,255,255,0.9);
-    box-shadow: 0 10px 24px rgba(0,0,0,0.25), 0 0 10px rgba(255,255,255,0.35);
-    transform: translateY(-2px);
-    filter: saturate(1.05);
-}
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
+.btn:hover { background: rgba(255,255,255,0.20); border-color: rgba(255,255,255,0.9); box-shadow: 0 10px 24px rgba(0,0,0,0.25), 0 0 10px rgba(255,255,255,0.35); transform: translateY(-2px); }
+.btn:disabled { opacity: .6; cursor: not-allowed; }
 .btn.btn-add { background: rgba(40,167,69,0.25); }
 .btn.btn-remove { background: rgba(220,53,69,0.28); }
 
 .scanner-buttons { display: flex; gap: 10px; margin: 10px 0 18px; }
 
-.sort-dropdown {
-    margin: 12px 0 18px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #fff;
-}
-.sort-dropdown label {
-    font-weight: 700;
-    color: rgba(255,255,255,0.92);
-}
+.sort-dropdown { margin: 12px 0 18px; display: flex; align-items: center; gap: 10px; color: #fff; }
+.sort-dropdown label { font-weight: 700; color: rgba(255,255,255,0.92); }
 .sort-select {
-    padding: 10px 14px;
-    border-radius: 16px;
-    border: 1.5px solid rgba(255,255,255,0.65);
-    background: rgba(255,255,255,0.12);
-    color: #fff;
-    font-size: 14px;
-    transition: transform .25s ease, box-shadow .25s ease, background .25s ease, border-color .25s ease;
-    outline: none;
+    padding: 10px 14px; border-radius: 16px; border: 1.5px solid rgba(255,255,255,0.65);
+    background: rgba(255,255,255,0.12); color: #fff; font-size: 14px; outline: none;
 }
-.sort-select:focus {
-    border-color: #ffffff;
-    background: rgba(255,255,255,0.16);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.25), 0 0 10px rgba(255,255,255,0.55);
-    transform: translateY(-1px) scale(1.01);
-}
+.sort-select:focus { border-color: #fff; background: rgba(255,255,255,0.16); box-shadow: 0 6px 18px rgba(0,0,0,0.25), 0 0 10px rgba(255,255,255,0.55); }
 
-/* Excel-кнопка-обёртка */
 .excel-button-wrapper { margin-bottom: 16px; }
 
-/* Лоадер поверх всего */
 .loading-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(255,255,255,0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 22px;
-    color: #555;
-    z-index: 1000;
+    position: fixed; inset: 0; background: rgba(255,255,255,0.7);
+    display: flex; justify-content: center; align-items: center;
+    font-size: 22px; color: #555; z-index: 1000;
 }
 
-/* Бэкдроп при открытом мобильном меню */
-.backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.38);
-    z-index: 9;
+/* ====== гамбургер ====== */
+.hamburger-btn {
+    display: inline-flex; width: 42px; height: 42px; align-items: center; justify-content: center;
+    border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.65);
+    background: rgba(255,255,255,0.12); cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+}
+.hamburger-btn:hover { background: rgba(255,255,255,0.20); border-color: rgba(255,255,255,0.9); box-shadow: 0 10px 24px rgba(0,0,0,0.25), 0 0 10px rgba(255,255,255,0.35); transform: translateY(-1px); }
+.hamburger-btn span { display:block; width: 20px; height: 2px; margin: 2.5px 0; background:#fff; transition: transform .2s ease, opacity .2s ease; }
+.hamburger-btn.is-open span:nth-child(1){ transform: translateY(4.5px) rotate(45deg); }
+.hamburger-btn.is-open span:nth-child(2){ opacity:0; }
+.hamburger-btn.is-open span:nth-child(3){ transform: translateY(-4.5px) rotate(-45deg); }
+
+.topbar-title {
+    margin: 0 0 0 12px; font-size: 18px; font-weight: 800; letter-spacing: .5px; color: #fff; text-transform: uppercase;
 }
 
-/* Адаптив: планшеты/телефоны — меню выезжает, сверху появляется topbar */
+/* ====== mobile / tablet overlay fix (ничего не сжимает) ====== */
+:root { --topbar-h: 56px; }
+
+body.no-scroll { overflow: hidden; touch-action: none; }
+
 @media (max-width: 1024px) {
     .app-container {
-        grid-template-columns: 1fr; /* меню перестаёт занимать колонку постоянно */
+        grid-template-columns: 1fr;
+        min-height: 100dvh;
+        background-attachment: scroll; /* для Safari */
+        overflow-x: hidden;
     }
+
     .topbar {
         display: flex;
-        position: sticky;
-        top: 0;
+        position: fixed; top: 0; left: 0; right: 0;
         z-index: 110;
-        min-height: 56px;
+        min-height: var(--topbar-h);
+        padding: 12px 16px;
+        padding-top: calc(12px + env(safe-area-inset-top));
+        backdrop-filter: saturate(140%) blur(6px);
+        background: rgba(255,255,255,0.18);
+        border-bottom: 1px solid rgba(255,255,255,0.45);
     }
 
     .sidebar {
         position: fixed;
         left: 0;
-        top: 56px; /* высота topbar */
-        height: calc(100vh - 56px);
-        transform: translateX(-100%);
-        transition: transform .25s ease;
+        top: calc(var(--topbar-h) + env(safe-area-inset-top));
+        height: calc(100dvh - (var(--topbar-h) + env(safe-area-inset-top)));
         width: 86%;
         max-width: 320px;
+        transform: translateX(-100%);
+        transition: transform .25s ease;
+        z-index: 100; /* ниже топбара, выше бэкдропа */
+        background: rgba(18,35,46,0.28);
         border-right: 1.5px solid rgba(255,255,255,0.75);
+        will-change: transform;
     }
-    .sidebar.open {
-        transform: translateX(0);
+    .sidebar.open { transform: translateX(0); }
+
+    .backdrop {
+        position: fixed;
+        left: 0; right: 0; bottom: 0;
+        top: calc(var(--topbar-h) + env(safe-area-inset-top));
+        background: rgba(0,0,0,0.45);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        z-index: 90;
     }
 
-    .app-main {
-        padding-top: 16px;
-    }
+    .app-main { padding: calc(var(--topbar-h) + env(safe-area-inset-top) + 8px) 16px 16px; }
 }
 
-/* Доступность */
+/* доступность */
 @media (prefers-reduced-motion: reduce) {
-    .btn, .menu-item, .hamburger-btn, .sort-select, .sidebar {
-        transition: none;
-    }
+    .btn, .menu-item, .hamburger-btn, .sort-select, .sidebar { transition: none; }
 }
-/* временный хотфикс для мобилок — сделать оверлей полупрозрачным и ниже по z-index */
-@media (max-width: 1024px) {
-    .loading-overlay {
-        background: rgba(255,255,255,0.6);
-        z-index: 100; /* было 1000 в моём шаблоне/может быть другое у тебя */
-    }
-}
-
-/* и обязательно используем безопасную единицу высоты экрана */
-.app-container { min-height: 100dvh; }
