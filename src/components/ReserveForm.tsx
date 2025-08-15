@@ -269,7 +269,7 @@ const ReserveForm: React.FC<ReserveFormProps> = ({
                 <input
                     type="text"
                     id="order-number-input"
-                    placeholder="Enter order numbern"
+                    placeholder="Enter order number"
                     value={orderNumber}
                     onChange={(e) => setOrderNumber(e.target.value)}
                 />
