@@ -1,5 +1,5 @@
 /* CreateItemPage.css */
-/* Полная страница добавления товара с тем же фоном, что и у приложения */
+/* Страница прозрачная — фон глобальный через body::before */
 .item-page{
     position: relative;
     width: 100%;
@@ -12,19 +12,10 @@
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     color: #333;
     overflow-x: hidden;
+    background: transparent;
 }
 
-/* Единый фон через переменную; убран fixed (ничего не «режется» на моб.) */
-.item-page::before{
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: var(--app-bg);
-    background-position: center top;
-    background-size: cover;
-    background-repeat: no-repeat;
-}
+/* НЕТ собственных градиентов/::before — используем глобальный фон */
 
 /* Карточка */
 .item-card{
