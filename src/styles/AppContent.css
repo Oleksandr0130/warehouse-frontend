@@ -269,15 +269,23 @@ body.no-scroll { overflow: hidden; touch-action: none; }
 }
 
 @media (max-width:1024px) {
-    /* 1) Topbar without blur on phones */
+    /* шапка без blur, лёгкая прозрачность — ничего не «замывает» */
     .topbar {
         -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
-        background: rgba(255,255,255,0.92) !important;
-        border-bottom: 1px solid rgba(0,0,0,.06);
+        background: rgba(255,255,255,0.18) !important; /* вернули лёгкую прозрачность вместо белого полотна */
+        border-bottom: 1px solid rgba(0,0,0,0.08) !important;
+        z-index: 1000 !important; /* ниже, чем тосты */
     }
 
-    /* 2) Backdrop hidden by default, shown only when menu is open */
+    /* бургер/рамка видимы на любом фоне */
+    .hamburger-btn {
+        color: #1f1f1f !important;
+        border-color: rgba(0,0,0,0.15) !important;
+        background: rgba(255,255,255,0.4);
+    }
+
+    /* подложка без blur и только когда меню реально открыто */
     .backdrop {
         display: none !important;
         -webkit-backdrop-filter: none !important;
@@ -289,12 +297,7 @@ body.no-scroll { overflow: hidden; touch-action: none; }
     }
 }
 
-/* Optional: keep a subtle blur ONLY when menu is open and device supports it */
-@media (max-width:1024px) {
-    @supports (backdrop-filter: blur(3px)) or (-webkit-backdrop-filter: blur(3px)) {
-        .sidebar.open ~ .backdrop {
-            -webkit-backdrop-filter: blur(3px) !important;
-            backdrop-filter: blur(3px) !important;
-        }
-    }
+/* тосты всегда выше шапки */
+.Toastify__toast-container {
+    z-index: 2147483647 !important;
 }
