@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import '../styles/FileViever.css';
 import api from '../api';
 
 interface QRFile {
     id: string;
     name?: string;
-    qrCode: string;
+    qrCode: string; // base64 без префикса
 }
 
 interface ReservationFile {
@@ -19,19 +19,26 @@ const FileViewer: React.FC = () => {
     const [reservationFiles, setReservationFiles] = useState<ReservationFile[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [activeQrCode, setActiveQrCode] = useState<string | null>(null);
+
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
     const [selectedReservations, setSelectedReservations] = useState<string[]>([]);
+
+    // canvas для предпросмотра
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const [canvasReady, setCanvasReady] = useState(false);
 
     useEffect(() => {
         const fetchQrFiles = async () => {
             try {
                 const response = await api.get('/items');
-                const qrBase64Files = response.data.map((item: { id: string; qrCode: string; name?: string }) => ({
-                    id: item.id,
-                    name: item.name,
-                    qrCode: item.qrCode,
-                }));
+                const qrBase64Files = response.data.map(
+                    (item: { id: string; qrCode: string; name?: string }) => ({
+                        id: item.id,
+                        name: item.name,
+                        qrCode: item.qrCode,
+                    })
+                );
                 setQrFiles(qrBase64Files);
             } catch (error) {
                 console.error('Error loading QR codes for products:', error);
@@ -58,21 +65,60 @@ const FileViewer: React.FC = () => {
         fetchReservationFiles();
     }, []);
 
-    // блокируем прокрутку фона при открытой модалке
+    // Блокируем прокрутку под модалкой
     useEffect(() => {
-        if (showModal) {
-            document.body.style.overflow = 'hidden';
-        } else {
+        if (showModal) document.body.style.overflow = 'hidden';
+        else document.body.style.overflow = '';
+        return () => {
             document.body.style.overflow = '';
-        }
-        return () => { document.body.style.overflow = ''; };
+        };
     }, [showModal]);
+
+    // Рисуем QR в canvas, когда модалка открыта
+    useEffect(() => {
+        if (!showModal || !activeQrCode) return;
+
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        setCanvasReady(false);
+
+        const img = new Image();
+        img.onload = () => {
+            // размеры карточки
+            const maxW = Math.min(window.innerWidth * 0.92, 520); // ширина .modal-content
+            const maxH = Math.min(window.innerHeight * 0.60, 520); // не выше 60% экрана
+            let drawW = img.width;
+            let drawH = img.height;
+
+            // впишем в рамки с сохранением пропорций
+            const ratio = Math.min(maxW / drawW, maxH / drawH, 1);
+            drawW = Math.floor(drawW * ratio);
+            drawH = Math.floor(drawH * ratio);
+
+            // задаём реальные размеры canvas в пикселях
+            canvas.width = drawW;
+            canvas.height = drawH;
+
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+                ctx.clearRect(0, 0, drawW, drawH);
+                ctx.drawImage(img, 0, 0, drawW, drawH);
+                setCanvasReady(true);
+            }
+        };
+        img.onerror = () => setCanvasReady(false);
+        img.src = activeQrCode.startsWith('data:')
+            ? activeQrCode
+            : `data:image/png;base64,${activeQrCode}`;
+    }, [showModal, activeQrCode]);
 
     const handleDownloadQRCode = async (id: string, type: 'item' | 'reservation') => {
         try {
-            const endpoint = type === 'item'
-                ? `/items/${id}/download-qrcode`
-                : `/reservations/${id}/download-qrcode`;
+            const endpoint =
+                type === 'item'
+                    ? `/items/${id}/download-qrcode`
+                    : `/reservations/${id}/download-qrcode`;
             const response = await api.get(endpoint, { responseType: 'blob' });
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
@@ -102,11 +148,15 @@ const FileViewer: React.FC = () => {
     };
 
     const toggleSelectFile = (id: string) => {
-        setSelectedFiles((prev) => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+        setSelectedFiles((prev) =>
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+        );
     };
 
     const toggleSelectReservation = (id: string) => {
-        setSelectedReservations((prev) => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+        setSelectedReservations((prev) =>
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+        );
     };
 
     const handlePrintSelected = () => {
@@ -119,22 +169,22 @@ const FileViewer: React.FC = () => {
             ...qrFiles
                 .filter((file) => selectedFiles.includes(file.id))
                 .map(
-                    (file) =>
-                        `<div style="page-break-after: always;">
-                            <h2>${file.name || file.id}</h2>
-                            <img src="data:image/png;base64,${file.qrCode}"
-                                 style="margin: 10px; width: 200px; height: 200px;" />
-                        </div>`
+                    (file) => `
+            <div style="page-break-after: always;">
+              <h2>${file.name || file.id}</h2>
+              <img src="data:image/png;base64,${file.qrCode}"
+                   style="margin: 10px; width: 200px; height: 200px;" />
+            </div>`
                 ),
             ...reservationFiles
                 .filter((file) => selectedReservations.includes(file.id))
                 .map(
-                    (file) =>
-                        `<div style="page-break-after: always;">
-                            <h2>${file.orderNumber}</h2>
-                            <img src="data:image/png;base64,${file.qrCode}"
-                                 style="margin: 10px; width: 200px; height: 200px;" />
-                        </div>`
+                    (file) => `
+            <div style="page-break-after: always;">
+              <h2>${file.orderNumber}</h2>
+              <img src="data:image/png;base64,${file.qrCode}"
+                   style="margin: 10px; width: 200px; height: 200px;" />
+            </div>`
                 ),
         ].join('');
 
@@ -151,33 +201,36 @@ const FileViewer: React.FC = () => {
         if (doc) {
             doc.open();
             doc.write(`
-                <html>
-                  <head>
-                    <title>${dynamicTitle}</title>
-                    <style>
-                      body { display: flex; flex-direction: column; align-items: center; }
-                      div { page-break-after: always; }
-                    </style>
-                  </head>
-                  <body class="print-body">
-                    ${selectedQrCodes}
-                  </body>
-                </html>
-            `);
+        <html>
+          <head>
+            <title>${dynamicTitle}</title>
+            <style>
+              body { display: flex; flex-direction: column; align-items: center; }
+              div { page-break-after: always; }
+            </style>
+          </head>
+          <body class="print-body">
+            ${selectedQrCodes}
+          </body>
+        </html>
+      `);
             doc.close();
 
             iframe.contentWindow?.focus();
             iframe.contentWindow?.print();
 
-            setTimeout(() => { document.body.removeChild(iframe); }, 1000);
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 1000);
         }
     };
 
-    const filteredQrFiles = qrFiles.filter((file) => file.id.toLowerCase().includes(searchTerm));
+    const filteredQrFiles = qrFiles.filter((file) =>
+        file.id.toLowerCase().includes(searchTerm)
+    );
 
     return (
         <div className="file-viewer-container">
-            {/* Поле для поиска */}
             <input
                 type="text"
                 placeholder="Search by name..."
@@ -187,7 +240,6 @@ const FileViewer: React.FC = () => {
                 aria-label="Search by name"
             />
 
-            {/* Кнопка для печати выбранных QR-кодов */}
             <button className="print-button" onClick={handlePrintSelected}>
                 Print
             </button>
@@ -208,8 +260,6 @@ const FileViewer: React.FC = () => {
                             alt={`QR code of item ${file.id}`}
                             className="qr-image"
                             onClick={() => handleImageClick(file.qrCode)}
-                            loading="eager"
-                            decoding="sync"
                         />
                         <span className="file-name">{file.id}</span>
                         <button
@@ -238,8 +288,6 @@ const FileViewer: React.FC = () => {
                             alt={`QR code for reservation ${file.orderNumber}`}
                             className="qr-image"
                             onClick={() => handleImageClick(file.qrCode)}
-                            loading="eager"
-                            decoding="sync"
                         />
                         <span className="file-name">Order number: {file.orderNumber}</span>
                         <button
@@ -252,8 +300,7 @@ const FileViewer: React.FC = () => {
                 ))}
             </ul>
 
-            {/* Модальное окно просмотра QR */}
-            {showModal && activeQrCode && (
+            {showModal && (
                 <div
                     className="modal-overlay"
                     onClick={handleCloseModal}
@@ -261,14 +308,19 @@ const FileViewer: React.FC = () => {
                     aria-modal="true"
                     aria-label="QR preview"
                 >
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <img
-                            src={`data:image/png;base64,${activeQrCode}`}
-                            alt="QR Code"
-                            className="modal-image"
-                            loading="eager"
-                            decoding="sync"
+                    <div
+                        className="modal-content"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Canvas вместо <img> — надёжно в WebView */}
+                        <canvas
+                            ref={canvasRef}
+                            className="modal-canvas"
+                            aria-label="QR preview canvas"
                         />
+                        {!canvasReady && (
+                            <div className="modal-loading">Loading…</div>
+                        )}
                         <button className="close-button" onClick={handleCloseModal}>
                             Close
                         </button>
