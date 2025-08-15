@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import '../styles/AppContent.css';
 import '../styles/CreateReservationPage.css'
+import '../styles/CreateItemPage.css'
 
 import ItemList from './ItemList';
 import ReservedItemsList from './ReservedItemsList';
@@ -21,7 +22,7 @@ import { ReservedItem } from '../types/ReservedItem';
 import { ReservationData } from '../types/ReservationData';
 import { SoldReservation } from '../types/SoldReservation';
 
-type MenuKey = 'inventory' | 'reserve' | 'createReservation' | 'sold' | 'files' | 'about' | 'account';
+type MenuKey = 'inventory' | 'createItem' | 'reserve' | 'createReservation' | 'sold' | 'files' | 'about' | 'account';
 
 // тип без any для проверки CSS.supports
 type CSSWithSupports = {
@@ -200,6 +201,8 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                 <h2 className="sidebar-title">FLOWQR</h2>
                 <ul className="sidebar-menu">
                     <li className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`} onClick={() => setActiveMenu('inventory')}>Inventory</li>
+                    <li className={`menu-item ${activeMenu === 'createItem' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('createItem')}>Create item</li>
                     <li className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`} onClick={() => setActiveMenu('reserve')}>Reserved items</li>
                     <li className={`menu-item ${activeMenu === 'createReservation' ? 'active' : ''}`} onClick={() => setActiveMenu('createReservation')}>Create a reservation</li> {/* NEW */}
                     <li className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`} onClick={() => setActiveMenu('sold')}>Sold items</li>
@@ -224,24 +227,6 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
 
                 {activeMenu === 'inventory' && (
                     <>
-                        <AddItemForm onAdd={handleAddItem} />
-
-                        <div className="scanner-buttons">
-                            <button
-                                className="btn btn-add"
-                                onClick={() => { setScannerAction('add'); setShowScanner(true); }}
-                                disabled={loading}
-                            >Scan to add</button>
-
-                            <button
-                                className="btn btn-remove"
-                                onClick={() => { setScannerAction('remove'); setShowScanner(true); }}
-                                disabled={loading}
-                            >Scan to remove</button>
-                        </div>
-
-                        {showScanner && <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />}
-
                         <div className="sort-dropdown">
                             <label htmlFor="sort-menu">Sort by:</label>
                             <select
@@ -261,12 +246,34 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                             <DownloadExcelButton />
                         </div>
 
-                        <ItemList
-                            items={items}
-                            onScanAdd={() => { setScannerAction('add'); setShowScanner(true); }}
-                            onScanRemove={() => { setScannerAction('remove'); setShowScanner(true); }}
-                        />
+                        <ItemList items={items}/>
                     </>
+                )}
+
+
+                {activeMenu === 'createItem' && (
+                    <div className="item-page">
+                        <div className="item-card">
+                            <AddItemForm onAdd={handleAddItem} />
+                            <div className="scanner-buttons">
+                                <button
+                                    className="btn btn-add"
+                                    onClick={() => { setScannerAction('add'); setShowScanner(true); }}
+                                    disabled={loading}
+                                >Scan to add</button>
+
+                                <button
+                                    className="btn btn-remove"
+                                    onClick={() => { setScannerAction('remove'); setShowScanner(true); }}
+                                    disabled={loading}
+                                >Scan to remove</button>
+                            </div>
+                        </div>
+
+                        {showScanner && (
+                            <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />
+                        )}
+                    </div>
                 )}
 
                 {activeMenu === 'reserve' && (

@@ -3,8 +3,6 @@ import { Item } from '../types/Item';
 import '../styles/ItemList.css';
 interface ItemListProps {
     items: Item[];
-    onScanAdd: (id: string) => void;
-    onScanRemove: (id: string) => void;
 }
 
 const ItemList: React.FC<ItemListProps> = ({ items }) => {

@@ -1,0 +1,79 @@
+/* CreateItemPage.css */
+.item-page {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    color: #333;
+    overflow-x: hidden;
+}
+
+.item-page::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+            radial-gradient(150% 80% at 50% 50%, #c8d4e3 0%, rgba(200,212,227,0) 70%),
+            linear-gradient(140deg, #c7d6ee 0%, #a9c3ea 40%, #8db1e6 100%);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    filter: saturate(0.95);
+}
+
+.item-card {
+    width: 100%;
+    max-width: 560px;
+    padding: 24px 20px 16px;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 16px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+}
+
+/* Чуть улучшаем кнопку сабмита формы добавления */
+.item-card .add-item-form .submit-btn {
+    border-radius: 12px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+
+.item-card .add-item-form .submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+/* Кнопки сканера внутри карточки */
+.item-card .scanner-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.item-card .scanner-buttons .btn {
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease, opacity .2s ease;
+}
+.item-card .scanner-buttons .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+@media (max-width: 480px) {
+    .item-card { padding: 18px 16px; }
+    .item-card .scanner-buttons { grid-template-columns: 1fr; }
+}
