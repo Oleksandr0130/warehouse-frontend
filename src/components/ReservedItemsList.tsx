@@ -1,20 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import { ReservedItem } from '../types/ReservedItem';
+import { ReservationData } from '../types/ReservationData';
 import '../styles/ReservedItemList.css';
+
 import QRScanner from './QRScanner';
-import api, {fetchReservationsByOrderPrefix} from '../api';
-import {toast} from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css'
-import {ReservationData} from "../types/ReservationData.ts";
+import api, { fetchReservationsByOrderPrefix } from '../api';
 
 interface ReservedItemsListProps {
-    reservedItems: ReservedItem[]; // Список зарезервированных предметов
-    setReservedItems: (items: ReservedItem[]) => void; // Метод для обновления списка резерваций
-    onScan: (orderNumber: string) => void; // Метод для завершения резервации
-    onWeekFilter: (week: string) => void; // Метод для фильтрации по неделе
-    onShowAll: () => void; // Метод для отображения всех товаров
-    onReservationRemoved: (updatedItemId: string, returnedQuantity: number) => void; // Новый callback для обновления Warehouse Item
-
+    reservedItems: ReservedItem[];
+    setReservedItems: (items: ReservedItem[]) => void;
+    onScan: (orderNumber: string) => void;                // завершить резервацию по QR
+    onWeekFilter: (week: string) => void;                 // фильтрация по неделе
+    onShowAll: () => void;                                // показать всё
+    onReservationRemoved: (updatedItemId: string, returnedQuantity: number) => void;
 }
 
 const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
@@ -27,11 +29,20 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                                                              }) => {
     const [showScanner, setShowScanner] = useState(false);
     const [filterWeek, setFilterWeek] = useState('');
-    const [orderPrefix, setOrderPrefix] = useState(''); // Локальное состояние для фильтра префикса
-    const [loading, setLoading] = useState(false); // Локальное состояние для загрузки
+    const [orderPrefix, setOrderPrefix] = useState('');
+    const [loading, setLoading] = useState(false);
 
+    // блокируем прокрутку под модалкой сканера
+    useEffect(() => {
+        if (showScanner) {
+            document.body.classList.add('no-scroll-scanner');
+        } else {
+            document.body.classList.remove('no-scroll-scanner');
+        }
+        return () => document.body.classList.remove('no-scroll-scanner');
+    }, [showScanner]);
 
-    // Метод для фильтрации по префиксу заказа
+    // ----- фильтр по номеру заказа (префикс)
     const handleFilterByOrderPrefix = async (event: React.FormEvent) => {
         event.preventDefault();
         if (!orderPrefix.trim()) {
@@ -44,19 +55,14 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
             const filteredReservations = (await fetchReservationsByOrderPrefix(orderPrefix)).filter(
                 (item) => !item.isSold
             );
-            // Преобразование данных для правильного сопоставления полей
-            const mappedReservations = filteredReservations.map((item: ReservationData) => {
-                return {
-                    id: item.id?.toString() || '', // Идентификатор
-                    name: item.itemName || 'Не указано', // Вывод названия товара (itemName -> name)
-                    orderNumber: item.orderNumber || 'Не указан', // Номер заказа
-                    week: item.reservationWeek || 'N/A', // Неделя (reservationWeek -> week)
-                    quantity: item.reservedQuantity || 0, // Количество (reservedQuantity -> quantity)
-                };
-            });
-
-            setReservedItems(mappedReservations); // Устанавливаем преобразованный список резерваций
-
+            const mappedReservations = filteredReservations.map((item: ReservationData) => ({
+                id: item.id?.toString() || '',
+                name: item.itemName || 'N/A',
+                orderNumber: item.orderNumber || 'N/A',
+                week: item.reservationWeek || 'N/A',
+                quantity: item.reservedQuantity || 0,
+            }));
+            setReservedItems(mappedReservations);
             toast.success(`Order number "${orderPrefix}" found.`);
         } catch (error) {
             console.error('Error filtering reservations:', error);
@@ -68,16 +74,11 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
 
     const handleShowAllReservations = () => {
         setOrderPrefix('');
-        onShowAll(); // Загружаем полный список резерваций через родительский метод
+        onShowAll();
         toast.success('Filter reset. Showing all reservations.');
     };
 
-
-
-    const handleScanClose = () => {
-        setShowScanner(false);
-    };
-
+    // ----- фильтр по неделе
     const handleFilterSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         if (filterWeek.trim() === '') {
@@ -94,16 +95,12 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
         toast.success('All articles are displayed.');
     };
 
+    // ----- удаление резервации
     const handleDelete = async (id: string) => {
-        if (!confirm('Do you really want to delete this reservation?')) return; // Подтверждение удаления
+        if (!confirm('Do you really want to delete this reservation?')) return;
 
         try {
-            console.log("Deleting a reservation with ID:", id);
-
-            // Выполняем DELETE запрос
             const response = await api.delete(`/reservations/${id}`);
-
-            // Получение данных из ответа
             const updatedReservation = response.data as {
                 id: string;
                 returnedQuantity: number;
@@ -111,12 +108,8 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
             };
             const { returnedQuantity, itemId } = updatedReservation;
 
-            // Вызываем callback для обновления в App.tsx
             onReservationRemoved(itemId, returnedQuantity);
-            // Уведомление об успехе
             toast.success('Reservation successfully deleted.');
-
-            // Обновление списка
             onShowAll();
         } catch (err) {
             toast.error('Deleting the reservation failed.');
@@ -128,7 +121,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
         <div className="reserved-items-list">
             <h3>Reservations</h3>
 
-            {/* Форма для фильтрации по префиксу заказа */}
+            {/* Фильтр по номеру заказа */}
             <form onSubmit={handleFilterByOrderPrefix} className="filter-form">
                 <label htmlFor="order-prefix">Filter by order number:</label>
                 <input
@@ -154,8 +147,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                 </div>
             </form>
 
-
-            {/* Форма для фильтрации по неделе */}
+            {/* Фильтр по неделе */}
             <form onSubmit={handleFilterSubmit} className="filter-form">
                 <label htmlFor="week-filter">Filter by week:</label>
                 <input
@@ -165,15 +157,13 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                     value={filterWeek}
                     onChange={(e) => setFilterWeek(e.target.value)}
                 />
-                <button type="submit" className="btn btn-filter">
-                    Apply filter
-                </button>
+                <button type="submit" className="btn btn-filter">Apply filter</button>
                 <button type="button" className="btn btn-check-all" onClick={handleShowAll}>
                     Show all
                 </button>
             </form>
 
-            {/* Список зарезервированных предметов */}
+            {/* Список резерваций */}
             {reservedItems.length === 0 ? (
                 <p>No reserved items found.</p>
             ) : (
@@ -181,7 +171,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                     {reservedItems.map((item) => (
                         <li key={item.id} className="reserved-item">
                             <div className="reserved-item-details">
-                                <strong>{item.name}</strong> - Order number # {item.orderNumber}, Week: {item.week}, Amount: {item.quantity}
+                                <strong>{item.name}</strong> — Order number # {item.orderNumber}, Week: {item.week}, Amount: {item.quantity}
                             </div>
                             <div className="reserved-item-actions">
                                 <button
@@ -202,20 +192,41 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                 </ul>
             )}
 
-            {/* QR-считыватель */}
-            {showScanner && (
-                <QRScanner
-                    onScan={(orderNumber) => {
-                        setShowScanner(false);
-                        onScan(orderNumber);
-                        toast.success('Reservation via QR code successfully completed.');
-                    }}
-                    onClose={handleScanClose}
-                />
-            )}
+            {/* ==== МОДАЛКА СКАНЕРА (портал в body) ==== */}
+            {showScanner &&
+                createPortal(
+                    <div
+                        className="ri-scanner-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        onClick={() => setShowScanner(false)}
+                    >
+                        <button
+                            className="ri-scanner-close"
+                            aria-label="Close scanner"
+                            onClick={() => setShowScanner(false)}
+                            type="button"
+                        >
+                            ×
+                        </button>
+                        <div
+                            className="ri-scanner-viewport"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <QRScanner
+                                onScan={(orderNumber) => {
+                                    setShowScanner(false);
+                                    onScan(orderNumber);
+                                    toast.success('Reservation via QR code successfully completed.');
+                                }}
+                                onClose={() => setShowScanner(false)}
+                            />
+                        </div>
+                    </div>,
+                    document.body
+                )}
         </div>
     );
 };
-
 
 export default ReservedItemsList;
