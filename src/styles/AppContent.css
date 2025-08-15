@@ -267,3 +267,34 @@ body.no-scroll { overflow: hidden; touch-action: none; }
         transition: none;
     }
 }
+
+@media (max-width:1024px) {
+    /* 1) Topbar without blur on phones */
+    .topbar {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        background: rgba(255,255,255,0.92) !important;
+        border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+
+    /* 2) Backdrop hidden by default, shown only when menu is open */
+    .backdrop {
+        display: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        background: rgba(0,0,0,.25) !important;
+    }
+    .sidebar.open ~ .backdrop {
+        display: block !important;
+    }
+}
+
+/* Optional: keep a subtle blur ONLY when menu is open and device supports it */
+@media (max-width:1024px) {
+    @supports (backdrop-filter: blur(3px)) or (-webkit-backdrop-filter: blur(3px)) {
+        .sidebar.open ~ .backdrop {
+            -webkit-backdrop-filter: blur(3px) !important;
+            backdrop-filter: blur(3px) !important;
+        }
+    }
+}
