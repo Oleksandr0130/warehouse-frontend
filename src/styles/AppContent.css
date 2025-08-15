@@ -266,8 +266,12 @@ body.no-scroll{ overflow:hidden; touch-action:none; }
         background: rgba(0,0,0,.25);
         z-index: 2147483644;
         pointer-events: none;
+        cursor: pointer;
     }
-    .sidebar.open ~ .backdrop{ display: block !important; }
+    .sidebar.open ~ .backdrop{
+        display: block !important;
+        pointer-events: auto;       /* когда меню открыто — ловим клик на всём экране */
+    }
 
     .app-main{ padding-top: 12px; }
 }
