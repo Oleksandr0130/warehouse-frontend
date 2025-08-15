@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import '../styles/AppContent.css';
-import '../styles/CreateReservationPage.css'
-import '../styles/CreateItemPage.css'
+import '../styles/CreateReservationPage.css';
+import '../styles/CreateItemPage.css';
 
 import ItemList from './ItemList';
 import ReservedItemsList from './ReservedItemsList';
@@ -22,7 +22,15 @@ import { ReservedItem } from '../types/ReservedItem';
 import { ReservationData } from '../types/ReservationData';
 import { SoldReservation } from '../types/SoldReservation';
 
-type MenuKey = 'inventory' | 'createItem' | 'reserve' | 'createReservation' | 'sold' | 'files' | 'about' | 'account';
+type MenuKey =
+    | 'inventory'
+    | 'createItem'
+    | 'reserve'
+    | 'createReservation'
+    | 'sold'
+    | 'files'
+    | 'about'
+    | 'account';
 
 // тип без any для проверки CSS.supports
 type CSSWithSupports = {
@@ -45,7 +53,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [supportsBlur, setSupportsBlur] = useState<boolean>(true);
 
-    // аккуратная проверка поддержки backdrop-filter, без any
+    // проверка поддержки backdrop-filter
     useEffect(() => {
         const cssObj = (window as Window & { CSS?: CSSWithSupports }).CSS;
         const ok =
@@ -57,22 +65,41 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         document.body.classList.toggle('no-blur', !ok);
     }, []);
 
-    // блокируем скролл фона под меню
+    // блокируем скролл фона под меню отдельным классом (не конфликтует со сканером)
     useEffect(() => {
-        document.body.classList.toggle('no-scroll', isMenuOpen);
-        return () => document.body.classList.remove('no-scroll');
+        document.body.classList.toggle('no-scroll-menu', isMenuOpen);
+        return () => document.body.classList.remove('no-scroll-menu');
     }, [isMenuOpen]);
 
     // закрываем меню после выбора пункта
-    useEffect(() => { setIsMenuOpen(false); }, [activeMenu]);
+    useEffect(() => {
+        setIsMenuOpen(false);
+    }, [activeMenu]);
 
-    useEffect(() => { fetchData(); }, [sortCriteria, activeMenu]);
+    // блокируем скролл и закрываем сканер по Esc, когда он открыт
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setShowScanner(false);
+        };
+        if (showScanner) {
+            document.body.classList.add('no-scroll-scanner');
+            window.addEventListener('keydown', onKey);
+        }
+        return () => {
+            document.body.classList.remove('no-scroll-scanner');
+            window.removeEventListener('keydown', onKey);
+        };
+    }, [showScanner]);
+
+    useEffect(() => {
+        fetchData();
+    }, [sortCriteria, activeMenu]);
 
     const fetchData = () => {
         if (activeMenu === 'inventory') fetchItems(sortCriteria);
         if (activeMenu === 'createReservation') fetchItems();
-        if (activeMenu === 'reserve')   fetchReservedItems();
-        if (activeMenu === 'sold')      fetchSoldReservations();
+        if (activeMenu === 'reserve') fetchReservedItems();
+        if (activeMenu === 'sold') fetchSoldReservations();
     };
 
     const fetchItems = async (sortBy?: string) => {
@@ -85,7 +112,9 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             console.error(e);
             toast.error('Error loading products.');
             setItems([]);
-        } finally { setLoading(false); }
+        } finally {
+            setLoading(false);
+        }
     };
 
     const fetchReservedItems = async () => {
@@ -93,8 +122,8 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         try {
             const res = await api.get<ReservationData[]>('/reservations');
             const data: ReservedItem[] = res.data
-                .filter(it => !it.isSold)
-                .map(it => ({
+                .filter((it) => !it.isSold)
+                .map((it) => ({
                     id: it.id?.toString() ?? '',
                     name: it.itemName ?? '',
                     quantity: it.reservedQuantity ?? 0,
@@ -106,7 +135,9 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             console.error(e);
             toast.error('Error loading reserved items.');
             setReservedItems([]);
-        } finally { setLoading(false); }
+        } finally {
+            setLoading(false);
+        }
     };
 
     const fetchSoldReservations = async () => {
@@ -118,7 +149,9 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             console.error(e);
             toast.error('Error loading sold items.');
             setSoldReservations([]);
-        } finally { setLoading(false); }
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleAddItem = async (item: Item) => {
@@ -130,7 +163,9 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         } catch (e) {
             console.error(e);
             toast.error('Error adding product.');
-        } finally { setLoading(false); }
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleScan = async (id: string) => {
@@ -152,13 +187,14 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         } catch (e) {
             console.error(e);
             toast.error('Operation error.');
-        } finally { setLoading(false); }
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // >>> важно: оставить и использовать как в исходнике
     const handleReservationRemoved = (updatedItemId: string, returnedQuantity: number) => {
-        setItems(prev =>
-            prev.map(it => (it.id === updatedItemId ? { ...it, quantity: it.quantity + returnedQuantity } : it))
+        setItems((prev) =>
+            prev.map((it) => (it.id === updatedItemId ? { ...it, quantity: it.quantity + returnedQuantity } : it))
         );
         fetchReservedItems();
         fetchItems(sortCriteria);
@@ -178,49 +214,89 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         } catch (e) {
             console.error(e);
             toast.error('Error processing reserve.');
-        } finally { setLoading(false); }
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div className="app-container">
-            {/* фиксированный topbar (на мобилке виден, на десктопе скрыт) */}
+            {/* topbar (мобайл) */}
             <header className="topbar">
                 <button
                     className={`hamburger-btn ${isMenuOpen ? 'is-open' : ''}`}
                     aria-label="Toggle menu"
                     aria-expanded={isMenuOpen}
-                    onClick={() => setIsMenuOpen(v => !v)}
+                    onClick={() => setIsMenuOpen((v) => !v)}
                 >
-                    <span /><span /><span />
+                    <span />
+                    <span />
+                    <span />
                 </button>
                 <h1 className="topbar-title">FLOWQR</h1>
             </header>
 
-            {/* sidebar: десктоп — колонка; мобайл — выездная панель поверх */}
+            {/* sidebar */}
             <aside className={`sidebar ${isMenuOpen ? 'open' : ''}`}>
                 <h2 className="sidebar-title">FLOWQR</h2>
                 <ul className="sidebar-menu">
-                    <li className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`} onClick={() => setActiveMenu('inventory')}>Inventory</li>
-                    <li className={`menu-item ${activeMenu === 'createItem' ? 'active' : ''}`}
-                        onClick={() => setActiveMenu('createItem')}>Create item</li>
-                    <li className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`} onClick={() => setActiveMenu('reserve')}>Reserved items</li>
-                    <li className={`menu-item ${activeMenu === 'createReservation' ? 'active' : ''}`} onClick={() => setActiveMenu('createReservation')}>Create a reservation</li> {/* NEW */}
-                    <li className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`} onClick={() => setActiveMenu('sold')}>Sold items</li>
-                    <li className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`} onClick={() => setActiveMenu('files')}>QR-Codes</li>
-                    <li className={`menu-item ${activeMenu === 'about' ? 'active' : ''}`} onClick={() => setActiveMenu('about')}>About App</li>
-                    <li className={`menu-item ${activeMenu === 'account' ? 'active' : ''}`} onClick={() => setActiveMenu('account')}>Personal account</li>
-                    <li className="logout-item" onClick={onLogout}>Log out</li>
+                    <li
+                        className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('inventory')}
+                    >
+                        Inventory
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'createItem' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('createItem')}
+                    >
+                        Create item
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('reserve')}
+                    >
+                        Reserved items
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'createReservation' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('createReservation')}
+                    >
+                        Create a reservation
+                    </li>
+                    <li className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`} onClick={() => setActiveMenu('sold')}>
+                        Sold items
+                    </li>
+                    <li className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`} onClick={() => setActiveMenu('files')}>
+                        QR-Codes
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'about' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('about')}
+                    >
+                        About App
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'account' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('account')}
+                    >
+                        Personal account
+                    </li>
+                    <li className="logout-item" onClick={onLogout}>
+                        Log out
+                    </li>
                 </ul>
             </aside>
 
-            {/* overlay в body через портал: blur (если поддерживается) + тёмный слой */}
-            {isMenuOpen && createPortal(
-                <>
-                    <div className={`backdrop ${supportsBlur ? '' : 'backdrop-fallback'}`} />
-                    <div className="scrim" onClick={() => setIsMenuOpen(false)} />
-                </>,
-                document.body
-            )}
+            {/* overlay меню через портал: один элемент .backdrop, кликом закрываем */}
+            {isMenuOpen &&
+                createPortal(
+                    <div
+                        className={`backdrop ${supportsBlur ? 'backdrop--blur' : ''}`}
+                        onClick={() => setIsMenuOpen(false)}
+                    />,
+                    document.body
+                )}
 
             <main className="app-main">
                 {loading && <div className="loading-overlay">Loading...</div>}
@@ -246,10 +322,9 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                             <DownloadExcelButton />
                         </div>
 
-                        <ItemList items={items}/>
+                        <ItemList items={items} />
                     </>
                 )}
-
 
                 {activeMenu === 'createItem' && (
                     <div className="item-page">
@@ -258,21 +333,28 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                             <div className="scanner-buttons">
                                 <button
                                     className="btn btn-add"
-                                    onClick={() => { setScannerAction('add'); setShowScanner(true); }}
+                                    onClick={() => {
+                                        setScannerAction('add');
+                                        setShowScanner(true);
+                                    }}
                                     disabled={loading}
-                                >Scan to add</button>
+                                >
+                                    Scan to add
+                                </button>
 
                                 <button
                                     className="btn btn-remove"
-                                    onClick={() => { setScannerAction('remove'); setShowScanner(true); }}
+                                    onClick={() => {
+                                        setScannerAction('remove');
+                                        setShowScanner(true);
+                                    }}
                                     disabled={loading}
-                                >Scan to remove</button>
+                                >
+                                    Scan to remove
+                                </button>
                             </div>
                         </div>
-
-                        {showScanner && (
-                            <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />
-                        )}
+                        {/* РАНЬШЕ: сканер был тут. Теперь — модальное окно ниже через портал */}
                     </div>
                 )}
 
@@ -282,15 +364,16 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                             reservedItems={reservedItems}
                             setReservedItems={setReservedItems}
                             onScan={handleReservedItemScan}
-                            /* <<< важное изменение: используем готовый обработчик, чтобы не было warn/unused */
                             onReservationRemoved={handleReservationRemoved}
                             onWeekFilter={async (week) => {
                                 setLoading(true);
                                 try {
-                                    const res = await api.get<ReservationData[]>('/reservations/sorted', { params: { reservationWeek: week } });
+                                    const res = await api.get<ReservationData[]>('/reservations/sorted', {
+                                        params: { reservationWeek: week },
+                                    });
                                     const data = res.data
-                                        .filter(it => !it.isSold)
-                                        .map(it => ({
+                                        .filter((it) => !it.isSold)
+                                        .map((it) => ({
                                             id: it.id?.toString() ?? '',
                                             name: it.itemName ?? '',
                                             quantity: it.reservedQuantity ?? 0,
@@ -313,25 +396,48 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                 )}
 
                 {activeMenu === 'createReservation' && (
-                    <div className="reservation-page"> {/* страничный контейнер со своими стилями */}
+                    <div className="reservation-page">
                         <div className="reservation-card">
                             <ReserveForm
                                 items={items}
                                 onReserveComplete={fetchReservedItems}
                                 onUpdateItems={(id, qty) =>
-                                    setItems(prev => prev.map(it => (it.id === id ? { ...it, quantity: it.quantity - qty } : it)))
+                                    setItems((prev) =>
+                                        prev.map((it) => (it.id === id ? { ...it, quantity: it.quantity - qty } : it))
+                                    )
                                 }
                             />
                         </div>
                     </div>
                 )}
 
-
                 {activeMenu === 'sold' && <SoldItemsList reservations={soldReservations} />}
                 {activeMenu === 'files' && <FileViewer />}
                 {activeMenu === 'about' && <AboutApp />}
                 {activeMenu === 'account' && <Account />}
             </main>
+
+            {/* === ГЛОБАЛЬНОЕ МОДАЛЬНОЕ ОКНО СКАНЕРА (портал в body) === */}
+            {showScanner &&
+                createPortal(
+                    <div className="scanner-modal" role="dialog" aria-modal="true" onClick={() => setShowScanner(false)}>
+                        <div className="scanner-dialog" onClick={(e) => e.stopPropagation()}>
+                            <button
+                                className="scanner-close"
+                                aria-label="Close scanner"
+                                onClick={() => setShowScanner(false)}
+                                type="button"
+                            >
+                                ×
+                            </button>
+                            <div className="scanner-body">
+                                <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />
+                            </div>
+                        </div>
+                    </div>,
+                    document.body
+                )}
+            {/* === /SCANNER MODAL === */}
         </div>
     );
 };

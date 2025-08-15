@@ -21,7 +21,13 @@ body::before{
     background-position: center top;
     background-size: cover;
     background-repeat: no-repeat;
-    /* без backdrop-filter — не замыливает UI на мобилках */
+}
+
+/* блокировка прокрутки (раздельно для меню и модалки сканера) */
+body.no-scroll-menu,
+body.no-scroll-scanner{
+    overflow: hidden;
+    touch-action: none;
 }
 
 /* ===== Desktop layout ===== */
@@ -31,8 +37,7 @@ body::before{
     min-height: 100%;
     color: #1f1f1f;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    /* ВАЖНО: фон теперь глобальный, здесь фон не задаём */
-    background: transparent;
+    background: transparent; /* фон теперь глобальный */
 }
 
 .topbar{ display:none; }
@@ -197,14 +202,11 @@ body::before{
 
 /* ===== Accessibility ===== */
 @media (prefers-reduced-motion: reduce){
-    .sidebar, .scrim, .backdrop, .hamburger-btn, .menu-item, .logout-item, .btn, .sort-select{ transition:none; }
+    .sidebar, .backdrop, .hamburger-btn, .menu-item, .logout-item, .btn, .sort-select{ transition:none; }
 }
 
 /* ===== Mobile / Tablet ===== */
-body.no-scroll{ overflow:hidden; touch-action:none; }
-
 @supports (height: 100svh){
-    /* card-страницы будут тянуться лучше, но фон всё равно глобальный */
     .app-container{ min-height: 100svh; }
 }
 
@@ -213,18 +215,17 @@ body.no-scroll{ overflow:hidden; touch-action:none; }
         grid-template-columns: 1fr;
         min-height: 100svh;
         overflow-x: hidden;
-        background: transparent; /* фон — глобальный */
+        background: transparent;
     }
 
-    /* Шапка без blur и без молочного полотна */
+    /* Шапка без blur */
     .topbar{
         display: flex;
         position: sticky;
         top: 0;
         min-height: var(--topbar-h);
         padding: 12px 16px;
-        padding-top: 40px;
-        /*padding-top: calc(12px + env(safe-area-inset-top));*/
+        padding-top: 40px; /* если используете safe-area — можно вернуть env() */
         -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
         background: rgba(255,255,255,0.18) !important;
@@ -258,22 +259,88 @@ body.no-scroll{ overflow:hidden; touch-action:none; }
     }
     .sidebar.open{ transform: translateX(0); }
 
-    /* Затемнение: только когда меню открыто */
-    .backdrop{
-        display: none !important;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,.25);
-        z-index: 2147483644;
-        pointer-events: none;
-        cursor: pointer;
-    }
-    .sidebar.open ~ .backdrop{
-        display: block !important;
-        pointer-events: auto;       /* когда меню открыто — ловим клик на всём экране */
-    }
-
     .app-main{ padding-top: 12px; }
+}
+
+/* ===== Backdrop для меню (портал) ===== */
+.backdrop{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.25);
+    z-index: 2147483645; /* ниже сайдбара, выше контента */
+    cursor: pointer;
+}
+.backdrop.backdrop--blur{
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+}
+
+/* ===== Scanner Modal (desktop + mobile) ===== */
+.scanner-modal{
+    position: fixed;
+    inset: 0;
+    z-index: 2147483646; /* ниже тостов, выше всего остального */
+    background: rgba(0,0,0,.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.scanner-dialog{
+    position: relative;
+    width: 92vw;
+    max-width: 720px;
+    background: #111;
+    color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    overflow: hidden;
+}
+.scanner-body{
+    padding: 12px;
+}
+/* адаптация под разные реализации QRScanner */
+.scanner-dialog video,
+.scanner-dialog canvas,
+.scanner-dialog .qr-video,
+.scanner-dialog .qr-canvas{
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: min(70vh, 560px);
+    object-fit: cover;
+    border-radius: 10px;
+}
+.scanner-close{
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,.15);
+    color: #fff;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .2s ease, transform .2s ease;
+}
+.scanner-close:hover{
+    background: rgba(255,255,255,.25);
+    transform: scale(1.05);
+}
+@media (max-width: 600px){
+    .scanner-modal{ padding: 12px; }
+    .scanner-dialog{
+        width: 100vw;
+        max-width: none;
+        border-radius: 14px;
+    }
+    .scanner-dialog video,
+    .scanner-dialog canvas{
+        max-height: 65vh;
+    }
 }
 
 /* Тосты всегда поверх */
