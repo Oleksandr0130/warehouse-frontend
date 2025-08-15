@@ -108,7 +108,7 @@
 /* Canvas – превью QR */
 .modal-canvas{
     display: block;
-    width: 100%;          /* тянется по ширине карточки */
+    /*width: 100%;          !* тянется по ширине карточки *!*/
     height: auto;         /* высота рассчитывается из реального размера canvas */
     background: #000;
     border-radius: 10px;
