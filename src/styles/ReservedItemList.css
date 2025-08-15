@@ -22,124 +22,121 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
     padding: 10px;
     border-bottom: 1px solid #ddd;
 }
-
-.reserved-item-details { flex-grow: 1; }
-
-.reserved-item-actions button { margin-left: 10px; }
+.reserved-item-details { flex: 1 1 auto; min-width: 0; }
+.reserved-item-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
 /* Кнопки */
 .btn-delete {
-    background-color: #dc3545;
-    color: #fff;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    background-color: #dc3545; color: #fff; padding: 8px 12px;
+    border: none; border-radius: 10px; cursor: pointer; font-weight: 700;
 }
 .btn-delete:hover { background-color: #c82333; }
 
 .btn-scan {
-    background-color: #007bff;
-    color: #fff;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    background-color: #007bff; color: #fff; padding: 8px 12px;
+    border: none; border-radius: 10px; cursor: pointer; font-weight: 700;
 }
 .btn-scan:hover { background-color: #0056b3; }
 
 /* Фильтры */
 .filter-form {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    flex-wrap: wrap;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 20px; padding: 12px; border: 1px solid #ddd;
+    border-radius: 12px; background-color: #f9f9f9;
 }
-.filter-form label { font-weight: bold; color: #555; }
+.filter-form label { font-weight: 800; color: #555; }
 .filter-form input {
-    flex-grow: 1;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    transition: border-color 0.3s ease;
+    flex: 1 1 220px; min-width: 200px;
+    padding: 10px 12px; font-size: 14px; border: 1px solid #ccc;
+    border-radius: 10px; transition: border-color .3s ease, box-shadow .3s ease;
 }
 .filter-form input:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0,123,255,0.5);
+    border-color: #007bff; outline: none; box-shadow: 0 0 0 4px rgba(0,123,255,0.15);
 }
-.filter-form .btn-group { display: flex; gap: 10px; }
-.filter-form .btn-filter {
-    padding: 10px 15px;
-    font-size: 14px;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-.filter-form .btn-filter:hover { background-color: #0056b3; }
+.filter-form .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+.filter-form .btn-filter,
 .filter-form .btn-check-all {
-    padding: 10px 15px;
-    font-size: 14px;
-    color: #fff;
-    background-color: #28a745;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    padding: 10px 15px; font-size: 14px; color: #fff; border: none;
+    border-radius: 10px; cursor: pointer; font-weight: 800; transition: background-color .2s ease;
 }
+.filter-form .btn-filter { background-color: #007bff; }
+.filter-form .btn-filter:hover { background-color: #0056b3; }
+.filter-form .btn-check-all { background-color: #28a745; }
 .filter-form .btn-check-all:hover { background-color: #218838; }
 
-/* ====== ПОЛНОЭКРАННЫЙ СКАНЕР ДЛЯ ЭТОГО КОМПОНЕНТА ====== */
-.ri-scanner-modal{
-    position: fixed;
-    inset: 0;
-    z-index: 2147483646;
-    background: #000; /* сплошной фон — надёжно для Android WebView */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* ================== МОДАЛКА СКАНЕРА (как на скрине) ================== */
+
+/* затемнённая подложка с лёгким блюром */
+.ri-modal-overlay{
+    position: fixed; inset: 0; z-index: 2147483646;
+    background: rgba(0,0,0,.45);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+    -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
 }
 
-.ri-scanner-viewport{
-    position: absolute;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
+/* белая карточка по центру */
+.ri-modal{
+    position: relative;
+    width: min(92vw, 520px);
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 22px 34px rgba(0,0,0,.35), 0 1px 0 rgba(0,0,0,.08) inset;
+    padding: 18px 18px 16px;
+    animation: ri-pop .18s ease-out;
+}
+@keyframes ri-pop { from { transform: translateY(8px); opacity: .85; } to { transform: none; opacity: 1; } }
+
+/* заголовок */
+.ri-modal__title{
+    text-align: center; font-weight: 800; color: #333; margin-bottom: 12px;
+}
+
+/* область видео */
+.ri-modal__viewport{
+    width: 100%;
+    height: clamp(220px, 48vw, 320px); /* как на скрине: около 4:3 и не слишком высокая */
     background: #000;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    will-change: transform;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-.ri-scanner-close{
-    position: fixed;
-    top: calc(env(safe-area-inset-top, 0px) + 12px);
-    right: 12px;
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 12px;
-    background: rgba(255,255,255,.18);
-    color: #fff;
-    font-size: 28px;
-    line-height: 1;
-    z-index: 2;
-    cursor: pointer;
-    transition: background .2s ease, transform .2s ease;
+/* видео/канвас из сканера заполняют viewport и имеют скругления */
+.ri-modal__viewport video,
+.ri-modal__viewport canvas,
+.ri-modal__viewport .qr-video{
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: #000;
 }
-.ri-scanner-close:hover{
-    background: rgba(255,255,255,.28);
-    transform: scale(1.05);
+
+/* действия */
+.ri-modal__actions{
+    display: flex; justify-content: center; margin-top: 12px;
+}
+.ri-modal__btn{
+    background: #dc3545; color: #fff; border: none;
+    padding: 10px 16px; border-radius: 8px; font-weight: 800; cursor: pointer;
+}
+.ri-modal__btn:hover{ background: #b92a38; }
+
+/* крестик */
+.ri-modal__close{
+    position: absolute; top: 10px; right: 10px;
+    width: 28px; height: 28px; border: none; border-radius: 8px;
+    background: rgba(0,0,0,.06); color: #666; font-size: 20px; line-height: 1;
+    cursor: pointer; transition: background .2s ease, transform .2s ease;
+}
+.ri-modal__close:hover{ background: rgba(0,0,0,.12); transform: scale(1.05); }
+
+/* на очень узких экранах чуть ниже высота, чтобы кнопка влезала */
+@media (max-width: 360px){
+    .ri-modal{ width: 94vw; padding: 14px; }
+    .ri-modal__viewport{ height: clamp(200px, 54vw, 280px); }
 }

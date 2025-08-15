@@ -34,11 +34,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
 
     // блокируем прокрутку под модалкой сканера
     useEffect(() => {
-        if (showScanner) {
-            document.body.classList.add('no-scroll-scanner');
-        } else {
-            document.body.classList.remove('no-scroll-scanner');
-        }
+        document.body.classList.toggle('no-scroll-scanner', showScanner);
         return () => document.body.classList.remove('no-scroll-scanner');
     }, [showScanner]);
 
@@ -192,35 +188,47 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                 </ul>
             )}
 
-            {/* ==== МОДАЛКА СКАНЕРА (портал в body) ==== */}
+            {/* ==== МОДАЛКА СКАНЕРА — центрированная карточка ==== */}
             {showScanner &&
                 createPortal(
                     <div
-                        className="ri-scanner-modal"
+                        className="ri-modal-overlay"
                         role="dialog"
                         aria-modal="true"
                         onClick={() => setShowScanner(false)}
                     >
-                        <button
-                            className="ri-scanner-close"
-                            aria-label="Close scanner"
-                            onClick={() => setShowScanner(false)}
-                            type="button"
-                        >
-                            ×
-                        </button>
-                        <div
-                            className="ri-scanner-viewport"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <QRScanner
-                                onScan={(orderNumber) => {
-                                    setShowScanner(false);
-                                    onScan(orderNumber);
-                                    toast.success('Reservation via QR code successfully completed.');
-                                }}
-                                onClose={() => setShowScanner(false)}
-                            />
+                        <div className="ri-modal" onClick={(e) => e.stopPropagation()}>
+                            <button
+                                className="ri-modal__close"
+                                aria-label="Close scanner"
+                                onClick={() => setShowScanner(false)}
+                                type="button"
+                            >
+                                ×
+                            </button>
+
+                            <div className="ri-modal__title">QR-Code scannen</div>
+
+                            <div className="ri-modal__viewport">
+                                <QRScanner
+                                    onScan={(orderNumber) => {
+                                        setShowScanner(false);
+                                        onScan(orderNumber);
+                                        toast.success('Reservation via QR code successfully completed.');
+                                    }}
+                                    onClose={() => setShowScanner(false)}
+                                />
+                            </div>
+
+                            <div className="ri-modal__actions">
+                                <button
+                                    className="ri-modal__btn"
+                                    type="button"
+                                    onClick={() => setShowScanner(false)}
+                                >
+                                    Scanner schließen
+                                </button>
+                            </div>
                         </div>
                     </div>,
                     document.body
