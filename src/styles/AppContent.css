@@ -1,18 +1,29 @@
+/* ====== GLOBAL ====== */
+:root {
+    /* единый бэкграунд для всего приложения */
+    --app-bg:
+            radial-gradient(150% 80% at 50% 50%, #d9c8ab 0%, rgba(217,200,171,0) 70%),
+            linear-gradient(140deg, #d2b892 0%, #c7a87e 40%, #b9946a 100%);
+    --topbar-h: 56px;
+}
+
 /* ===== Desktop ===== */
 .app-container {
     display: grid;
     grid-template-columns: 260px 1fr;
     min-height: 100vh;
-    background:
-            radial-gradient(150% 80% at 50% 50%, #d9c8ab 0%, rgba(217,200,171,0) 70%),
-            linear-gradient(140deg, #d2b892 0%, #c7a87e 40%, #b9946a 100%);
-    background-attachment: fixed;
+    background: var(--app-bg);
+    background-position: center top;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* на мобиле отключим */
     color: #1f1f1f;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
 .topbar { display: none; }
 
+/* ===== Sidebar ===== */
 .sidebar {
     position: sticky;
     top: 0;
@@ -57,15 +68,13 @@
     color: rgba(255,255,255,.95);
     background: rgba(255,255,255,.10);
     border: 1.5px solid transparent;
-    transition: all 0.3s ease; /* анимация */
+    transition: all .3s ease;
 }
-
 .menu-item:hover {
     background: rgba(255,255,255,.25);
     border-color: rgba(255,255,255,.85);
     transform: translateY(-2px);
 }
-
 .menu-item.active {
     background: rgba(255,255,255,.22);
     border-color: rgba(255,255,255,.9);
@@ -82,9 +91,8 @@
     border: 1.5px solid rgba(255,255,255,.75);
     color: #fff;
     cursor: pointer;
-    transition: all 0.3s ease; /* анимация */
+    transition: all .3s ease;
 }
-
 .logout-item:hover {
     background: rgba(231,76,60,.95);
     transform: translateY(-2px);
@@ -92,7 +100,7 @@
 
 .app-main { padding: 24px; }
 
-/* buttons/selects */
+/* ===== Buttons / selects ===== */
 .btn {
     padding: 12px 16px;
     font-size: 14px;
@@ -101,20 +109,19 @@
     border: 1.5px solid rgba(255,255,255,.65);
     background: rgba(255,255,255,.12);
     color: #fff;
-    transition: all 0.3s ease; /* анимация */
+    transition: all .3s ease;
 }
 .btn:hover {
     background: rgba(255,255,255,.25);
     transform: translateY(-2px);
 }
-
 .btn.btn-add { background: rgba(40,167,69,.25); }
 .btn.btn-add:hover { background: rgba(40,167,69,.4); }
-
 .btn.btn-remove { background: rgba(220,53,69,.28); }
 .btn.btn-remove:hover { background: rgba(220,53,69,.45); }
 
 .scanner-buttons { display: flex; gap: 10px; margin: 10px 0 18px; }
+
 .sort-dropdown { margin: 12px 0 18px; display: flex; align-items: center; gap: 10px; color: #fff; }
 .sort-select {
     padding: 10px 14px;
@@ -122,11 +129,9 @@
     border: 1.5px solid rgba(255,255,255,.65);
     background: rgba(255,255,255,.12);
     color: #fff;
-    transition: all 0.3s ease; /* анимация */
+    transition: all .3s ease;
 }
-.sort-select:hover {
-    background: rgba(255,255,255,.25);
-}
+.sort-select:hover { background: rgba(255,255,255,.25); }
 
 .loading-overlay {
     position: fixed;
@@ -140,7 +145,7 @@
     z-index: 9990;
 }
 
-/* hamburger */
+/* ===== Hamburger ===== */
 .hamburger-btn {
     display: inline-flex;
     width: 42px;
@@ -151,20 +156,19 @@
     border: 1.5px solid rgba(255,255,255,.65);
     background: rgba(255,255,255,.12);
     cursor: pointer;
-    transition: all 0.3s ease; /* анимация */
+    transition: all .3s ease;
 }
 .hamburger-btn:hover {
     background: rgba(255,255,255,.25);
     transform: scale(1.05);
 }
-
 .hamburger-btn span {
     display: block;
     width: 20px;
     height: 2px;
     margin: 2.5px 0;
     background: #fff;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform .3s ease, opacity .3s ease;
 }
 .hamburger-btn.is-open span:nth-child(1) { transform: translateY(4.5px) rotate(45deg); }
 .hamburger-btn.is-open span:nth-child(2) { opacity: 0; }
@@ -178,47 +182,62 @@
     text-transform: uppercase;
 }
 
+/* ===== Accessibility ===== */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar, .scrim, .backdrop, .hamburger-btn, .menu-item, .logout-item, .btn, .sort-select {
+        transition: none;
+    }
+}
+
 /* ===== Mobile / Tablet ===== */
-:root { --topbar-h: 56px; }
 body.no-scroll { overflow: hidden; touch-action: none; }
+
+@supports (height: 100svh) {
+    .app-container { min-height: 100svh; }
+}
 
 @media (max-width:1024px) {
     .app-container {
         grid-template-columns: 1fr;
-        min-height: 100dvh;
-        background-attachment: scroll;
+        min-height: 100svh;
+        background-attachment: scroll; /* главное: без fixed на телефонах */
         overflow-x: hidden;
     }
 
+    /* Шапка без blur и без «молочного полотна» */
     .topbar {
         display: flex;
-        position: relative;
-        top: auto;
-        left: auto;
-        right: auto;
+        position: sticky;
+        top: 0;
         min-height: var(--topbar-h);
         padding: 12px 16px;
-        /*padding-top: calc(12px + env(safe-area-inset-top));*/
-        padding-top: 40px;
-        -webkit-backdrop-filter: saturate(140%) blur(6px);
-        backdrop-filter: saturate(140%) blur(6px);
-        background: rgba(255, 255, 255, 0.18);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.45);
-        z-index: 2147483643;
+        padding-top: calc(12px + env(safe-area-inset-top));
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        background: rgba(255,255,255,0.18) !important;
+        border-bottom: 1px solid rgba(0,0,0,0.08) !important;
+        z-index: 1000 !important; /* тосты будут выше */
     }
 
+    /* Бургер контрастный на светлом фоне */
+    .hamburger-btn {
+        color: #1f1f1f !important;
+        border-color: rgba(0,0,0,0.15) !important;
+        background: rgba(255,255,255,0.4);
+    }
+
+    /* Мобильный сайдбар как выдвижное меню */
     .sidebar {
         position: fixed;
         left: 0;
         top: 0;
         bottom: 0;
         height: auto;
-        min-height: 100vh;
-        min-height: 100dvh;
+        min-height: 100svh;
         width: 86%;
         max-width: 320px;
         transform: translateX(-100%);
-        transition: transform 0.25s ease;
+        transition: transform .25s ease;
         z-index: 2147483646;
         background: #12232e47;
         border-right: 1.5px solid rgba(255,255,255,.75);
@@ -228,77 +247,19 @@ body.no-scroll { overflow: hidden; touch-action: none; }
     }
     .sidebar.open { transform: translateX(0); }
 
-    .scrim {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,.52);
-        z-index: 2147483645;
-        pointer-events: auto;
-    }
-
-    @supports (backdrop-filter: blur(3px)) or (-webkit-backdrop-filter: blur(3px)) {
-        .backdrop {
-            position: fixed;
-            inset: 0;
-            -webkit-backdrop-filter: blur(3px);
-            backdrop-filter: blur(3px);
-            background: transparent;
-            z-index: 2147483644;
-            pointer-events: none;
-        }
-    }
-
-    @supports not (backdrop-filter: blur(3px)) {
-        .backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,.25);
-            z-index: 2147483644;
-            pointer-events: none;
-        }
-    }
-
-    body.no-blur .backdrop { background: rgba(0,0,0,.25) !important; }
-
-    .app-main { padding-top: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .sidebar, .scrim, .backdrop, .hamburger-btn, .menu-item, .logout-item, .btn, .sort-select {
-        transition: none;
-    }
-}
-
-@media (max-width:1024px) {
-    /* шапка без blur, лёгкая прозрачность — ничего не «замывает» */
-    .topbar {
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-        background: rgba(255,255,255,0.18) !important; /* вернули лёгкую прозрачность вместо белого полотна */
-        border-bottom: 1px solid rgba(0,0,0,0.08) !important;
-        z-index: 1000 !important; /* ниже, чем тосты */
-    }
-
-    /* бургер/рамка видимы на любом фоне */
-    .hamburger-btn {
-        color: #1f1f1f !important;
-        border-color: rgba(0,0,0,0.15) !important;
-        background: rgba(255,255,255,0.4);
-    }
-
-    /* подложка без blur и только когда меню реально открыто */
+    /* Подложка: только при открытом меню, без blur */
     .backdrop {
         display: none !important;
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-        background: rgba(0,0,0,.25) !important;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.25);
+        z-index: 2147483644;
+        pointer-events: none;
     }
-    .sidebar.open ~ .backdrop {
-        display: block !important;
-    }
+    .sidebar.open ~ .backdrop { display: block !important; }
+
+    .app-main { padding-top: 12px; }
 }
 
-/* тосты всегда выше шапки */
-.Toastify__toast-container {
-    z-index: 2147483647 !important;
-}
+/* Тосты всегда сверху */
+.Toastify__toast-container { z-index: 2147483647 !important; }

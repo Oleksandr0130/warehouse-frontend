@@ -1,8 +1,9 @@
-/* Полноэкранный раздел со своим фоном — по духу как .auth-page */
-.reservation-page {
+/* CreateReservationPage.css */
+/* Полноэкранная страница с единым фоном приложения */
+.reservation-page{
     position: relative;
     width: 100%;
-    min-height: 100vh;
+    min-height: 100svh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -13,23 +14,20 @@
     overflow-x: hidden;
 }
 
-/* Фон через псевдоэлемент — мягкий теплый градиент */
-.reservation-page::before {
+/* Фон привязываем к странице, а не к вьюпорту; цвета — как в AppContent */
+.reservation-page::before{
     content: "";
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: -1;
-    background:
-            radial-gradient(150% 80% at 50% 50%, #d9c8ab 0%, rgba(217,200,171,0) 70%),
-            linear-gradient(140deg, #d2b892 0%, #c7a87e 40%, #b9946a 100%);
-    background-repeat: no-repeat;
+    background: var(--app-bg);
+    background-position: center top;
     background-size: cover;
-    background-position: center;
-    filter: saturate(0.95);
+    background-repeat: no-repeat;
 }
 
-/* Карточка с формой — аккуратная, прозрачная, без тяжёлых теней */
-.reservation-card {
+/* Карточка формы */
+.reservation-card{
     width: 100%;
     max-width: 560px;
     padding: 24px 20px 16px;
@@ -41,25 +39,19 @@
     box-shadow: 0 10px 24px rgba(0,0,0,0.10);
 }
 
-/* Чуть улучшаем кнопку из ReserveForm.css без ломки его стилей */
-.reservation-card .reserve-form .btn-submit {
+/* Небольшой апгрейд кнопки, не ломая её базовые стили */
+.reservation-card .reserve-form .btn-submit{
     border-radius: 12px;
     font-weight: 700;
     letter-spacing: .3px;
     transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease;
 }
-
-.reservation-card .reserve-form .btn-submit:hover {
+.reservation-card .reserve-form .btn-submit:hover{
     transform: translateY(-1px);
     box-shadow: 0 6px 14px rgba(0,0,0,0.12);
 }
 
-/* Мобильная адаптация */
-@media (max-width: 480px) {
-    .reservation-card { padding: 18px 16px; }
-    .reservation-page::before {
-        background:
-                radial-gradient(200% 120% at 50% 40%, #d9c8ab 0%, rgba(217,200,171,0) 70%),
-                linear-gradient(140deg, #d2b892 0%, #c7a87e 40%, #b9946a 100%);
-    }
+/* Моб. адаптация */
+@media (max-width:480px){
+    .reservation-card{ padding: 18px 16px; }
 }
