@@ -32,6 +32,7 @@ type MenuKey =
     | 'about'
     | 'account';
 
+// тип без any для проверки CSS.supports
 type CSSWithSupports = {
     supports?: (prop: string, value?: string) => boolean;
 };
@@ -52,30 +53,34 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [supportsBlur, setSupportsBlur] = useState<boolean>(true);
 
+    // проверка поддержки backdrop-filter
     useEffect(() => {
         const cssObj = (window as Window & { CSS?: CSSWithSupports }).CSS;
         const ok =
             !!cssObj?.supports &&
             (cssObj.supports('backdrop-filter', 'blur(3px)') ||
                 cssObj.supports('-webkit-backdrop-filter', 'blur(3px)'));
+
         setSupportsBlur(ok);
         document.body.classList.toggle('no-blur', !ok);
     }, []);
 
-    // блокируем скролл под открытым меню
+    // блокируем скролл фона под меню отдельным классом (не конфликтует со сканером)
     useEffect(() => {
         document.body.classList.toggle('no-scroll-menu', isMenuOpen);
         return () => document.body.classList.remove('no-scroll-menu');
     }, [isMenuOpen]);
 
-    // автозакрытие меню при переходе
+    // закрываем меню после выбора пункта
     useEffect(() => {
         setIsMenuOpen(false);
     }, [activeMenu]);
 
-    // блокируем скролл под открытым сканером + ESC закрывает
+    // блокируем скролл и закрываем сканер по Esc, когда он открыт
     useEffect(() => {
-        const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowScanner(false); };
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setShowScanner(false);
+        };
         if (showScanner) {
             document.body.classList.add('no-scroll-scanner');
             window.addEventListener('keydown', onKey);
@@ -86,7 +91,9 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         };
     }, [showScanner]);
 
-    useEffect(() => { fetchData(); }, [sortCriteria, activeMenu]);
+    useEffect(() => {
+        fetchData();
+    }, [sortCriteria, activeMenu]);
 
     const fetchData = () => {
         if (activeMenu === 'inventory') fetchItems(sortCriteria);
@@ -214,7 +221,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
 
     return (
         <div className="app-container">
-            {/* topbar (mobile) */}
+            {/* topbar (мобайл) */}
             <header className="topbar">
                 <button
                     className={`hamburger-btn ${isMenuOpen ? 'is-open' : ''}`}
@@ -233,23 +240,63 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             <aside className={`sidebar ${isMenuOpen ? 'open' : ''}`}>
                 <h2 className="sidebar-title">FLOWQR</h2>
                 <ul className="sidebar-menu">
-                    <li className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`} onClick={() => setActiveMenu('inventory')}>Inventory</li>
-                    <li className={`menu-item ${activeMenu === 'createItem' ? 'active' : ''}`} onClick={() => setActiveMenu('createItem')}>Create item</li>
-                    <li className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`} onClick={() => setActiveMenu('reserve')}>Reserved items</li>
-                    <li className={`menu-item ${activeMenu === 'createReservation' ? 'active' : ''}`} onClick={() => setActiveMenu('createReservation')}>Create a reservation</li>
-                    <li className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`} onClick={() => setActiveMenu('sold')}>Sold items</li>
-                    <li className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`} onClick={() => setActiveMenu('files')}>QR-Codes</li>
-                    <li className={`menu-item ${activeMenu === 'about' ? 'active' : ''}`} onClick={() => setActiveMenu('about')}>About App</li>
-                    <li className={`menu-item ${activeMenu === 'account' ? 'active' : ''}`} onClick={() => setActiveMenu('account')}>Personal account</li>
-                    <li className="logout-item" onClick={onLogout}>Log out</li>
+                    <li
+                        className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('inventory')}
+                    >
+                        Inventory
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'createItem' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('createItem')}
+                    >
+                        Create item
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('reserve')}
+                    >
+                        Reserved items
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'createReservation' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('createReservation')}
+                    >
+                        Create a reservation
+                    </li>
+                    <li className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`} onClick={() => setActiveMenu('sold')}>
+                        Sold items
+                    </li>
+                    <li className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`} onClick={() => setActiveMenu('files')}>
+                        QR-Codes
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'about' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('about')}
+                    >
+                        About App
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'account' ? 'active' : ''}`}
+                        onClick={() => setActiveMenu('account')}
+                    >
+                        Personal account
+                    </li>
+                    <li className="logout-item" onClick={onLogout}>
+                        Log out
+                    </li>
                 </ul>
             </aside>
 
-            {/* overlay меню (портал): кликом закрываем */}
-            {isMenuOpen && createPortal(
-                <div className={`backdrop ${supportsBlur ? 'backdrop--blur' : ''}`} onClick={() => setIsMenuOpen(false)} />,
-                document.body
-            )}
+            {/* overlay меню через портал: один элемент .backdrop, кликом закрываем */}
+            {isMenuOpen &&
+                createPortal(
+                    <div
+                        className={`backdrop ${supportsBlur ? 'backdrop--blur' : ''}`}
+                        onClick={() => setIsMenuOpen(false)}
+                    />,
+                    document.body
+                )}
 
             <main className="app-main">
                 {loading && <div className="loading-overlay">Loading...</div>}
@@ -286,7 +333,10 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                             <div className="scanner-buttons">
                                 <button
                                     className="btn btn-add"
-                                    onClick={() => { setScannerAction('add'); setShowScanner(true); }}
+                                    onClick={() => {
+                                        setScannerAction('add');
+                                        setShowScanner(true);
+                                    }}
                                     disabled={loading}
                                 >
                                     Scan to add
@@ -294,47 +344,55 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
 
                                 <button
                                     className="btn btn-remove"
-                                    onClick={() => { setScannerAction('remove'); setShowScanner(true); }}
+                                    onClick={() => {
+                                        setScannerAction('remove');
+                                        setShowScanner(true);
+                                    }}
                                     disabled={loading}
                                 >
                                     Scan to remove
                                 </button>
                             </div>
                         </div>
+                        {/* РАНЬШЕ: сканер был тут. Теперь — модальное окно ниже через портал */}
                     </div>
                 )}
 
                 {activeMenu === 'reserve' && (
-                    <ReservedItemsList
-                        reservedItems={reservedItems}
-                        setReservedItems={setReservedItems}
-                        onScan={handleReservedItemScan}
-                        onReservationRemoved={handleReservationRemoved}
-                        onWeekFilter={async (week) => {
-                            setLoading(true);
-                            try {
-                                const res = await api.get<ReservationData[]>('/reservations/sorted', { params: { reservationWeek: week } });
-                                const data = res.data
-                                    .filter((it) => !it.isSold)
-                                    .map((it) => ({
-                                        id: it.id?.toString() ?? '',
-                                        name: it.itemName ?? '',
-                                        quantity: it.reservedQuantity ?? 0,
-                                        orderNumber: it.orderNumber ?? '',
-                                        week: it.reservationWeek ?? '',
-                                    }));
-                                setReservedItems(data);
-                                toast.success(`Sorted by week ${week}`);
-                            } catch (err) {
-                                console.error(err);
-                                toast.error('Failed to filter.');
-                                setReservedItems([]);
-                            } finally {
-                                setLoading(false);
-                            }
-                        }}
-                        onShowAll={fetchReservedItems}
-                    />
+                    <>
+                        <ReservedItemsList
+                            reservedItems={reservedItems}
+                            setReservedItems={setReservedItems}
+                            onScan={handleReservedItemScan}
+                            onReservationRemoved={handleReservationRemoved}
+                            onWeekFilter={async (week) => {
+                                setLoading(true);
+                                try {
+                                    const res = await api.get<ReservationData[]>('/reservations/sorted', {
+                                        params: { reservationWeek: week },
+                                    });
+                                    const data = res.data
+                                        .filter((it) => !it.isSold)
+                                        .map((it) => ({
+                                            id: it.id?.toString() ?? '',
+                                            name: it.itemName ?? '',
+                                            quantity: it.reservedQuantity ?? 0,
+                                            orderNumber: it.orderNumber ?? '',
+                                            week: it.reservationWeek ?? '',
+                                        }));
+                                    setReservedItems(data);
+                                    toast.success(`Sorted by week ${week}`);
+                                } catch (err) {
+                                    console.error(err);
+                                    toast.error('Failed to filter.');
+                                    setReservedItems([]);
+                                } finally {
+                                    setLoading(false);
+                                }
+                            }}
+                            onShowAll={fetchReservedItems}
+                        />
+                    </>
                 )}
 
                 {activeMenu === 'createReservation' && (
@@ -344,7 +402,9 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                                 items={items}
                                 onReserveComplete={fetchReservedItems}
                                 onUpdateItems={(id, qty) =>
-                                    setItems((prev) => prev.map((it) => (it.id === id ? { ...it, quantity: it.quantity - qty } : it)))
+                                    setItems((prev) =>
+                                        prev.map((it) => (it.id === id ? { ...it, quantity: it.quantity - qty } : it))
+                                    )
                                 }
                             />
                         </div>
@@ -357,28 +417,27 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                 {activeMenu === 'account' && <Account />}
             </main>
 
-            {/* === СКАНЕР: модалка через портал === */}
-            {showScanner && createPortal(
-                <div className="scanner-modal" role="dialog" aria-modal="true" onClick={() => setShowScanner(false)}>
-                    <div className="scanner-dialog" onClick={(e) => e.stopPropagation()}>
-                        <button
-                            className="scanner-close"
-                            aria-label="Close scanner"
-                            onClick={() => setShowScanner(false)}
-                            type="button"
-                        >
-                            ×
-                        </button>
-
-                        {/* ВАЖНО: явный viewport, чтобы библиотека получила размеры */}
-                        <div className="scanner-viewport">
-                            <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />
+            {/* === ГЛОБАЛЬНОЕ МОДАЛЬНОЕ ОКНО СКАНЕРА (портал в body) === */}
+            {showScanner &&
+                createPortal(
+                    <div className="scanner-modal" role="dialog" aria-modal="true" onClick={() => setShowScanner(false)}>
+                        <div className="scanner-dialog" onClick={(e) => e.stopPropagation()}>
+                            <button
+                                className="scanner-close"
+                                aria-label="Close scanner"
+                                onClick={() => setShowScanner(false)}
+                                type="button"
+                            >
+                                ×
+                            </button>
+                            <div className="scanner-body">
+                                <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />
+                            </div>
                         </div>
-                    </div>
-                </div>,
-                document.body
-            )}
-            {/* === /SCANNER === */}
+                    </div>,
+                    document.body
+                )}
+            {/* === /SCANNER MODAL === */}
         </div>
     );
 };

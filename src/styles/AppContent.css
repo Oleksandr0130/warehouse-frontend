@@ -270,7 +270,7 @@ body.no-scroll-scanner{
     backdrop-filter: blur(3px);
 }
 
-/* ===== Scanner Modal (ОБНОВЛЕНО) ===== */
+/* ===== Scanner Modal ===== */
 .scanner-modal{
     position: fixed;
     inset: 0;
@@ -281,7 +281,6 @@ body.no-scroll-scanner{
     justify-content: center;
     padding: 20px;
 }
-
 .scanner-dialog{
     position: relative;
     width: 92vw;
@@ -290,24 +289,21 @@ body.no-scroll-scanner{
     color: #fff;
     border-radius: 16px;
     box-shadow: 0 20px 60px rgba(0,0,0,.4);
-    /* ВНИМАНИЕ: никакого overflow:hidden здесь — WebView иногда «теряет» кадр видео */
-    overflow: visible;
+    overflow: hidden;
 }
 
-/* Viewport с реальными размерами: сюда монтируется библиотека сканера */
+/* явное окно для видео сканера — ДОЛЖЕН быть фиксированный размер */
 .scanner-viewport{
     width: 100%;
     height: min(78vh, 560px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 12px;
     box-sizing: border-box;
-    background: #000;
-    border-radius: 12px;
-    overflow: hidden;           /* скругляем углы уже на viewport */
-    position: relative;
-    z-index: 1;
 }
 
-/* Видео/канвас: принудительный отдельный слой + защита от схлопывания */
+/* делаем любое видео/канвас растягиваемым */
 .scanner-viewport video,
 .scanner-viewport canvas,
 .scanner-viewport .qr-video,
@@ -316,12 +312,14 @@ body.no-scroll-scanner{
     width: 100%;
     height: 100%;
     object-fit: cover;
-    position: relative;
-    z-index: 2;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    will-change: transform;
-    background: #000;
+    border-radius: 10px;
+}
+
+/* иногда библиотеки добавляют внутренние контейнеры — не позволяем им схлопываться */
+.scanner-viewport > *{
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
 }
 
 .scanner-close{
@@ -343,6 +341,16 @@ body.no-scroll-scanner{
 
 @media (max-width: 600px){
     .scanner-modal{ padding: 12px; }
-    .scanner-dialog{ width: 100vw; max-width: none; border-radius: 14px; }
-    .scanner-viewport{ height: 70vh; padding: 8px; }
+    .scanner-dialog{
+        width: 100vw;
+        max-width: none;
+        border-radius: 14px;
+    }
+    .scanner-viewport{
+        height: 70vh; /* побольше места под видео на телефонах */
+        padding: 8px;
+    }
 }
+
+/* Тосты всегда сверху */
+.Toastify__toast-container{ z-index: 2147483647 !important; }
