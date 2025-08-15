@@ -64,7 +64,7 @@
     border: 1px solid #e9e9e9;
     border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-    overflow: hidden; /* не даём контенту вылезать за края */
+    overflow: hidden;
 }
 
 /* Чекбокс выбора */
@@ -74,7 +74,7 @@
     cursor: pointer;
 }
 
-/* Изображение QR кода: на мобилке уменьшаем */
+/* Изображение QR кода */
 .qr-image {
     width: 150px;
     height: 150px;
@@ -88,7 +88,7 @@
 .file-name {
     font-size: 14px;
     flex: 1 1 auto;
-    min-width: 0; /* позволяет тексту ужиматься, а не распихивать карточку */
+    min-width: 0;
     color: #222;
 }
 
@@ -104,33 +104,46 @@
 }
 .download-button:hover { background-color: #0056b3; }
 
-/* ===== Модалка ===== */
+/* ===== Модалка (исправлено для Android) ===== */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background-color: rgba(0,0,0,0.8);
+    background-color: rgba(0,0,0,0.75);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2147483646; /* выше сайдбара */
-}
-.modal-content {
-    background-color: #fff;
-    border-radius: 12px;
     padding: 16px;
-    max-width: 92vw;
-    max-height: 92vh;
+    z-index: 2147483646; /* выше всего */
+}
+
+.modal-content {
+    position: relative;
+    width: min(92vw, 520px);     /* явная ширина карточки — важно для расчёта размеров картинки */
+    max-height: 86vh;
+    background-color: #fff;
+    border-radius: 14px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-    position: relative;
+    box-shadow: 0 22px 34px rgba(0,0,0,.35), 0 1px 0 rgba(0,0,0,.08) inset;
 }
+
+/* Картинка в модалке — теперь всегда видима на мобилке */
 .modal-image {
-    max-width: 100%;
-    max-height: 78vh;
+    display: block;              /* убираем inline-artefacts */
+    width: 100%;                 /* опираемся на ширину карточки */
+    height: auto;
+    max-height: 60vh;            /* не выше 60% экрана */
+    object-fit: contain;         /* целиком в видимой области */
+    background: #000;            /* чёрный фон под QR */
+    border-radius: 10px;
     margin-bottom: 14px;
 }
+
+/* Кнопка закрытия */
 .close-button {
     background-color: #f44336;
     color: #fff;
@@ -139,7 +152,6 @@
     border-radius: 10px;
     cursor: pointer;
     font-size: 14px;
-    align-self: flex-end;
 }
 .close-button:hover { background-color: #d32f2f; }
 
@@ -148,25 +160,29 @@
     .file-viewer-container { margin: 12px; padding: 12px; }
 
     .file-item {
-        flex-wrap: wrap;           /* элементы могут переноситься */
+        flex-wrap: wrap;
         align-items: flex-start;
         gap: 10px;
     }
 
     .qr-image {
-        width: 120px;              /* делаем картинку меньше */
+        width: 120px;
         height: 120px;
     }
 
     .file-name {
-        flex-basis: 100%;          /* переносим подпись на новую строку */
+        flex-basis: 100%;
         margin-top: 4px;
     }
 
     .download-button {
-        width: 100%;               /* кнопка занимает всю ширину, не вылезает */
+        width: 100%;
         margin-top: 6px;
     }
 
     .select-checkbox { transform: scale(1.2); }
+
+    /* на очень узких — немного ниже картинку в модалке */
+    .modal-content { width: 94vw; }
+    .modal-image { max-height: 52vh; }
 }
