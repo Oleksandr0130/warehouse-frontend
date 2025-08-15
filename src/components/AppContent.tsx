@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import '../styles/AppContent.css';
+import '../styles/CreateReservationPage.css'
 
 import ItemList from './ItemList';
 import ReservedItemsList from './ReservedItemsList';
@@ -20,7 +21,7 @@ import { ReservedItem } from '../types/ReservedItem';
 import { ReservationData } from '../types/ReservationData';
 import { SoldReservation } from '../types/SoldReservation';
 
-type MenuKey = 'inventory' | 'reserve' | 'sold' | 'files' | 'about' | 'account';
+type MenuKey = 'inventory' | 'reserve' | 'createReservation' | 'sold' | 'files' | 'about' | 'account';
 
 // тип без any для проверки CSS.supports
 type CSSWithSupports = {
@@ -68,6 +69,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
 
     const fetchData = () => {
         if (activeMenu === 'inventory') fetchItems(sortCriteria);
+        if (activeMenu === 'createReservation') fetchItems();
         if (activeMenu === 'reserve')   fetchReservedItems();
         if (activeMenu === 'sold')      fetchSoldReservations();
     };
@@ -199,6 +201,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                 <ul className="sidebar-menu">
                     <li className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`} onClick={() => setActiveMenu('inventory')}>Inventory</li>
                     <li className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`} onClick={() => setActiveMenu('reserve')}>Reserved items</li>
+                    <li className={`menu-item ${activeMenu === 'createReservation' ? 'active' : ''}`} onClick={() => setActiveMenu('createReservation')}>Create a reservation</li> {/* NEW */}
                     <li className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`} onClick={() => setActiveMenu('sold')}>Sold items</li>
                     <li className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`} onClick={() => setActiveMenu('files')}>QR-Codes</li>
                     <li className={`menu-item ${activeMenu === 'about' ? 'active' : ''}`} onClick={() => setActiveMenu('about')}>About App</li>
@@ -268,14 +271,6 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
 
                 {activeMenu === 'reserve' && (
                     <>
-                        <ReserveForm
-                            items={items}
-                            onReserveComplete={fetchReservedItems}
-                            onUpdateItems={(id, qty) =>
-                                setItems(prev => prev.map(it => (it.id === id ? { ...it, quantity: it.quantity - qty } : it)))
-                            }
-                        />
-
                         <ReservedItemsList
                             reservedItems={reservedItems}
                             setReservedItems={setReservedItems}
@@ -309,6 +304,21 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                         />
                     </>
                 )}
+
+                {activeMenu === 'createReservation' && (
+                    <div className="reservation-page"> {/* страничный контейнер со своими стилями */}
+                        <div className="reservation-card">
+                            <ReserveForm
+                                items={items}
+                                onReserveComplete={fetchReservedItems}
+                                onUpdateItems={(id, qty) =>
+                                    setItems(prev => prev.map(it => (it.id === id ? { ...it, quantity: it.quantity - qty } : it)))
+                                }
+                            />
+                        </div>
+                    </div>
+                )}
+
 
                 {activeMenu === 'sold' && <SoldItemsList reservations={soldReservations} />}
                 {activeMenu === 'files' && <FileViewer />}
