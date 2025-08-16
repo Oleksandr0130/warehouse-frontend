@@ -26,19 +26,20 @@ const Login: React.FC<LoginProps> = ({ onSuccess, onSwitch }) => {
                 password: credentials.password,
             });
             localStorage.setItem('token', response.data.token);
-            toast.success('Successful login!');
             onSuccess();
         } catch (err) {
+            // Без alert — только toast
             if (err instanceof AxiosError && err.response) {
-                alert(
-                    `Ошибка входа: ${err.response.status} - ${
-                        err.response.data?.message || 'Неопределенная ошибка'
-                    }`
-                );
+                const status = err.response.status;
+                const msg =
+                    (err.response.data as any)?.message ||
+                    'Incorrect username or password';
+                console.error(`Login error ${status}:`, msg);
+                toast.error(`Login failed (${status}). ${msg}`);
             } else {
-                alert('Unknown error login.');
+                console.error('Unknown login error:', err);
+                toast.error('Login failed. Please try again.');
             }
-            toast.error('Incorrect username/password!');
         }
     };
 
