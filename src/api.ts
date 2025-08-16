@@ -1,153 +1,176 @@
-import axios from 'axios';
-import { SoldReservation } from './types/SoldReservation.ts';
-import {ReservationData} from "./types/ReservationData.ts";
+import axios, { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 
-const BASE_URL = '/api';
+// ====== Настройки ======
+const API_BASE = import.meta.env.VITE_API_URL ?? '/api'; // на проде: https://warehouse-qr-app-8adwv.ondigitalocean.app/api
+const REFRESH_PATH = '/auth/refresh'; // поправьте, если у вас другой путь
 
-const api = axios.create({
-    baseURL: BASE_URL,
-    timeout: 10000, // Тайм-аут 10 секунд
-    withCredentials: true, // Для передачи cookie
+// ====== Хранилище токенов ======
+function getAccessToken(): string | null {
+    return localStorage.getItem('token') || localStorage.getItem('accessToken');
+}
+function getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken');
+}
+function setAccessToken(token: string) {
+    localStorage.setItem('token', token);
+    localStorage.setItem('accessToken', token);
+}
+function setRefreshToken(token: string) {
+    localStorage.setItem('refreshToken', token);
+}
+function clearTokens() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+}
+
+// ====== Инстанс ======
+export const api = axios.create({
+    baseURL: API_BASE,
+    withCredentials: true,
+    timeout: 15000,
 });
 
-// Запрос к /sold для получения проданных резерваций
-export const fetchSoldReservations = async (): Promise<SoldReservation[]> => {
-    const response = await api.get('/sold');
-    return response.data;
-};
-
-// Метод для фильтрации резерваций по префиксу заказа
-export const fetchReservationsByOrderPrefix = async (prefix: string): Promise<ReservationData[]> => {
-    const response = await api.get(`/reservations/search/by-order-prefix`, { params: { orderPrefix: prefix } });
-    return response.data;
-};
-
-
-// Функции для регистрации пользователя, входа, подтверждения email
-export const registerUser = (data: { username: string; email: string; password: string; companyName: string }) =>
-    api.post('/auth/register', data);
-
-export const loginUser = (data: { username: string; password: string }) =>
-    api.post('/auth/login', data);
-
-export const confirmEmail = (code: string) =>
-    api.get(`/confirmation?code=${code}`);
-
-// Новый метод для удаления QR-кода
-export const deleteQRCode = async (orderNumber: string): Promise<void> => {
-    await api.delete(`/reservations/${orderNumber}/qrcode`);
-};
-
-export const fetchBillingStatus = async () => {
-    const resp = await api.get('/billing/status');
-    return resp.data as {
-        status: 'TRIAL'|'ACTIVE'|'EXPIRED'|'ANON'|'NO_COMPANY';
-        trialEnd?: string;
-        currentPeriodEnd?: string;
-        daysLeft?: number;
-        isAdmin?: boolean;
-    };
-};
-
-export const createCheckout = async () => {
-    const resp = await api.post('/billing/checkout');
-    return resp.data as { checkoutUrl: string };
-};
-
-
-// Интерцептор запросов: добавляем заголовок Authorization, если токен доступен
-api.interceptors.request.use(
-    (config) => {
-        const accessToken = localStorage.getItem('accessToken'); // Получаем Access Token из localStorage
-        if (accessToken) {
-            config.headers.Authorization = `Bearer ${accessToken}`;
+// ====== Подстановка Bearer ко всем запросам ======
+function attachAuth(config: InternalAxiosRequestConfig) {
+    const token = getAccessToken();
+    if (token) {
+        config.headers = config.headers ?? {};
+        if (!('Authorization' in config.headers)) {
+            (config.headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
         }
-        // console.log(`API Request -> ${config.method?.toUpperCase()} ${config.url}`, config.params || {});
-        return config;
-    },
-    (error) => {
-        console.error('Ошибка перед отправкой запроса:', error);
-        return Promise.reject(error);
     }
-);
+    return config;
+}
+api.interceptors.request.use(attachAuth);
 
-// Интерцептор ответа: автоматическое обновление Access Token при истечении
+// ====== Глобальный refresh-механизм ======
+let isRefreshing = false;
+let pendingQueue: Array<(token: string | null) => void> = [];
+
+function subscribeTokenRefresh(cb: (token: string | null) => void) {
+    pendingQueue.push(cb);
+}
+function onRefreshed(newToken: string | null) {
+    pendingQueue.forEach((cb) => cb(newToken));
+    pendingQueue = [];
+}
+
+async function refreshToken(): Promise<string> {
+    const rt = getRefreshToken();
+    if (!rt) throw new Error('no_refresh_token');
+
+    // отдельный вызов без глобальных интерцепторов, чтобы не зациклиться
+    const axiosBare = axios.create({ baseURL: API_BASE, withCredentials: true, timeout: 10000 });
+    const { data } = await axiosBare.post<{ accessToken: string; refreshToken?: string }>(
+        REFRESH_PATH,
+        { refreshToken: rt }
+    );
+
+    if (!data?.accessToken) throw new Error('bad_refresh_response');
+    setAccessToken(data.accessToken);
+    if (data.refreshToken) setRefreshToken(data.refreshToken);
+    return data.accessToken;
+}
+
+// ====== Обработка 401 с попыткой refresh и повтором ======
 api.interceptors.response.use(
-    (response) => {
-        // console.log(`API Response <- ${response.status} ${response.config.url}`, response.data);
-        return response;
-    },
-    async (error) => {
-        const originalRequest = error.config;
+    (r) => r,
+    async (err: AxiosError) => {
+        const original = err.config as (AxiosRequestConfig & { _retry?: boolean }) | undefined;
+        const status = err.response?.status || 0;
+        const url = (original?.url ?? '').toString();
 
-        // Проверяем 401 из-за истечения Access Token
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true; // Устанавливаем флаг, чтобы не выполнить запрос повторно
+        // Если это не 401 — отдаем как есть
+        if (status !== 401 || !original) {
+            return Promise.reject(err);
+        }
 
-            try {
-                // console.log('Access Token истек. Выполняем обновление через Refresh Token...');
+        // Не пытаемся рефрешить сам /auth/refresh и /auth/login
+        if (url.includes('/auth/login') || url.includes('/auth/refresh')) {
+            // реальный "выход"
+            clearTokens();
+            window.dispatchEvent(new Event('auth:logout'));
+            return Promise.reject(err);
+        }
 
-                // Получаем Refresh Token из localStorage
-                const refreshToken = localStorage.getItem('refreshToken');
-                if (!refreshToken) {
-                    console.error('Refresh Token отсутствует. Завершаем сессию.');
-                    localStorage.removeItem('accessToken');
-                    localStorage.removeItem('refreshToken');
-                    window.dispatchEvent(new Event('auth:logout')); // уведомляем фронт
-                    return Promise.reject(error);
-                }
+        // Уже пробовали этот запрос? — не зацикливаемся
+        if (original._retry) {
+            clearTokens();
+            window.dispatchEvent(new Event('auth:logout'));
+            return Promise.reject(err);
+        }
 
-                // Выполняем запрос обновления токенов
-                const { data } = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
+        original._retry = true;
 
-                // Сохраняем новые токены
-                localStorage.setItem('accessToken', data.accessToken);
-                localStorage.setItem('refreshToken', data.refreshToken);
+        try {
+            // Если уже идёт refresh — ждём его завершения
+            if (isRefreshing) {
+                const newToken = await new Promise<string | null>((resolve) => {
+                    subscribeTokenRefresh(resolve);
+                });
+                // если рефреш не вернул токен — выходим
+                if (!newToken) throw new Error('refresh_failed_no_token');
 
-                // Повторяем оригинальный запрос с новым токеном
-                originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
-                return axios(originalRequest);
-            } catch (refreshError) {
-                console.error('Ошибка обновления токена:', refreshError);
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                window.dispatchEvent(new Event('auth:logout')); // Перенаправляем на страницу логина при ошибке Refresh Token
-                return Promise.reject(refreshError);
+                // подставим новый токен и повторим изначальный запрос
+                original.headers = original.headers ?? {};
+                (original.headers as Record<string, string>)['Authorization'] = `Bearer ${newToken}`;
+                return api(original);
             }
-        }
 
-        console.error('API Error:', error.message);
-        if (error.response) {
-            console.error(`Status: ${error.response.status}`, error.response.data);
+            // Инициируем refresh
+            isRefreshing = true;
+            const newToken = await refreshToken();
+            isRefreshing = false;
+            onRefreshed(newToken);
+
+            // Повторяем исходный запрос с новым токеном
+            original.headers = original.headers ?? {};
+            (original.headers as Record<string, string>)['Authorization'] = `Bearer ${newToken}`;
+            return api(original);
+
+        } catch (e) {
+            isRefreshing = false;
+            onRefreshed(null); // разбудим ожидателей с ошибкой
+            clearTokens();
+            window.dispatchEvent(new Event('auth:logout'));
+            return Promise.reject(err);
         }
-        alert(`Произошла ошибка: ${error.response?.data.message || 'Неизвестная ошибка'}`);
-        return Promise.reject(error);
     }
 );
 
-// --- Профиль текущего пользователя
+// ===== Типы =====
 export interface MeDto {
     username: string;
     email: string;
-    companyName: string | null;
+    companyName?: string | null;
     admin: boolean;
 }
 
-export async function fetchMe(): Promise<MeDto> {
-    const { data } = await api.get<MeDto>('/users/me');
-    return data;
-}
-
-// --- Создать пользователя (админ)
 export interface AdminCreateUserRequest {
     username: string;
     email: string;
     password: string;
 }
 
-export async function adminCreateUser(req: AdminCreateUserRequest): Promise<MeDto> {
-    const { data } = await api.post<MeDto>('/admin/users', req);
+// ===== API-методы =====
+export async function fetchMe(): Promise<MeDto> {
+    const { data } = await api.get<MeDto>('/users/me');
     return data;
 }
 
-export default api;
+export async function adminCreateUser(payload: AdminCreateUserRequest) {
+    return api.post('/admin/users', payload);
+}
+
+export async function createCheckout(): Promise<{ checkoutUrl: string }> {
+    const { data } = await api.post<{ checkoutUrl: string }>('/billing/checkout');
+    return data;
+}
+
+export async function loginUser(payload: { username: string; password: string }) {
+    const { data } = await api.post<{ accessToken: string; refreshToken?: string }>('/auth/login', payload);
+    if (data?.accessToken) setAccessToken(data.accessToken);
+    if (data?.refreshToken) setRefreshToken(data.refreshToken);
+    return data;
+}
