@@ -1,10 +1,21 @@
+// src/api.ts
 import axios, { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 
-// ====== Настройки ======
-const API_BASE = import.meta.env.VITE_API_URL ?? '/api'; // на проде: https://warehouse-qr-app-8adwv.ondigitalocean.app/api
-const REFRESH_PATH = '/auth/refresh'; // поправьте, если у вас другой путь
+/**
+ * БАЗА API
+ * На проде задай VITE_API_URL=https://warehouse-qr-app-8adwv.ondigitalocean.app/api
+ * иначе возьмётся относительный '/api'
+ */
+const API_BASE = import.meta.env.VITE_API_URL ?? '/api';
 
-// ====== Хранилище токенов ======
+/**
+ * Путь refresh-эндпоинта (проверь у себя)
+ * Если у тебя другой — поменяй здесь.
+ */
+const REFRESH_PATH = '/auth/refresh';
+
+/* ===================== ХРАНИЛИЩЕ ТОКЕНОВ ===================== */
+
 function getAccessToken(): string | null {
     return localStorage.getItem('token') || localStorage.getItem('accessToken');
 }
@@ -24,14 +35,16 @@ function clearTokens() {
     localStorage.removeItem('refreshToken');
 }
 
-// ====== Инстанс ======
+/* ===================== AXIOS ИНСТАНС ===================== */
+
 export const api = axios.create({
     baseURL: API_BASE,
     withCredentials: true,
     timeout: 15000,
 });
 
-// ====== Подстановка Bearer ко всем запросам ======
+/* ===================== REQUEST INTERCEPTOR (AUTH) ===================== */
+
 function attachAuth(config: InternalAxiosRequestConfig) {
     const token = getAccessToken();
     if (token) {
@@ -42,9 +55,11 @@ function attachAuth(config: InternalAxiosRequestConfig) {
     }
     return config;
 }
+
 api.interceptors.request.use(attachAuth);
 
-// ====== Глобальный refresh-механизм ======
+/* ===================== REFRESH МЕХАНИЗМ ===================== */
+
 let isRefreshing = false;
 let pendingQueue: Array<(token: string | null) => void> = [];
 
@@ -60,9 +75,10 @@ async function refreshToken(): Promise<string> {
     const rt = getRefreshToken();
     if (!rt) throw new Error('no_refresh_token');
 
-    // отдельный вызов без глобальных интерцепторов, чтобы не зациклиться
-    const axiosBare = axios.create({ baseURL: API_BASE, withCredentials: true, timeout: 10000 });
-    const { data } = await axiosBare.post<{ accessToken: string; refreshToken?: string }>(
+    // отдельный клиент без интерцепторов, чтобы не зациклиться
+    const bare = axios.create({ baseURL: API_BASE, withCredentials: true, timeout: 10000 });
+
+    const { data } = await bare.post<{ accessToken: string; refreshToken?: string }>(
         REFRESH_PATH,
         { refreshToken: rt }
     );
@@ -73,65 +89,59 @@ async function refreshToken(): Promise<string> {
     return data.accessToken;
 }
 
-// ====== Обработка 401 с попыткой refresh и повтором ======
+/* ===================== RESPONSE INTERCEPTOR (401→refresh) ===================== */
+
 api.interceptors.response.use(
     (r) => r,
     async (err: AxiosError) => {
         const original = err.config as (AxiosRequestConfig & { _retry?: boolean }) | undefined;
-        const status = err.response?.status || 0;
+        const status = err.response?.status ?? 0;
         const url = (original?.url ?? '').toString();
 
-        // Если это не 401 — отдаем как есть
+        // Не 401 — отдаём как есть
         if (status !== 401 || !original) {
             return Promise.reject(err);
         }
 
-        // Не пытаемся рефрешить сам /auth/refresh и /auth/login
+        // Не пытаемся рефрешить сами /auth/refresh и /auth/login
         if (url.includes('/auth/login') || url.includes('/auth/refresh')) {
-            // реальный "выход"
             clearTokens();
             window.dispatchEvent(new Event('auth:logout'));
             return Promise.reject(err);
         }
 
-        // Уже пробовали этот запрос? — не зацикливаемся
+        // Защита от зацикливания
         if (original._retry) {
             clearTokens();
             window.dispatchEvent(new Event('auth:logout'));
             return Promise.reject(err);
         }
-
         original._retry = true;
 
         try {
-            // Если уже идёт refresh — ждём его завершения
+            // Если рефреш уже идёт — ждём его
             if (isRefreshing) {
-                const newToken = await new Promise<string | null>((resolve) => {
-                    subscribeTokenRefresh(resolve);
-                });
-                // если рефреш не вернул токен — выходим
+                const newToken = await new Promise<string | null>((resolve) => subscribeTokenRefresh(resolve));
                 if (!newToken) throw new Error('refresh_failed_no_token');
 
-                // подставим новый токен и повторим изначальный запрос
                 original.headers = original.headers ?? {};
                 (original.headers as Record<string, string>)['Authorization'] = `Bearer ${newToken}`;
                 return api(original);
             }
 
-            // Инициируем refresh
+            // Запускаем refresh
             isRefreshing = true;
             const newToken = await refreshToken();
             isRefreshing = false;
             onRefreshed(newToken);
 
-            // Повторяем исходный запрос с новым токеном
             original.headers = original.headers ?? {};
             (original.headers as Record<string, string>)['Authorization'] = `Bearer ${newToken}`;
             return api(original);
 
-        } catch (e) {
+        } catch (_e) {
             isRefreshing = false;
-            onRefreshed(null); // разбудим ожидателей с ошибкой
+            onRefreshed(null); // разбудим ожидающих с ошибкой
             clearTokens();
             window.dispatchEvent(new Event('auth:logout'));
             return Promise.reject(err);
@@ -139,7 +149,8 @@ api.interceptors.response.use(
     }
 );
 
-// ===== Типы =====
+/* ===================== ТИПЫ ДЛЯ ФРОНТА ===================== */
+
 export interface MeDto {
     username: string;
     email: string;
@@ -153,7 +164,8 @@ export interface AdminCreateUserRequest {
     password: string;
 }
 
-// ===== API-методы =====
+/* ===================== API-МЕТОДЫ ===================== */
+
 export async function fetchMe(): Promise<MeDto> {
     const { data } = await api.get<MeDto>('/users/me');
     return data;
