@@ -12,6 +12,17 @@ function App() {
   const [authStage, setAuthStage] = useState<'login' | 'register' | 'confirmed'>('login');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
+  useEffect(() => {
+    const onLogout = () => {
+      logout();
+      setIsAuthenticated(false);
+      setAuthStage('login');
+      toast.info('Сессия завершена. Войдите снова.');
+    };
+
+    window.addEventListener('auth:logout', onLogout);
+    return () => window.removeEventListener('auth:logout', onLogout);
+  }, []);
 
   useEffect(() => {
     const initializeAuth = async () => {

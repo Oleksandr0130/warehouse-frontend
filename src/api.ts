@@ -90,10 +90,10 @@ api.interceptors.response.use(
                 // Получаем Refresh Token из localStorage
                 const refreshToken = localStorage.getItem('refreshToken');
                 if (!refreshToken) {
-                    console.error('Refresh Token отсутствует. Перенаправляем на страницу входа.');
+                    console.error('Refresh Token отсутствует. Завершаем сессию.');
                     localStorage.removeItem('accessToken');
                     localStorage.removeItem('refreshToken');
-                    window.location.href = '/login';
+                    window.dispatchEvent(new Event('auth:logout')); // уведомляем фронт
                     return Promise.reject(error);
                 }
 
@@ -111,7 +111,7 @@ api.interceptors.response.use(
                 console.error('Ошибка обновления токена:', refreshError);
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
-                window.location.href = '/login'; // Перенаправляем на страницу логина при ошибке Refresh Token
+                window.dispatchEvent(new Event('auth:logout')); // Перенаправляем на страницу логина при ошибке Refresh Token
                 return Promise.reject(refreshError);
             }
         }
