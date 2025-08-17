@@ -64,13 +64,11 @@ function App() {
                     path="/app"
                     element={
                         <RequireAuth>
-                            <ItemsPage />
+                            <AppContent onLogout={handleLogout} />
                         </RequireAuth>
                     }
                 >
-                    {/* index: /app */}
-                    <Route index element={<AppContent onLogout={handleLogout} />} />
-                    {/* вложенные страницы */}
+                    <Route index element={<Navigate to="items" replace />} />
                     <Route path="about" element={<AboutApp />} />
                     <Route path="account" element={<Account />} />
                     <Route path="items" element={<ItemsPage />} />

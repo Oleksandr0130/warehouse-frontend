@@ -274,13 +274,13 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                     </li>
                     <li
                         className={`menu-item ${activeMenu === 'about' ? 'active' : ''}`}
-                        onClick={() => navigate('/about')}
+                        onClick={() => navigate('about')}
                     >
                         About App
                     </li>
                     <li
                         className={`menu-item ${activeMenu === 'account' ? 'active' : ''}`}
-                        onClick={() => navigate('/account')}
+                        onClick={() => navigate('account')}
                     >
                         Personal account
                     </li>
