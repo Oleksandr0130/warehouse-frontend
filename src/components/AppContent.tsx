@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {Outlet, useNavigate} from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { createPortal } from 'react-dom';
 import '../styles/AppContent.css';
 import '../styles/CreateReservationPage.css';
@@ -12,9 +12,7 @@ import ReserveForm from './ReserveForm';
 import SoldItemsList from './SoldItemsList';
 import QRScanner from './QRScanner';
 import FileViewer from './FileViewer';
-import AboutApp from './AboutApp';
 import DownloadExcelButton from './DownloadExelButton';
-import Account from './Account';
 
 import { toast } from 'react-toastify';
 import api from '../api';
@@ -29,11 +27,8 @@ type MenuKey =
     | 'reserve'
     | 'createReservation'
     | 'sold'
-    | 'files'
-    | 'about'
-    | 'account';
+    | 'files';
 
-// тип без any для проверки CSS.supports
 type CSSWithSupports = {
     supports?: (prop: string, value?: string) => boolean;
 };
@@ -55,7 +50,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     const [supportsBlur, setSupportsBlur] = useState<boolean>(true);
     const navigate = useNavigate();
 
-    // проверка поддержки backdrop-filter
+    // проверка backdrop-filter
     useEffect(() => {
         const cssObj = (window as Window & { CSS?: CSSWithSupports }).CSS;
         const ok =
@@ -67,18 +62,15 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         document.body.classList.toggle('no-blur', !ok);
     }, []);
 
-    // блокируем скролл фона под меню отдельным классом (не конфликтует со сканером)
     useEffect(() => {
         document.body.classList.toggle('no-scroll-menu', isMenuOpen);
         return () => document.body.classList.remove('no-scroll-menu');
     }, [isMenuOpen]);
 
-    // закрываем меню после выбора пункта
     useEffect(() => {
         setIsMenuOpen(false);
     }, [activeMenu]);
 
-    // блокируем скролл и закрываем сканер по Esc, когда он открыт
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => {
             if (e.key === 'Escape') setShowScanner(false);
@@ -223,7 +215,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
 
     return (
         <div className="app-container">
-            {/* topbar (мобайл) */}
+            {/* topbar */}
             <header className="topbar">
                 <button
                     className={`hamburger-btn ${isMenuOpen ? 'is-open' : ''}`}
@@ -242,55 +234,19 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             <aside className={`sidebar ${isMenuOpen ? 'open' : ''}`}>
                 <h2 className="sidebar-title">FLOWQR</h2>
                 <ul className="sidebar-menu">
-                    <li
-                        className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`}
-                        onClick={() => setActiveMenu('inventory')}
-                    >
-                        Inventory
-                    </li>
-                    <li
-                        className={`menu-item ${activeMenu === 'createItem' ? 'active' : ''}`}
-                        onClick={() => setActiveMenu('createItem')}
-                    >
-                        Create item
-                    </li>
-                    <li
-                        className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`}
-                        onClick={() => setActiveMenu('reserve')}
-                    >
-                        Reserved items
-                    </li>
-                    <li
-                        className={`menu-item ${activeMenu === 'createReservation' ? 'active' : ''}`}
-                        onClick={() => setActiveMenu('createReservation')}
-                    >
-                        Create a reservation
-                    </li>
-                    <li className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`} onClick={() => setActiveMenu('sold')}>
-                        Sold items
-                    </li>
-                    <li className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`} onClick={() => setActiveMenu('files')}>
-                        QR-Codes
-                    </li>
-                    <li
-                        className={`menu-item ${activeMenu === 'about' ? 'active' : ''}`}
-                        onClick={() => navigate('about')}
-                    >
-                        About App
-                    </li>
-                    <li
-                        className={`menu-item ${activeMenu === 'account' ? 'active' : ''}`}
-                        onClick={() => navigate('account')}
-                    >
-                        Personal account
-                    </li>
-                    <li className="logout-item" onClick={onLogout}>
-                        Log out
-                    </li>
+                    <li className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`} onClick={() => setActiveMenu('inventory')}>Inventory</li>
+                    <li className={`menu-item ${activeMenu === 'createItem' ? 'active' : ''}`} onClick={() => setActiveMenu('createItem')}>Create item</li>
+                    <li className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`} onClick={() => setActiveMenu('reserve')}>Reserved items</li>
+                    <li className={`menu-item ${activeMenu === 'createReservation' ? 'active' : ''}`} onClick={() => setActiveMenu('createReservation')}>Create a reservation</li>
+                    <li className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`} onClick={() => setActiveMenu('sold')}>Sold items</li>
+                    <li className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`} onClick={() => setActiveMenu('files')}>QR-Codes</li>
+                    <li className="menu-item" onClick={() => navigate('/app/about')}>About App</li>
+                    <li className="menu-item" onClick={() => navigate('/app/account')}>Personal account</li>
+                    <li className="logout-item" onClick={() => { onLogout(); navigate('/login'); }}>Log out</li>
                 </ul>
             </aside>
 
-            {/* overlay меню через портал: один элемент .backdrop, кликом закрываем */}
+            {/* overlay меню */}
             {isMenuOpen &&
                 createPortal(
                     <div
@@ -335,10 +291,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                             <div className="scanner-buttons">
                                 <button
                                     className="btn btn-add"
-                                    onClick={() => {
-                                        setScannerAction('add');
-                                        setShowScanner(true);
-                                    }}
+                                    onClick={() => { setScannerAction('add'); setShowScanner(true); }}
                                     disabled={loading}
                                 >
                                     Scan to add
@@ -346,55 +299,47 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
 
                                 <button
                                     className="btn btn-remove"
-                                    onClick={() => {
-                                        setScannerAction('remove');
-                                        setShowScanner(true);
-                                    }}
+                                    onClick={() => { setScannerAction('remove'); setShowScanner(true); }}
                                     disabled={loading}
                                 >
                                     Scan to remove
                                 </button>
                             </div>
                         </div>
-                        {/* РАНЬШЕ: сканер был тут. Теперь — модальное окно ниже через портал */}
                     </div>
                 )}
 
                 {activeMenu === 'reserve' && (
-                    <>
-                        <ReservedItemsList
-                            reservedItems={reservedItems}
-                            setReservedItems={setReservedItems}
-                            onScan={handleReservedItemScan}
-                            onReservationRemoved={handleReservationRemoved}
-                            onWeekFilter={async (week) => {
-                                setLoading(true);
-                                try {
-                                    const res = await api.get<ReservationData[]>('/reservations/sorted', {
-                                        params: { reservationWeek: week },
-                                    });
-                                    const data = res.data
-                                        .filter((it) => !it.isSold)
-                                        .map((it) => ({
-                                            id: it.id?.toString() ?? '',
-                                            name: it.itemName ?? '',
-                                            quantity: it.reservedQuantity ?? 0,
-                                            orderNumber: it.orderNumber ?? '',
-                                            week: it.reservationWeek ?? '',
-                                        }));
-                                    setReservedItems(data);
-                                    toast.success(`Sorted by week ${week}`);
-                                } catch (err) {
-                                    console.error(err);
-                                    toast.error('Failed to filter.');
-                                    setReservedItems([]);
-                                } finally {
-                                    setLoading(false);
-                                }
-                            }}
-                            onShowAll={fetchReservedItems}
-                        />
-                    </>
+                    <ReservedItemsList
+                        reservedItems={reservedItems}
+                        setReservedItems={setReservedItems}
+                        onScan={handleReservedItemScan}
+                        onReservationRemoved={handleReservationRemoved}
+                        onWeekFilter={async (week) => {
+                            setLoading(true);
+                            try {
+                                const res = await api.get<ReservationData[]>('/reservations/sorted', { params: { reservationWeek: week } });
+                                const data = res.data
+                                    .filter((it) => !it.isSold)
+                                    .map((it) => ({
+                                        id: it.id?.toString() ?? '',
+                                        name: it.itemName ?? '',
+                                        quantity: it.reservedQuantity ?? 0,
+                                        orderNumber: it.orderNumber ?? '',
+                                        week: it.reservationWeek ?? '',
+                                    }));
+                                setReservedItems(data);
+                                toast.success(`Sorted by week ${week}`);
+                            } catch (err) {
+                                console.error(err);
+                                toast.error('Failed to filter.');
+                                setReservedItems([]);
+                            } finally {
+                                setLoading(false);
+                            }
+                        }}
+                        onShowAll={fetchReservedItems}
+                    />
                 )}
 
                 {activeMenu === 'createReservation' && (
@@ -415,12 +360,12 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
 
                 {activeMenu === 'sold' && <SoldItemsList reservations={soldReservations} />}
                 {activeMenu === 'files' && <FileViewer />}
-                {activeMenu === 'about' && <AboutApp />}
-                {activeMenu === 'account' && <Account />}
+
+                {/* сюда подставятся AboutApp и Account */}
                 <Outlet />
             </main>
 
-            {/* === ГЛОБАЛЬНОЕ МОДАЛЬНОЕ ОКНО СКАНЕРА (портал в body) === */}
+            {/* модальное окно сканера */}
             {showScanner &&
                 createPortal(
                     <div className="scanner-modal" role="dialog" aria-modal="true" onClick={() => setShowScanner(false)}>
@@ -440,7 +385,6 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                     </div>,
                     document.body
                 )}
-            {/* === /SCANNER MODAL === */}
         </div>
     );
 };
