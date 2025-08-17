@@ -1,38 +1,58 @@
+// src/components/AboutApp.tsx
 import React from 'react';
 import '../styles/AboutApp.css';
 
 const AboutApp: React.FC = () => {
     return (
         <div className="about-app-container">
-            <h1>Über die App</h1>
+            <h1>About FLOWQR</h1>
+
             <section className="about-section">
-                <h2>Zweck</h2>
+                <h2>What is FLOWQR?</h2>
                 <p>
-                    Diese App ist für die Verwaltung von Lagerbeständen, die Reservierung von Waren und andere Vorgänge wie die Erfassung verkaufter Artikel oder das Anzeigen von Dateien vorgesehen.
+                    FLOWQR is a modern warehouse management application that helps you
+                    organize, control, and track your inventory using QR codes.
+                    The system is available both as a web application and as a mobile app.
                 </p>
             </section>
+
             <section className="about-section">
-                <h2>Funktionalität</h2>
+                <h2>Main Features</h2>
                 <ul>
-                    <li><strong>Lagerverwaltung:</strong> Hinzufügen, Bearbeiten und Löschen von Artikeln.</li>
-                    <li><strong>Warenreservierung:</strong> System zur Reservierung von Artikeln im Lager.</li>
-                    <li><strong>Verkaufte Artikel:</strong> Anzeige der Liste verkaufter Reservierungen.</li>
-                    <li><strong>QR-Code-Scanner:</strong> Unterstützung für das Hinzufügen/Löschen über QR-Codes.</li>
-                    <li><strong>Datenexport:</strong> Möglichkeit, Daten im Excel-Format zu exportieren.</li>
+                    <li><strong>Inventory:</strong> View and manage all items stored in the warehouse.</li>
+                    <li><strong>Create Item:</strong> Add new products with details and generate QR codes automatically.</li>
+                    <li><strong>Reserved Items:</strong> Manage reservations and track reserved quantities.</li>
+                    <li><strong>Create a Reservation:</strong> Reserve products for orders with specific weeks and order numbers.</li>
+                    <li><strong>Sold Items:</strong> View items that have been sold and completed.</li>
+                    <li><strong>QR-Codes:</strong> Generate and scan warehouse or reserved QR codes for quick access.</li>
+                    <li><strong>Personal Account:</strong> Manage your subscription, trial period, and account information.</li>
                 </ul>
             </section>
+
             <section className="about-section">
-                <h2>Urheberrechtshinweis</h2>
+                <h2>Subscription & Trial</h2>
                 <p>
-                    © 2025 Alexander Starikov. Diese App ist geistiges Eigentum des Entwicklers. Alle Rechte vorbehalten.
-                </p>
-                <p>
-                    Die Verbreitung von Binärdateien und Quellcode ohne Genehmigung des Eigentümers ist untersagt.
+                    Every new user starts with a trial period. After the trial expires, you can
+                    subscribe to continue using all FLOWQR features without limitations.
                 </p>
             </section>
+
             <section className="about-section">
-                <h2>Kontakt</h2>
-                <p>Bei Fragen wenden Sie sich bitte an: <a href="mailto:olek92112@gmail.com">olek92112@gmail.com</a></p>
+                <h2>Why FLOWQR?</h2>
+                <p>
+                    By combining warehouse management with QR code technology, FLOWQR makes
+                    stock tracking faster, more reliable, and user-friendly.
+                    Whether you are managing a small business or a large warehouse,
+                    FLOWQR adapts to your needs.
+                </p>
+            </section>
+
+            <section className="about-section">
+                <h2>Contact</h2>
+                <p>
+                    For questions or support, please contact:{" "}
+                    <a href="mailto:olek92112@gmail.com">olek92112@gmail.com</a>
+                </p>
             </section>
         </div>
     );
