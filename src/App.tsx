@@ -1,5 +1,5 @@
-// App.tsx
-import {JSX, useEffect, useState} from 'react';
+// src/App.tsx
+import { JSX, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -7,83 +7,83 @@ import Register from './components/Register';
 import Login from './components/Login';
 import Confirmation from './components/Confirmation';
 import AppContent from './components/AppContent';
-import AboutApp from './components/AboutApp';
 import Account from './components/Account';
+import AboutApp from './components/AboutApp';
+import ItemsPage from './components/ItemsPage';
 import { validateTokens, logout } from './types/AuthManager';
 import { toast } from 'react-toastify';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
-    const token = localStorage.getItem('accessToken'); // ключ должен совпадать с Login/api.ts
+    const token = localStorage.getItem('token');
     if (!token) return <Navigate to="/login" replace />;
     return children;
 }
 
-export default function App() {
+function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    // быстрый «подъём» авторизации по наличию токена + тихая валидация
     useEffect(() => {
-        if (localStorage.getItem('accessToken')) setIsAuthenticated(true);
-        (async () => {
-            const ok = await validateTokens();
-            setIsAuthenticated(ok);
-            if (!ok) logout();
-        })();
+        const onLogout = () => {
+            logout();
+            setIsAuthenticated(false);
+            toast.info('Сессия завершена. Войдите снова.');
+        };
+        window.addEventListener('auth:logout', onLogout);
+        return () => window.removeEventListener('auth:logout', onLogout);
+    }, []);
+
+    useEffect(() => {
+        const init = async () => {
+            const valid = await validateTokens();
+            setIsAuthenticated(valid);
+        };
+        init();
     }, []);
 
     const handleAuthSuccess = () => {
         setIsAuthenticated(true);
-        toast.success('Вы успешно вошли!');
-        window.location.href = '/app'; // можно заменить на useNavigate('/app')
+        toast.success('Successful Login!');
     };
 
     const handleLogout = () => {
         logout();
         setIsAuthenticated(false);
-        toast.info('Вы вышли из системы.');
-        window.location.href = '/login';
+        toast.info('Successful Logout!');
     };
-
-    const hasToken = !!localStorage.getItem('accessToken');
 
     return (
         <Router>
             <Routes>
                 {/* публичные */}
-                <Route
-                    path="/login"
-                    element={
-                        (isAuthenticated || hasToken)
-                            ? <Navigate to="/app" replace />
-                            : <Login onSuccess={handleAuthSuccess} />
-                    }
-                />
+                <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
                 <Route path="/register" element={<Register onSuccess={() => {}} />} />
                 <Route path="/confirmed" element={<Confirmation />} />
-                <Route path="/about" element={<AboutApp />} />
 
-                {/* приватные */}
+                {/* Вложенное дерево под /app/* */}
                 <Route
                     path="/app"
                     element={
                         <RequireAuth>
-                            <AppContent onLogout={handleLogout} />
+                            <ItemsPage />
                         </RequireAuth>
                     }
-                />
-                <Route
-                    path="/account"
-                    element={
-                        <RequireAuth>
-                            <Account />
-                        </RequireAuth>
-                    }
-                />
+                >
+                    {/* index: /app */}
+                    <Route index element={<AppContent onLogout={handleLogout} />} />
+                    {/* вложенные страницы */}
+                    <Route path="about" element={<AboutApp />} />
+                    <Route path="account" element={<Account />} />
+                    <Route path="items" element={<ItemsPage />} />
+                </Route>
 
-                {/* корень / дефолты */}
-                <Route path="/" element={<Navigate to={isAuthenticated || hasToken ? '/app' : '/login'} replace />} />
-                <Route path="*" element={<Navigate to={isAuthenticated || hasToken ? '/app' : '/login'} replace />} />
+                {/* редиректы */}
+                <Route path="/" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
+                <Route path="*" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
             </Routes>
+
+            <div id="gt_widget_global" style={{ width: 0, height: 0, overflow: 'hidden' }} />
         </Router>
     );
 }
+
+export default App;
