@@ -4,6 +4,8 @@ import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import Register from './components/Register';
 import Login from './components/Login';
+import Account from './components/Account';
+import AboutApp from "./components/AboutApp.tsx";
 import Confirmation from './components/Confirmation';
 import AppContent from './components/AppContent';
 import { validateTokens, logout } from './types/AuthManager';
@@ -56,6 +58,7 @@ function App() {
                 <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
                 <Route path="/register" element={<Register onSuccess={() => {}} />} />
                 <Route path="/confirmed" element={<Confirmation />} />
+                <Route path="/about" element={<AboutApp />} />
 
                 {/* Приватная страница приложения */}
                 <Route
@@ -63,6 +66,14 @@ function App() {
                     element={
                         <RequireAuth>
                             <AppContent onLogout={handleLogout} />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path="/account"
+                    element={
+                        <RequireAuth>
+                            <Account />
                         </RequireAuth>
                     }
                 />

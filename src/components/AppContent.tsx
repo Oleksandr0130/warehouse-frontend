@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import {useNavigate} from "react-router-dom";
 import { createPortal } from 'react-dom';
 import '../styles/AppContent.css';
 import '../styles/CreateReservationPage.css';
@@ -52,6 +53,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     const [sortCriteria, setSortCriteria] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [supportsBlur, setSupportsBlur] = useState<boolean>(true);
+    const navigate = useNavigate();
 
     // проверка поддержки backdrop-filter
     useEffect(() => {
@@ -272,13 +274,13 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                     </li>
                     <li
                         className={`menu-item ${activeMenu === 'about' ? 'active' : ''}`}
-                        onClick={() => setActiveMenu('about')}
+                        onClick={() => navigate('about')}
                     >
                         About App
                     </li>
                     <li
                         className={`menu-item ${activeMenu === 'account' ? 'active' : ''}`}
-                        onClick={() => setActiveMenu('account')}
+                        onClick={() => navigate('account')}
                     >
                         Personal account
                     </li>
