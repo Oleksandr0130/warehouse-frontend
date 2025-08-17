@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { SoldReservation } from './types/SoldReservation.ts';
 import {ReservationData} from "./types/ReservationData.ts";
+import {Item} from "./types/Item.ts";
 
 const BASE_URL = '/api';
 
