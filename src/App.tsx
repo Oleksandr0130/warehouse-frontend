@@ -1,5 +1,5 @@
 // src/App.tsx
-import {JSX, useEffect, useState} from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -7,9 +7,10 @@ import Register from './components/Register';
 import Login from './components/Login';
 import Confirmation from './components/Confirmation';
 import AppContent from './components/AppContent';
-import Account from './components/Account';          // ← добавлено
-import AboutApp from './components/AboutApp';        // ← добавлено
+import Account from './components/Account';
+import AboutApp from './components/AboutApp';
 import ItemsPage from './components/ItemsPage';
+import AppLayout from './components/AppLayout'; // ← новое
 import { validateTokens, logout } from './types/AuthManager';
 import { toast } from 'react-toastify';
 
@@ -54,39 +55,29 @@ function App() {
     return (
         <Router>
             <Routes>
-                {/* Публичные */}
+                {/* публичные */}
                 <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
                 <Route path="/register" element={<Register onSuccess={() => {}} />} />
                 <Route path="/confirmed" element={<Confirmation />} />
-                <Route path="/about" element={<AboutApp />} />
 
-                {/* Приватные */}
+                {/* Вложенное дерево под /app/* */}
                 <Route
                     path="/app"
                     element={
                         <RequireAuth>
-                            <AppContent onLogout={handleLogout} />
+                            <AppLayout />
                         </RequireAuth>
                     }
-                />
-                <Route
-                    path="/account"
-                    element={
-                        <RequireAuth>
-                            <Account />
-                        </RequireAuth>
-                    }
-                />
-                <Route
-                    path="/items"
-                    element={
-                        <RequireAuth>
-                            <ItemsPage />
-                        </RequireAuth>
-                    }
-                />
+                >
+                    {/* index: /app */}
+                    <Route index element={<AppContent onLogout={handleLogout} />} />
+                    {/* вложенные страницы */}
+                    <Route path="about" element={<AboutApp />} />
+                    <Route path="account" element={<Account />} />
+                    <Route path="items" element={<ItemsPage />} />
+                </Route>
 
-                {/* Редиректы по умолчанию */}
+                {/* редиректы */}
                 <Route path="/" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
                 <Route path="*" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
             </Routes>
