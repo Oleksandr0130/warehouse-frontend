@@ -41,6 +41,7 @@ function App() {
     const handleAuthSuccess = () => {
         setIsAuthenticated(true);
         toast.success('Successful Login!');
+        window.location.href = '/app';
     };
 
     const handleLogout = () => {
@@ -54,12 +55,19 @@ function App() {
         <Router>
             <Routes>
                 {/* Публичные страницы */}
-                <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
+                <Route
+                    path="/login"
+                    element={
+                        isAuthenticated
+                            ? <Navigate to="/app" replace />
+                            : <Login onSuccess={handleAuthSuccess} />
+                    }
+                />
                 <Route path="/register" element={<Register onSuccess={() => {}} />} />
                 <Route path="/confirmed" element={<Confirmation />} />
                 <Route path="/about" element={<AboutApp />} />
 
-                {/* Приватная страница приложения */}
+                {/* Приватные страницы */}
                 <Route
                     path="/app"
                     element={
