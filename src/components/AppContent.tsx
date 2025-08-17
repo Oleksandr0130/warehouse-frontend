@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {useNavigate} from "react-router-dom";
+import {Outlet, useNavigate} from "react-router-dom";
 import { createPortal } from 'react-dom';
 import '../styles/AppContent.css';
 import '../styles/CreateReservationPage.css';
@@ -417,6 +417,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                 {activeMenu === 'files' && <FileViewer />}
                 {activeMenu === 'about' && <AboutApp />}
                 {activeMenu === 'account' && <Account />}
+                <Outlet />
             </main>
 
             {/* === ГЛОБАЛЬНОЕ МОДАЛЬНОЕ ОКНО СКАНЕРА (портал в body) === */}
