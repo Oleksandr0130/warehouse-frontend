@@ -64,6 +64,11 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         fetchData();
     }, [sortCriteria, activeMenu]);
 
+    useEffect(() => {
+        // закрываем меню при смене активной вкладки ИЛИ пути
+        setIsMenuOpen(false);
+    }, [activeMenu, location.pathname]);
+
     const fetchData = () => {
         if (activeMenu === 'inventory') fetchItems(sortCriteria);
         if (activeMenu === 'createReservation') fetchItems();
@@ -195,6 +200,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     };
 
     const goRoute = (path: 'about' | 'account') => {
+        setIsMenuOpen(false);
         setActiveMenu('route');
         navigate(`/app/${path}`);
     };
