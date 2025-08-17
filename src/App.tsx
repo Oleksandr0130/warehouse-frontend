@@ -12,10 +12,8 @@ import { validateTokens, logout } from './types/AuthManager';
 import { toast } from 'react-toastify';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        return <Navigate to="/login" replace />;
-    }
+    const token = localStorage.getItem('accessToken'); // вместо 'token'
+    if (!token) return <Navigate to="/login" replace />;
     return children;
 }
 
@@ -49,6 +47,7 @@ function App() {
         logout();
         setIsAuthenticated(false);
         toast.info('Successful Logout!');
+        window.location.href = '/login';
     };
 
     return (
