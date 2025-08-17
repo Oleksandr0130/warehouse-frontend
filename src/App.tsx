@@ -1,5 +1,4 @@
-// src/App.tsx
-import { JSX, useEffect, useState } from 'react';
+import {JSX, useEffect, useState} from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -7,16 +6,14 @@ import Register from './components/Register';
 import Login from './components/Login';
 import Confirmation from './components/Confirmation';
 import AppContent from './components/AppContent';
-import Account from './components/Account';
-import AboutApp from './components/AboutApp';
-import ItemsPage from './components/ItemsPage';
-import AppLayout from './components/AppLayout'; // ← новое
 import { validateTokens, logout } from './types/AuthManager';
 import { toast } from 'react-toastify';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
     const token = localStorage.getItem('token');
-    if (!token) return <Navigate to="/login" replace />;
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
     return children;
 }
 
@@ -55,33 +52,30 @@ function App() {
     return (
         <Router>
             <Routes>
-                {/* публичные */}
+                {/* Публичные страницы */}
                 <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
                 <Route path="/register" element={<Register onSuccess={() => {}} />} />
                 <Route path="/confirmed" element={<Confirmation />} />
 
-                {/* Вложенное дерево под /app/* */}
+                {/* Приватная страница приложения */}
                 <Route
                     path="/app"
                     element={
                         <RequireAuth>
-                            <AppLayout />
+                            <AppContent onLogout={handleLogout} />
                         </RequireAuth>
                     }
-                >
-                    {/* index: /app */}
-                    <Route index element={<AppContent onLogout={handleLogout} />} />
-                    {/* вложенные страницы */}
-                    <Route path="about" element={<AboutApp />} />
-                    <Route path="account" element={<Account />} />
-                    <Route path="items" element={<ItemsPage />} />
-                </Route>
+                />
 
-                {/* редиректы */}
-                <Route path="/" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
+                {/* Редиректы по умолчанию */}
+                <Route
+                    path="/"
+                    element={
+                        isAuthenticated ? <Navigate to="/app" replace /> : <Navigate to="/login" replace />
+                    }
+                />
                 <Route path="*" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
             </Routes>
-
             <div id="gt_widget_global" style={{ width: 0, height: 0, overflow: 'hidden' }} />
         </Router>
     );
