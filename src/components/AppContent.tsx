@@ -1,3 +1,4 @@
+// src/components/AppContent.tsx
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { createPortal } from 'react-dom';
@@ -21,7 +22,6 @@ import { ReservedItem } from '../types/ReservedItem';
 import { ReservationData } from '../types/ReservationData';
 import { SoldReservation } from '../types/SoldReservation';
 
-// добавили 'route' — это «режим роутера», когда рендерим только <Outlet />
 type MenuKey =
     | 'inventory'
     | 'createItem'
@@ -30,10 +30,6 @@ type MenuKey =
     | 'sold'
     | 'files'
     | 'route';
-
-type CSSWithSupports = {
-    supports?: (prop: string, value?: string) => boolean;
-};
 
 interface AppContentProps {
     onLogout: () => void;
@@ -49,60 +45,20 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     const [activeMenu, setActiveMenu] = useState<MenuKey>('inventory');
     const [sortCriteria, setSortCriteria] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [supportsBlur, setSupportsBlur] = useState<boolean>(true);
+    const [supportsBlur] = useState<boolean>(true);
 
     const navigate = useNavigate();
     const location = useLocation();
 
-    // если находимся на /app/about, /app/account или /app/items — показываем только <Outlet />
+    // переключение между internal и route-вкладками
     useEffect(() => {
         const p = location.pathname;
-        if (
-            p.startsWith('/app/about') ||
-            p.startsWith('/app/account') ||
-            p.startsWith('/app/items')
-        ) {
+        if (p.startsWith('/app/about') || p.startsWith('/app/account')) {
             setActiveMenu('route');
+        } else if (p === '/app' && activeMenu === 'route') {
+            setActiveMenu('inventory');
         }
     }, [location.pathname]);
-
-    // проверка поддержки backdrop-filter
-    useEffect(() => {
-        const cssObj = (window as Window & { CSS?: CSSWithSupports }).CSS;
-        const ok =
-            !!cssObj?.supports &&
-            (cssObj.supports('backdrop-filter', 'blur(3px)') ||
-                cssObj.supports('-webkit-backdrop-filter', 'blur(3px)'));
-
-        setSupportsBlur(ok);
-        document.body.classList.toggle('no-blur', !ok);
-    }, []);
-
-    // блокируем скролл под открытым меню
-    useEffect(() => {
-        document.body.classList.toggle('no-scroll-menu', isMenuOpen);
-        return () => document.body.classList.remove('no-scroll-menu');
-    }, [isMenuOpen]);
-
-    // закрываем меню после выбора пункта
-    useEffect(() => {
-        setIsMenuOpen(false);
-    }, [activeMenu]);
-
-    // esc закрывает сканер
-    useEffect(() => {
-        const onKey = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') setShowScanner(false);
-        };
-        if (showScanner) {
-            document.body.classList.add('no-scroll-scanner');
-            window.addEventListener('keydown', onKey);
-        }
-        return () => {
-            document.body.classList.remove('no-scroll-scanner');
-            window.removeEventListener('keydown', onKey);
-        };
-    }, [showScanner]);
 
     useEffect(() => {
         fetchData();
@@ -232,25 +188,22 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         }
     };
 
-    // помощники для меню: внутренние вкладки всегда ведут на /app, роутовые — на /app/*
+    // переключатели
     const goInternal = (key: Exclude<MenuKey, 'route'>) => {
         navigate('/app');
         setActiveMenu(key);
     };
 
-    const goRoute = (path: 'about' | 'account' | 'items') => {
+    const goRoute = (path: 'about' | 'account') => {
         setActiveMenu('route');
         navigate(`/app/${path}`);
     };
 
     return (
         <div className="app-container">
-            {/* topbar */}
             <header className="topbar">
                 <button
                     className={`hamburger-btn ${isMenuOpen ? 'is-open' : ''}`}
-                    aria-label="Toggle menu"
-                    aria-expanded={isMenuOpen}
                     onClick={() => setIsMenuOpen((v) => !v)}
                 >
                     <span />
@@ -260,36 +213,24 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                 <h1 className="topbar-title">FLOWQR</h1>
             </header>
 
-            {/* sidebar */}
             <aside className={`sidebar ${isMenuOpen ? 'open' : ''}`}>
                 <h2 className="sidebar-title">FLOWQR</h2>
                 <ul className="sidebar-menu">
-                    <li className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`} onClick={() => goInternal('inventory')}>Inventory</li>
-                    <li className={`menu-item ${activeMenu === 'createItem' ? 'active' : ''}`} onClick={() => goInternal('createItem')}>Create item</li>
-                    <li className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`} onClick={() => goInternal('reserve')}>Reserved items</li>
-                    <li className={`menu-item ${activeMenu === 'createReservation' ? 'active' : ''}`} onClick={() => goInternal('createReservation')}>Create a reservation</li>
-                    <li className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`} onClick={() => goInternal('sold')}>Sold items</li>
-                    <li className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`} onClick={() => goInternal('files')}>QR-Codes</li>
-                    <li className={`menu-item ${location.pathname.startsWith('/app/about') ? 'active' : ''}`} onClick={() => goRoute('about')}>About App</li>
-                    <li className={`menu-item ${location.pathname.startsWith('/app/account') ? 'active' : ''}`} onClick={() => goRoute('account')}>Personal account</li>
+                    <li className={activeMenu === 'inventory' ? 'active' : ''} onClick={() => goInternal('inventory')}>Inventory</li>
+                    <li className={activeMenu === 'createItem' ? 'active' : ''} onClick={() => goInternal('createItem')}>Create item</li>
+                    <li className={activeMenu === 'reserve' ? 'active' : ''} onClick={() => goInternal('reserve')}>Reserved items</li>
+                    <li className={activeMenu === 'createReservation' ? 'active' : ''} onClick={() => goInternal('createReservation')}>Create a reservation</li>
+                    <li className={activeMenu === 'sold' ? 'active' : ''} onClick={() => goInternal('sold')}>Sold items</li>
+                    <li className={activeMenu === 'files' ? 'active' : ''} onClick={() => goInternal('files')}>QR-Codes</li>
+                    <li className={location.pathname.startsWith('/app/about') ? 'active' : ''} onClick={() => goRoute('about')}>About App</li>
+                    <li className={location.pathname.startsWith('/app/account') ? 'active' : ''} onClick={() => goRoute('account')}>Personal account</li>
                     <li className="logout-item" onClick={() => { onLogout(); navigate('/login'); }}>Log out</li>
                 </ul>
             </aside>
 
-            {/* overlay меню */}
-            {isMenuOpen &&
-                createPortal(
-                    <div
-                        className={`backdrop ${supportsBlur ? 'backdrop--blur' : ''}`}
-                        onClick={() => setIsMenuOpen(false)}
-                    />,
-                    document.body
-                )}
-
             <main className="app-main">
                 {loading && <div className="loading-overlay">Loading...</div>}
 
-                {/* показываем контент вкладок только когда activeMenu НЕ 'route' */}
                 {activeMenu !== 'route' && (
                     <>
                         {activeMenu === 'inventory' && (
@@ -322,20 +263,8 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                                 <div className="item-card">
                                     <AddItemForm onAdd={handleAddItem} />
                                     <div className="scanner-buttons">
-                                        <button
-                                            className="btn btn-add"
-                                            onClick={() => { setScannerAction('add'); setShowScanner(true); }}
-                                            disabled={loading}
-                                        >
-                                            Scan to add
-                                        </button>
-                                        <button
-                                            className="btn btn-remove"
-                                            onClick={() => { setScannerAction('remove'); setShowScanner(true); }}
-                                            disabled={loading}
-                                        >
-                                            Scan to remove
-                                        </button>
+                                        <button className="btn btn-add" onClick={() => { setScannerAction('add'); setShowScanner(true); }}>Scan to add</button>
+                                        <button className="btn btn-remove" onClick={() => { setScannerAction('remove'); setShowScanner(true); }}>Scan to remove</button>
                                     </div>
                                 </div>
                             </div>
@@ -350,9 +279,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                                 onWeekFilter={async (week) => {
                                     setLoading(true);
                                     try {
-                                        const res = await api.get<ReservationData[]>('/reservations/sorted', {
-                                            params: { reservationWeek: week },
-                                        });
+                                        const res = await api.get<ReservationData[]>('/reservations/sorted', { params: { reservationWeek: week } });
                                         const data = res.data
                                             .filter((it) => !it.isSold)
                                             .map((it) => ({
@@ -397,23 +324,24 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                     </>
                 )}
 
-                {/* сюда попадают AboutApp, Account и ItemsPage через роутер */}
                 <Outlet />
             </main>
 
-            {/* модальное окно сканера */}
+            {/* backdrop для меню */}
+            {isMenuOpen &&
+                createPortal(
+                    <div
+                        className={`backdrop ${supportsBlur ? 'backdrop--blur' : ''}`}
+                        onClick={() => setIsMenuOpen(false)}
+                    />,
+                    document.body
+                )}
+
             {showScanner &&
                 createPortal(
-                    <div className="scanner-modal" role="dialog" aria-modal="true" onClick={() => setShowScanner(false)}>
+                    <div className="scanner-modal" onClick={() => setShowScanner(false)}>
                         <div className="scanner-dialog" onClick={(e) => e.stopPropagation()}>
-                            <button
-                                className="scanner-close"
-                                aria-label="Close scanner"
-                                onClick={() => setShowScanner(false)}
-                                type="button"
-                            >
-                                ×
-                            </button>
+                            <button className="scanner-close" onClick={() => setShowScanner(false)}>×</button>
                             <div className="scanner-body">
                                 <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />
                             </div>

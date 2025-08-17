@@ -9,7 +9,6 @@ import Confirmation from './components/Confirmation';
 import AppContent from './components/AppContent';
 import Account from './components/Account';
 import AboutApp from './components/AboutApp';
-import ItemsPage from './components/ItemsPage';
 import { validateTokens, logout } from './types/AuthManager';
 import { toast } from 'react-toastify';
 
@@ -28,7 +27,7 @@ function App() {
             logout();
             setIsAuthenticated(false);
             toast.info('Сессия завершена. Войдите снова.');
-            navigate('/login'); // редирект при глобальном logout
+            navigate('/login');
         };
         window.addEventListener('auth:logout', onLogout);
         return () => window.removeEventListener('auth:logout', onLogout);
@@ -51,7 +50,7 @@ function App() {
         logout();
         setIsAuthenticated(false);
         toast.info('Successful Logout!');
-        navigate('/login'); // <<< теперь редирект после выхода
+        navigate('/login');
     };
 
     return (
@@ -61,7 +60,7 @@ function App() {
             <Route path="/register" element={<Register onSuccess={() => {}} />} />
             <Route path="/confirmed" element={<Confirmation />} />
 
-            {/* Вложенное дерево под /app/* */}
+            {/* приватные под /app */}
             <Route
                 path="/app"
                 element={
@@ -70,10 +69,9 @@ function App() {
                     </RequireAuth>
                 }
             >
-                <Route index element={<Navigate to="items" replace />} />
+                <Route index element={<></>} />
                 <Route path="about" element={<AboutApp />} />
                 <Route path="account" element={<Account />} />
-                <Route path="items" element={<ItemsPage />} />
             </Route>
 
             {/* редиректы */}
@@ -83,7 +81,6 @@ function App() {
     );
 }
 
-// Оборачиваем App в Router
 function AppWithRouter() {
     return (
         <Router>
