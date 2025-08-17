@@ -216,15 +216,57 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             <aside className={`sidebar ${isMenuOpen ? 'open' : ''}`}>
                 <h2 className="sidebar-title">FLOWQR</h2>
                 <ul className="sidebar-menu">
-                    <li className={activeMenu === 'inventory' ? 'active' : ''} onClick={() => goInternal('inventory')}>Inventory</li>
-                    <li className={activeMenu === 'createItem' ? 'active' : ''} onClick={() => goInternal('createItem')}>Create item</li>
-                    <li className={activeMenu === 'reserve' ? 'active' : ''} onClick={() => goInternal('reserve')}>Reserved items</li>
-                    <li className={activeMenu === 'createReservation' ? 'active' : ''} onClick={() => goInternal('createReservation')}>Create a reservation</li>
-                    <li className={activeMenu === 'sold' ? 'active' : ''} onClick={() => goInternal('sold')}>Sold items</li>
-                    <li className={activeMenu === 'files' ? 'active' : ''} onClick={() => goInternal('files')}>QR-Codes</li>
-                    <li className={location.pathname.startsWith('/app/about') ? 'active' : ''} onClick={() => goRoute('about')}>About App</li>
-                    <li className={location.pathname.startsWith('/app/account') ? 'active' : ''} onClick={() => goRoute('account')}>Personal account</li>
-                    <li className="logout-item" onClick={() => { onLogout(); navigate('/login'); }}>Log out</li>
+                    <li
+                        className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`}
+                        onClick={() => goInternal('inventory')}
+                    >
+                        Inventory
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'createItem' ? 'active' : ''}`}
+                        onClick={() => goInternal('createItem')}
+                    >
+                        Create item
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`}
+                        onClick={() => goInternal('reserve')}
+                    >
+                        Reserved items
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'createReservation' ? 'active' : ''}`}
+                        onClick={() => goInternal('createReservation')}
+                    >
+                        Create a reservation
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`}
+                        onClick={() => goInternal('sold')}
+                    >
+                        Sold items
+                    </li>
+                    <li
+                        className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`}
+                        onClick={() => goInternal('files')}
+                    >
+                        QR-Codes
+                    </li>
+                    <li
+                        className={`menu-item ${location.pathname.startsWith('/app/about') ? 'active' : ''}`}
+                        onClick={() => goRoute('about')}
+                    >
+                        About App
+                    </li>
+                    <li
+                        className={`menu-item ${location.pathname.startsWith('/app/account') ? 'active' : ''}`}
+                        onClick={() => goRoute('account')}
+                    >
+                        Personal account
+                    </li>
+                    <li className="logout-item" onClick={() => { onLogout(); navigate('/login'); }}>
+                        Log out
+                    </li>
                 </ul>
             </aside>
 
