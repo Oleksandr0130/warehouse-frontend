@@ -10,6 +10,11 @@ const api = axios.create({
     withCredentials: true, // Для передачи cookie
 });
 
+export const fetchItems = async (): Promise<Item[]> => {
+    const resp = await api.get('/items'); // если у тебя другой путь (напр. /stock), просто поменяй
+    return resp.data as Item[];
+};
+
 // Запрос к /sold для получения проданных резерваций
 export const fetchSoldReservations = async (): Promise<SoldReservation[]> => {
     const response = await api.get('/sold');
