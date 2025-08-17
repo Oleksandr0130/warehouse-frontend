@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../api';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -6,8 +7,7 @@ import '../styles/AuthLoginAndRegister.css';
 import logo from '../assets/flowqr-logo.png';
 
 interface RegisterProps {
-    onSuccess: () => void;
-    onSwitch: () => void; // переключить на логин
+    onSuccess?: () => void;
 }
 
 interface RegisterForm {
@@ -17,7 +17,8 @@ interface RegisterForm {
     companyName: string;
 }
 
-const Register: React.FC<RegisterProps> = ({ onSuccess, onSwitch }) => {
+const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
+    const navigate = useNavigate();
     const [form, setForm] = useState<RegisterForm>({
         username: '',
         email: '',
@@ -35,7 +36,8 @@ const Register: React.FC<RegisterProps> = ({ onSuccess, onSwitch }) => {
         try {
             await registerUser(form);
             toast.success('Registration successfully sent. Please check your email for confirmation.');
-            onSuccess();
+            onSuccess?.();
+            navigate('/login', { replace: true });
         } catch (err) {
             console.error(err);
             toast.error('Registration error');
@@ -83,7 +85,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess, onSwitch }) => {
 
                 <div className="auth-alt">
                     ALREADY HAVE AN ACCOUNT?{' '}
-                    <button type="button" onClick={onSwitch}>LOGIN</button>
+                    <button type="button" onClick={() => navigate('/login')}>LOGIN</button>
                 </div>
 
                 <footer className="auth-footer">

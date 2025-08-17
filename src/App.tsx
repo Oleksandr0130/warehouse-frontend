@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import {JSX, useEffect, useState} from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import Register from './components/Register';
@@ -8,73 +9,76 @@ import AppContent from './components/AppContent';
 import { validateTokens, logout } from './types/AuthManager';
 import { toast } from 'react-toastify';
 
+function RequireAuth({ children }: { children: JSX.Element }) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
+    return children;
+}
+
 function App() {
-  const [authStage, setAuthStage] = useState<'login' | 'register' | 'confirmed'>('login');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    const onLogout = () => {
-      logout();
-      setIsAuthenticated(false);
-      setAuthStage('login');
-      toast.info('Сессия завершена. Войдите снова.');
-    };
+    useEffect(() => {
+        const onLogout = () => {
+            logout();
+            setIsAuthenticated(false);
+            toast.info('Сессия завершена. Войдите снова.');
+        };
+        window.addEventListener('auth:logout', onLogout);
+        return () => window.removeEventListener('auth:logout', onLogout);
+    }, []);
 
-    window.addEventListener('auth:logout', onLogout);
-    return () => window.removeEventListener('auth:logout', onLogout);
-  }, []);
+    useEffect(() => {
+        const init = async () => {
+            const valid = await validateTokens();
+            setIsAuthenticated(valid);
+        };
+        init();
+    }, []);
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      const isValid = await validateTokens();
-      if (isValid) {
+    const handleAuthSuccess = () => {
         setIsAuthenticated(true);
-        setAuthStage('confirmed');
-      } else {
-        setIsAuthenticated(false);
-      }
+        toast.success('Successful Login!');
     };
-    initializeAuth();
-  }, []);
 
-  const handleAuthSuccess = () => {
-    setIsAuthenticated(true);
-    setAuthStage('confirmed');
-    toast.success('Successful Login!');
-  };
+    const handleLogout = () => {
+        logout();
+        setIsAuthenticated(false);
+        toast.info('Successful Logout!');
+    };
 
-  const handleLogout = () => {
-    logout();
-    setIsAuthenticated(false);
-    setAuthStage('login');
-    toast.info('Successful Logout!');
-  };
-
-  if (!isAuthenticated) {
     return (
-        <div className="auth-container">
-          {authStage === 'login' && (
-              <Login
-                  onSuccess={handleAuthSuccess}
-                  onSwitch={() => setAuthStage('register')}
-              />
-          )}
-          {authStage === 'register' && (
-              <Register
-                  onSuccess={() => setAuthStage('login')}
-                  onSwitch={() => setAuthStage('login')}
-              />
-          )}
-          {authStage === 'confirmed' && <Confirmation />}
-          <div id="gt_widget_global" style={{ width: 0, height: 0, overflow: 'hidden' }} />
-        </div>
-    );
-  }
+        <Router>
+            <Routes>
+                {/* Публичные страницы */}
+                <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
+                <Route path="/register" element={<Register onSuccess={() => {}} />} />
+                <Route path="/confirmed" element={<Confirmation />} />
 
-  return (
-  <>
-  <AppContent onLogout={handleLogout} />
-  </>)
+                {/* Приватная страница приложения */}
+                <Route
+                    path="/app"
+                    element={
+                        <RequireAuth>
+                            <AppContent onLogout={handleLogout} />
+                        </RequireAuth>
+                    }
+                />
+
+                {/* Редиректы по умолчанию */}
+                <Route
+                    path="/"
+                    element={
+                        isAuthenticated ? <Navigate to="/app" replace /> : <Navigate to="/login" replace />
+                    }
+                />
+                <Route path="*" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
+            </Routes>
+            <div id="gt_widget_global" style={{ width: 0, height: 0, overflow: 'hidden' }} />
+        </Router>
+    );
 }
 
 export default App;

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../api';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -7,11 +8,11 @@ import { AxiosError } from 'axios';
 import logo from '../assets/flowqr-logo.png';
 
 interface LoginProps {
-    onSuccess: () => void;
-    onSwitch: () => void; // переключить на регистрацию
+    onSuccess?: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onSuccess, onSwitch }) => {
+const Login: React.FC<LoginProps> = ({ onSuccess }) => {
+    const navigate = useNavigate();
     const [credentials, setCredentials] = useState({ username: '', password: '' });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,7 +27,9 @@ const Login: React.FC<LoginProps> = ({ onSuccess, onSwitch }) => {
                 password: credentials.password,
             });
             localStorage.setItem('token', response.data.token);
-            onSuccess();
+            onSuccess?.();
+            toast.success('Successful Login!');
+            navigate('/app', { replace: true });
         } catch (err) {
             if (err instanceof AxiosError && err.response) {
                 const status = err.response.status;
@@ -68,7 +71,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess, onSwitch }) => {
 
                 <div className="auth-alt">
                     DON’T HAVE AN ACCOUNT?{' '}
-                    <button type="button" onClick={onSwitch}>SIGN UP</button>
+                    <button type="button" onClick={() => navigate('/register')}>SIGN UP</button>
                 </div>
 
                 <footer className="auth-footer">
