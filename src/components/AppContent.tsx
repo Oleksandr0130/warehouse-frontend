@@ -259,107 +259,113 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             <main className="app-main">
                 {loading && <div className="loading-overlay">Loading...</div>}
 
-                {activeMenu === 'inventory' && (
+                {/* складские вкладки */}
+                {['inventory','createItem','reserve','createReservation','sold','files'].includes(activeMenu) && (
                     <>
-                        <div className="sort-dropdown">
-                            <label htmlFor="sort-menu">Sort by:</label>
-                            <select
-                                id="sort-menu"
-                                className="sort-select"
-                                value={sortCriteria}
-                                onChange={(e) => setSortCriteria(e.target.value)}
-                            >
-                                <option value="">Standard</option>
-                                <option value="name">Name</option>
-                                <option value="quantity">Amount</option>
-                                <option value="sold">Sold</option>
-                            </select>
-                        </div>
+                        {activeMenu === 'inventory' && (
+                            <>
+                                <div className="sort-dropdown">
+                                    <label htmlFor="sort-menu">Sort by:</label>
+                                    <select
+                                        id="sort-menu"
+                                        className="sort-select"
+                                        value={sortCriteria}
+                                        onChange={(e) => setSortCriteria(e.target.value)}
+                                    >
+                                        <option value="">Standard</option>
+                                        <option value="name">Name</option>
+                                        <option value="quantity">Amount</option>
+                                        <option value="sold">Sold</option>
+                                    </select>
+                                </div>
 
-                        <div className="excel-button-wrapper">
-                            <DownloadExcelButton />
-                        </div>
+                                <div className="excel-button-wrapper">
+                                    <DownloadExcelButton />
+                                </div>
 
-                        <ItemList items={items} />
+                                <ItemList items={items} />
+                            </>
+                        )}
+
+                        {activeMenu === 'createItem' && (
+                            <div className="item-page">
+                                <div className="item-card">
+                                    <AddItemForm onAdd={handleAddItem} />
+                                    <div className="scanner-buttons">
+                                        <button
+                                            className="btn btn-add"
+                                            onClick={() => { setScannerAction('add'); setShowScanner(true); }}
+                                            disabled={loading}
+                                        >
+                                            Scan to add
+                                        </button>
+                                        <button
+                                            className="btn btn-remove"
+                                            onClick={() => { setScannerAction('remove'); setShowScanner(true); }}
+                                            disabled={loading}
+                                        >
+                                            Scan to remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeMenu === 'reserve' && (
+                            <ReservedItemsList
+                                reservedItems={reservedItems}
+                                setReservedItems={setReservedItems}
+                                onScan={handleReservedItemScan}
+                                onReservationRemoved={handleReservationRemoved}
+                                onWeekFilter={async (week) => {
+                                    setLoading(true);
+                                    try {
+                                        const res = await api.get<ReservationData[]>('/reservations/sorted', {
+                                            params: { reservationWeek: week },
+                                        });
+                                        const data = res.data
+                                            .filter((it) => !it.isSold)
+                                            .map((it) => ({
+                                                id: it.id?.toString() ?? '',
+                                                name: it.itemName ?? '',
+                                                quantity: it.reservedQuantity ?? 0,
+                                                orderNumber: it.orderNumber ?? '',
+                                                week: it.reservationWeek ?? '',
+                                            }));
+                                        setReservedItems(data);
+                                        toast.success(`Sorted by week ${week}`);
+                                    } catch (err) {
+                                        console.error(err);
+                                        toast.error('Failed to filter.');
+                                        setReservedItems([]);
+                                    } finally {
+                                        setLoading(false);
+                                    }
+                                }}
+                                onShowAll={fetchReservedItems}
+                            />
+                        )}
+
+                        {activeMenu === 'createReservation' && (
+                            <div className="reservation-page">
+                                <div className="reservation-card">
+                                    <ReserveForm
+                                        items={items}
+                                        onReserveComplete={fetchReservedItems}
+                                        onUpdateItems={(id, qty) =>
+                                            setItems((prev) =>
+                                                prev.map((it) => (it.id === id ? { ...it, quantity: it.quantity - qty } : it))
+                                            )
+                                        }
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {activeMenu === 'sold' && <SoldItemsList reservations={soldReservations} />}
+                        {activeMenu === 'files' && <FileViewer />}
                     </>
                 )}
-
-                {activeMenu === 'createItem' && (
-                    <div className="item-page">
-                        <div className="item-card">
-                            <AddItemForm onAdd={handleAddItem} />
-                            <div className="scanner-buttons">
-                                <button
-                                    className="btn btn-add"
-                                    onClick={() => { setScannerAction('add'); setShowScanner(true); }}
-                                    disabled={loading}
-                                >
-                                    Scan to add
-                                </button>
-
-                                <button
-                                    className="btn btn-remove"
-                                    onClick={() => { setScannerAction('remove'); setShowScanner(true); }}
-                                    disabled={loading}
-                                >
-                                    Scan to remove
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {activeMenu === 'reserve' && (
-                    <ReservedItemsList
-                        reservedItems={reservedItems}
-                        setReservedItems={setReservedItems}
-                        onScan={handleReservedItemScan}
-                        onReservationRemoved={handleReservationRemoved}
-                        onWeekFilter={async (week) => {
-                            setLoading(true);
-                            try {
-                                const res = await api.get<ReservationData[]>('/reservations/sorted', { params: { reservationWeek: week } });
-                                const data = res.data
-                                    .filter((it) => !it.isSold)
-                                    .map((it) => ({
-                                        id: it.id?.toString() ?? '',
-                                        name: it.itemName ?? '',
-                                        quantity: it.reservedQuantity ?? 0,
-                                        orderNumber: it.orderNumber ?? '',
-                                        week: it.reservationWeek ?? '',
-                                    }));
-                                setReservedItems(data);
-                                toast.success(`Sorted by week ${week}`);
-                            } catch (err) {
-                                console.error(err);
-                                toast.error('Failed to filter.');
-                                setReservedItems([]);
-                            } finally {
-                                setLoading(false);
-                            }
-                        }}
-                        onShowAll={fetchReservedItems}
-                    />
-                )}
-
-                {activeMenu === 'createReservation' && (
-                    <div className="reservation-page">
-                        <div className="reservation-card">
-                            <ReserveForm
-                                items={items}
-                                onReserveComplete={fetchReservedItems}
-                                onUpdateItems={(id, qty) =>
-                                    setItems((prev) =>
-                                        prev.map((it) => (it.id === id ? { ...it, quantity: it.quantity - qty } : it))
-                                    )
-                                }
-                            />
-                        </div>
-                    </div>
-                )}
-
-                {activeMenu === 'sold' && <SoldItemsList reservations={soldReservations} />}
-                {activeMenu === 'files' && <FileViewer />}
 
                 {/* сюда подставятся AboutApp и Account */}
                 <Outlet />
