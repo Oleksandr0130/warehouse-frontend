@@ -28,12 +28,10 @@ const Login: React.FC<LoginProps> = ({ onSuccess, onSwitch }) => {
             localStorage.setItem('token', response.data.token);
             onSuccess();
         } catch (err) {
-            // Без alert — только toast
             if (err instanceof AxiosError && err.response) {
                 const status = err.response.status;
-                const msg =
-                    (err.response.data as any)?.message ||
-                    'Incorrect username or password';
+                const errorData = err.response.data as { message?: string };
+                const msg = errorData?.message || 'Incorrect username or password';
                 console.error(`Login error ${status}:`, msg);
                 toast.error(`Login failed (${status}). ${msg}`);
             } else {
