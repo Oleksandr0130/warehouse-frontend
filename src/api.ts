@@ -1,35 +1,33 @@
 import axios from 'axios';
 import { SoldReservation } from './types/SoldReservation.ts';
-import {ReservationData} from "./types/ReservationData.ts";
-import {Item} from "./types/Item.ts";
+import { ReservationData } from "./types/ReservationData.ts";
+import { Item } from "./types/Item.ts";
 
-const BASE_URL = '/api';
+// Гибкий BASE_URL: либо из переменной окружения, либо дефолт '/api'
+const BASE_URL = import.meta.env.VITE_API_BASE ?? '/api';
 
 const api = axios.create({
     baseURL: BASE_URL,
-    timeout: 10000, // Тайм-аут 10 секунд
-    withCredentials: true, // Для передачи cookie
+    timeout: 10000,
+    withCredentials: true,
 });
 
+// --- API методы ---
 export const fetchItems = async (): Promise<Item[]> => {
-    const resp = await api.get('/items'); // если у тебя другой путь (напр. /stock), просто поменяй
+    const resp = await api.get('/items');
     return resp.data as Item[];
 };
 
-// Запрос к /sold для получения проданных резерваций
 export const fetchSoldReservations = async (): Promise<SoldReservation[]> => {
     const response = await api.get('/sold');
     return response.data;
 };
 
-// Метод для фильтрации резерваций по префиксу заказа
 export const fetchReservationsByOrderPrefix = async (prefix: string): Promise<ReservationData[]> => {
     const response = await api.get(`/reservations/search/by-order-prefix`, { params: { orderPrefix: prefix } });
     return response.data;
 };
 
-
-// Функции для регистрации пользователя, входа, подтверждения email
 export const registerUser = (data: { username: string; email: string; password: string; companyName: string }) =>
     api.post('/auth/register', data);
 
@@ -39,7 +37,6 @@ export const loginUser = (data: { username: string; password: string }) =>
 export const confirmEmail = (code: string) =>
     api.get(`/confirmation?code=${code}`);
 
-// Новый метод для удаления QR-кода
 export const deleteQRCode = async (orderNumber: string): Promise<void> => {
     await api.delete(`/reservations/${orderNumber}/qrcode`);
 };
@@ -47,7 +44,7 @@ export const deleteQRCode = async (orderNumber: string): Promise<void> => {
 export const fetchBillingStatus = async () => {
     const resp = await api.get('/billing/status');
     return resp.data as {
-        status: 'TRIAL'|'ACTIVE'|'EXPIRED'|'ANON'|'NO_COMPANY';
+        status: 'TRIAL' | 'ACTIVE' | 'EXPIRED' | 'ANON' | 'NO_COMPANY';
         trialEnd?: string;
         currentPeriodEnd?: string;
         daysLeft?: number;
@@ -60,78 +57,56 @@ export const createCheckout = async () => {
     return resp.data as { checkoutUrl: string };
 };
 
-
-// Интерцептор запросов: добавляем заголовок Authorization, если токен доступен
+// --- Интерцепторы ---
 api.interceptors.request.use(
     (config) => {
-        const accessToken = localStorage.getItem('accessToken'); // Получаем Access Token из localStorage
+        const accessToken = localStorage.getItem('accessToken');
         if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
-        // console.log(`API Request -> ${config.method?.toUpperCase()} ${config.url}`, config.params || {});
         return config;
     },
-    (error) => {
-        console.error('Ошибка перед отправкой запроса:', error);
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
 );
 
-// Интерцептор ответа: автоматическое обновление Access Token при истечении
 api.interceptors.response.use(
-    (response) => {
-        // console.log(`API Response <- ${response.status} ${response.config.url}`, response.data);
-        return response;
-    },
+    (response) => response,
     async (error) => {
         const originalRequest = error.config;
 
-        // Проверяем 401 из-за истечения Access Token
         if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true; // Устанавливаем флаг, чтобы не выполнить запрос повторно
+            originalRequest._retry = true;
 
             try {
-                // console.log('Access Token истек. Выполняем обновление через Refresh Token...');
-
-                // Получаем Refresh Token из localStorage
                 const refreshToken = localStorage.getItem('refreshToken');
                 if (!refreshToken) {
-                    console.error('Refresh Token отсутствует. Перенаправляем на страницу входа.');
                     localStorage.removeItem('accessToken');
                     localStorage.removeItem('refreshToken');
                     window.location.href = '/login';
                     return Promise.reject(error);
                 }
 
-                // Выполняем запрос обновления токенов
-                const { data } = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
+                // ⚡️ тут используем api.post вместо axios.post(BASE_URL+...)
+                const { data } = await api.post('/auth/refresh', { refreshToken });
 
-                // Сохраняем новые токены
                 localStorage.setItem('accessToken', data.accessToken);
                 localStorage.setItem('refreshToken', data.refreshToken);
 
-                // Повторяем оригинальный запрос с новым токеном
                 originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
-                return axios(originalRequest);
+                return api(originalRequest);
             } catch (refreshError) {
-                console.error('Ошибка обновления токена:', refreshError);
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
-                window.location.href = '/login'; // Перенаправляем на страницу логина при ошибке Refresh Token
+                window.location.href = '/login';
                 return Promise.reject(refreshError);
             }
         }
 
-        console.error('API Error:', error.message);
-        if (error.response) {
-            console.error(`Status: ${error.response.status}`, error.response.data);
-        }
-        alert(`Произошла ошибка: ${error.response?.data.message || 'Неизвестная ошибка'}`);
         return Promise.reject(error);
     }
 );
 
-// --- Профиль текущего пользователя
+// --- Типы и методы профиля ---
 export interface MeDto {
     username: string;
     email: string;
@@ -144,7 +119,6 @@ export async function fetchMe(): Promise<MeDto> {
     return data;
 }
 
-// --- Создать пользователя (админ)
 export interface AdminCreateUserRequest {
     username: string;
     email: string;
