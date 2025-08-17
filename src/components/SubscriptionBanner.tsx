@@ -75,8 +75,8 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
         </span>
                 {(data.trialEnd || data.currentPeriodEnd) && (
                     <span className="sub-dates">
-            {data.status === 'TRIAL' && data.trialEnd && `до ${new Date(data.trialEnd).toLocaleDateString()}`}
-                        {data.status === 'EXPIRED' && data.currentPeriodEnd && `завершилась ${new Date(data.currentPeriodEnd).toLocaleDateString()}`}
+            {data.status === 'TRIAL' && data.trialEnd && `to ${new Date(data.trialEnd).toLocaleDateString()}`}
+                        {data.status === 'EXPIRED' && data.currentPeriodEnd && `ended ${new Date(data.currentPeriodEnd).toLocaleDateString()}`}
           </span>
                 )}
             </div>
