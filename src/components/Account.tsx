@@ -47,7 +47,7 @@ const Account: React.FC = () => {
 
     return (
         <div className="account-wrap">
-            <h2>Личный кабинет</h2>
+            <h2>Personal account</h2>
 
             <SubscriptionBanner embedded />
 
