@@ -226,7 +226,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                         className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`}
                         onClick={() => goInternal('inventory')}
                     >
-                        Inventory
+                        Stock
                     </li>
                     <li
                         className={`menu-item ${activeMenu === 'createItem' ? 'active' : ''}`}
