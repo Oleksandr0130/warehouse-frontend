@@ -10,7 +10,7 @@ import AppContent from './components/AppContent';
 import Account from './components/Account';
 import AboutApp from './components/AboutApp';
 import { validateTokens, logout } from './types/AuthManager';
-import {toast, ToastContainer} from 'react-toastify';
+import { toast } from 'react-toastify';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
     const token = localStorage.getItem('token');
@@ -85,17 +85,6 @@ function AppWithRouter() {
     return (
         <Router>
             <App />
-            <ToastContainer
-                containerId="root-toaster"  // ← ключевой момент
-                position="top-right"
-                autoClose={3500}
-                newestOnTop
-                closeOnClick
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="colored"
-            />
         </Router>
     );
 }

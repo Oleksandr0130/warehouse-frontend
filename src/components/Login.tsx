@@ -28,7 +28,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
             });
             localStorage.setItem('token', response.data.token);
             onSuccess?.();
-            toast.success('Successful Login!', {containerId:'root-toaster'});
+            toast.success('Successful Login!');
             navigate('/app', { replace: true });
         } catch (err) {
             if (err instanceof AxiosError && err.response) {
