@@ -86,8 +86,9 @@ function AppWithRouter() {
         <Router>
             <App />
             <ToastContainer
+                containerId="root-toaster"  // ← ключевой момент
                 position="top-right"
-                autoClose={3000}
+                autoClose={3500}
                 newestOnTop
                 closeOnClick
                 pauseOnFocusLoss
