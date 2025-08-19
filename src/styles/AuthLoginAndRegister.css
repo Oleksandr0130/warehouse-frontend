@@ -179,4 +179,34 @@
         background-size: cover;
         background-position: center;
     }
+
+    /* Общая плашка ошибки над формой */
+    .form-error {
+        background: #fde7e9;
+        color: #b00020;
+        border: 1px solid #f5c2c7;
+        padding: 10px 12px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+    }
+
+    /* Ошибка под конкретным полем */
+    .error-text {
+        color: #d93025;
+        font-size: 0.85rem;
+        margin-top: 6px;
+    }
+
+    /* Подсветка инпута с ошибкой */
+    .input-error {
+        border: 2px solid #d93025 !important;
+        outline: none;
+    }
+
+    /* Обертка для поля — чтобы отступы были ровными */
+    .field {
+        margin-bottom: 12px;
+    }
+
 }
