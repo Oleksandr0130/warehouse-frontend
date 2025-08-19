@@ -25,8 +25,6 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setCredentials((prev) => ({ ...prev, [name]: value }));
-
-        // снять подсказку для конкретного поля при вводе
         if (fieldErrors[name as keyof FieldErrors]) {
             setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
         }
@@ -83,14 +81,13 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
             <div className="auth-card">
                 <img src={logo} alt="FlowQR" className="app-logo" />
 
-                {/* Общая ошибка над формой */}
                 {formError && (
                     <div className="form-error" role="alert" aria-live="assertive">
                         {formError}
                     </div>
                 )}
 
-                {/* Это не нативная форма: onSubmit не используем, чтобы не было перезагрузки */}
+                {/* не используем onSubmit, чтобы браузер ничего не «сабмитил» сам */}
                 <div className="auth-form" role="form" aria-label="Login form">
                     <div className="field">
                         <input

@@ -1,3 +1,4 @@
+// src/api.ts
 import axios from 'axios';
 import { SoldReservation } from './types/SoldReservation.ts';
 import { ReservationData } from "./types/ReservationData.ts";
@@ -60,9 +61,11 @@ export const createCheckout = async () => {
 // --- Интерцепторы ---
 api.interceptors.request.use(
     (config) => {
-        const accessToken = localStorage.getItem('accessToken');
+        // поддерживаем и новую (accessToken), и старую (token) схему хранения
+        const accessToken = localStorage.getItem('accessToken') ?? localStorage.getItem('token');
         if (accessToken) {
-            config.headers.Authorization = `Bearer ${accessToken}`;
+            config.headers = config.headers ?? {};
+            (config.headers as any).Authorization = `Bearer ${accessToken}`;
         }
         return config;
     },
@@ -72,32 +75,41 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
-        const originalRequest = error.config;
+        const originalRequest: any = error?.config ?? {};
+        const url: string = originalRequest?.url ?? '';
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // 1) Не перехватываем 401 на сам логин/регу/рефреш/подтверждение — отдаём ошибку форме
+        if (error?.response?.status === 401 && /\/auth\/login|\/auth\/register|\/auth\/refresh|\/confirmation/.test(url)) {
+            return Promise.reject(error);
+        }
+
+        // 2) Пробуем рефреш только один раз и только для защищённых эндпоинтов
+        if (error?.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
             try {
                 const refreshToken = localStorage.getItem('refreshToken');
                 if (!refreshToken) {
-                    localStorage.removeItem('accessToken');
-                    localStorage.removeItem('refreshToken');
-                    window.location.href = '/login';
-                    return Promise.reject(error);
+                    throw new Error('No refresh token');
                 }
 
-                // ⚡️ тут используем api.post вместо axios.post(BASE_URL+...)
                 const { data } = await api.post('/auth/refresh', { refreshToken });
 
                 localStorage.setItem('accessToken', data.accessToken);
                 localStorage.setItem('refreshToken', data.refreshToken);
 
+                originalRequest.headers = originalRequest.headers ?? {};
                 originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
+                // 3) Рефреш не удался — чистим и даём приложению выполнить SPA-logout
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
-                window.location.href = '/login';
+
+                // Не дёргаем редирект, если уже на /login — пусть форма останется как есть
+                if (window.location.pathname !== '/login') {
+                    window.dispatchEvent(new Event('auth:logout'));
+                }
                 return Promise.reject(refreshError);
             }
         }

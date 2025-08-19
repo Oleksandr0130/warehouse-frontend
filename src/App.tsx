@@ -1,6 +1,6 @@
 // src/App.tsx
 import { JSX, useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import Register from './components/Register';
@@ -21,17 +21,24 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation(); // ⬅️ добавили
 
     useEffect(() => {
         const onLogout = () => {
+            // если 401 прилетел на экране логина — не дёргаем навигацию/тост, просто чистим токен
+            const alreadyOnLogin = location.pathname === '/login';
             logout();
             setIsAuthenticated(false);
-            toast.info('Сессия завершена. Войдите снова.');
-            navigate('/login');
+
+            if (!alreadyOnLogin) {
+                toast.info('Сессия завершена. Войдите снова.');
+                navigate('/login', { replace: true });
+            }
         };
+
         window.addEventListener('auth:logout', onLogout);
         return () => window.removeEventListener('auth:logout', onLogout);
-    }, [navigate]);
+    }, [navigate, location.pathname]); // ⬅️ следим за путём
 
     useEffect(() => {
         const init = async () => {
@@ -50,11 +57,10 @@ function App() {
         logout();
         setIsAuthenticated(false);
         toast.info('Successful Logout!');
-        navigate('/login');
+        navigate('/login', { replace: true });
     };
 
     return (
-        <>
         <Routes>
             {/* публичные */}
             <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
@@ -79,7 +85,6 @@ function App() {
             <Route path="/" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
             <Route path="*" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
         </Routes>
-        </>
     );
 }
 
