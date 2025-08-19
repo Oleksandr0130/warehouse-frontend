@@ -31,10 +31,3 @@ body.no-scroll {
     display: none !important;
   }
 }
-
-.Toastify__toast-container {
-    z-index: 2147483647 !important;
-    position: fixed !important;
-}
-.Toastify__toast { pointer-events: auto; }
-

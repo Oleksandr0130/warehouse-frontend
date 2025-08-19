@@ -10,7 +10,7 @@ import AppContent from './components/AppContent';
 import Account from './components/Account';
 import AboutApp from './components/AboutApp';
 import { validateTokens, logout } from './types/AuthManager';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
     const token = localStorage.getItem('token');
@@ -26,7 +26,7 @@ function App() {
         const onLogout = () => {
             logout();
             setIsAuthenticated(false);
-            toast.info('Сессия завершена. Войдите снова.', { containerId: 'app' });
+            toast.info('Сессия завершена. Войдите снова.');
             navigate('/login');
         };
         window.addEventListener('auth:logout', onLogout);
@@ -43,64 +43,42 @@ function App() {
 
     const handleAuthSuccess = () => {
         setIsAuthenticated(true);
-        toast.success('Successful Login!', { containerId: 'app' });
+        toast.success('Successful Login!');
     };
 
     const handleLogout = () => {
         logout();
         setIsAuthenticated(false);
-        toast.info('Successful Logout!', { containerId: 'app' });
+        toast.info('Successful Logout!');
         navigate('/login');
     };
 
     return (
         <>
-            <Routes>
-                {/* публичные */}
-                <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
-                <Route path="/register" element={<Register onSuccess={() => {}} />} />
-                <Route path="/confirmed" element={<Confirmation />} />
+        <Routes>
+            {/* публичные */}
+            <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
+            <Route path="/register" element={<Register onSuccess={() => {}} />} />
+            <Route path="/confirmed" element={<Confirmation />} />
 
-                {/* приватные под /app */}
-                <Route
-                    path="/app"
-                    element={
-                        <RequireAuth>
-                            <AppContent onLogout={handleLogout} />
-                        </RequireAuth>
-                    }
-                >
-                    <Route index element={<></>} />
-                    <Route path="about" element={<AboutApp />} />
-                    <Route path="account" element={<Account />} />
-                </Route>
+            {/* приватные под /app */}
+            <Route
+                path="/app"
+                element={
+                    <RequireAuth>
+                        <AppContent onLogout={handleLogout} />
+                    </RequireAuth>
+                }
+            >
+                <Route index element={<></>} />
+                <Route path="about" element={<AboutApp />} />
+                <Route path="account" element={<Account />} />
+            </Route>
 
-                {/* редиректы */}
-                <Route path="/" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
-                <Route path="*" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
-            </Routes>
-
-            {/* контейнер тостов */}
-            <ToastContainer
-                containerId="app"
-                position="top-center"
-                autoClose={4000}          // можно false для "липких"
-                hideProgressBar={false}
-                newestOnTop
-                closeOnClick
-                draggable
-                pauseOnHover
-                pauseOnFocusLoss={false}  // важно для WebView
-                theme="colored"
-                limit={3}
-            />
-
-            {/* debug button — можешь удалить */}
-            {import.meta.env.MODE === 'development' && (
-                <button onClick={() => toast.info('Debug toast', { containerId: 'app' })}>
-                    Test toast
-                </button>
-            )}
+            {/* редиректы */}
+            <Route path="/" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
+            <Route path="*" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
+        </Routes>
         </>
     );
 }
