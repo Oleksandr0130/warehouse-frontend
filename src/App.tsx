@@ -10,7 +10,7 @@ import AppContent from './components/AppContent';
 import Account from './components/Account';
 import AboutApp from './components/AboutApp';
 import { validateTokens, logout } from './types/AuthManager';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
     const token = localStorage.getItem('token');
@@ -54,6 +54,7 @@ function App() {
     };
 
     return (
+        <>
         <Routes>
             {/* публичные */}
             <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
@@ -78,6 +79,19 @@ function App() {
             <Route path="/" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
             <Route path="*" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
         </Routes>
+            <ToastContainer
+                position="top-center"
+                autoClose={4000}          // сделай false, если хочешь «липкие» ошибки
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                draggable
+                pauseOnHover
+                pauseOnFocusLoss={false}  // важно для WebView
+                theme="colored"
+                limit={3}
+            />
+        </>
     );
 }
 
