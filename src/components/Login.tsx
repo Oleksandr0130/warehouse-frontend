@@ -1,3 +1,4 @@
+// src/components/Login.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../api';
@@ -34,10 +35,17 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 const errorData = err.response.data as { message?: string };
                 const msg = errorData?.message || 'Incorrect username or password';
                 console.error(`Login error ${status}:`, msg);
-                toast.error(`Login failed (${status}). ${msg}`);
+
+                toast.error(`Login failed (${status}). ${msg}`, {
+                    containerId: 'app',
+                    autoClose: false,   // ошибка будет висеть, пока не закроешь
+                });
             } else {
                 console.error('Unknown login error:', err);
-                toast.error('Login failed. Please try again.');
+                toast.error('Login failed. Please try again.', {
+                    containerId: 'app',
+                    autoClose: false,
+                });
             }
         }
     };

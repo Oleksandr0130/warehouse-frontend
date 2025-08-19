@@ -26,7 +26,7 @@ function App() {
         const onLogout = () => {
             logout();
             setIsAuthenticated(false);
-            toast.info('Сессия завершена. Войдите снова.');
+            toast.info('Сессия завершена. Войдите снова.', { containerId: 'app' });
             navigate('/login');
         };
         window.addEventListener('auth:logout', onLogout);
@@ -43,45 +43,48 @@ function App() {
 
     const handleAuthSuccess = () => {
         setIsAuthenticated(true);
-        toast.success('Successful Login!');
+        toast.success('Successful Login!', { containerId: 'app' });
     };
 
     const handleLogout = () => {
         logout();
         setIsAuthenticated(false);
-        toast.info('Successful Logout!');
+        toast.info('Successful Logout!', { containerId: 'app' });
         navigate('/login');
     };
 
     return (
         <>
-        <Routes>
-            {/* публичные */}
-            <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
-            <Route path="/register" element={<Register onSuccess={() => {}} />} />
-            <Route path="/confirmed" element={<Confirmation />} />
+            <Routes>
+                {/* публичные */}
+                <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
+                <Route path="/register" element={<Register onSuccess={() => {}} />} />
+                <Route path="/confirmed" element={<Confirmation />} />
 
-            {/* приватные под /app */}
-            <Route
-                path="/app"
-                element={
-                    <RequireAuth>
-                        <AppContent onLogout={handleLogout} />
-                    </RequireAuth>
-                }
-            >
-                <Route index element={<></>} />
-                <Route path="about" element={<AboutApp />} />
-                <Route path="account" element={<Account />} />
-            </Route>
+                {/* приватные под /app */}
+                <Route
+                    path="/app"
+                    element={
+                        <RequireAuth>
+                            <AppContent onLogout={handleLogout} />
+                        </RequireAuth>
+                    }
+                >
+                    <Route index element={<></>} />
+                    <Route path="about" element={<AboutApp />} />
+                    <Route path="account" element={<Account />} />
+                </Route>
 
-            {/* редиректы */}
-            <Route path="/" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
-            <Route path="*" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
-        </Routes>
+                {/* редиректы */}
+                <Route path="/" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
+                <Route path="*" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
+            </Routes>
+
+            {/* контейнер тостов */}
             <ToastContainer
+                containerId="app"
                 position="top-center"
-                autoClose={4000}          // сделай false, если хочешь «липкие» ошибки
+                autoClose={4000}          // можно false для "липких"
                 hideProgressBar={false}
                 newestOnTop
                 closeOnClick
@@ -91,6 +94,13 @@ function App() {
                 theme="colored"
                 limit={3}
             />
+
+            {/* debug button — можешь удалить */}
+            {import.meta.env.MODE === 'development' && (
+                <button onClick={() => toast.info('Debug toast', { containerId: 'app' })}>
+                    Test toast
+                </button>
+            )}
         </>
     );
 }
