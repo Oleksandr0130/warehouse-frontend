@@ -1,8 +1,9 @@
+// src/components/Login.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AxiosError } from 'axios';
 import { loginUser } from '../api';
 import '../styles/AuthLoginAndRegister.css';
-import { AxiosError } from 'axios';
 import logo from '../assets/flowqr-logo.png';
 
 interface LoginProps {
@@ -24,44 +25,42 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setCredentials((prev) => ({ ...prev, [name]: value }));
-        // очищаем ошибку конкретного поля при вводе
+
+        // снять подсказку для конкретного поля при вводе
         if (fieldErrors[name as keyof FieldErrors]) {
             setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
         }
-        // общую ошибку тоже убираем при любом вводе
         if (formError) setFormError(null);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const doLogin = async () => {
+        if (isSubmitting) return;
+
         setIsSubmitting(true);
         setFormError(null);
         setFieldErrors({});
 
         try {
-            const response = await loginUser({
+            const res = await loginUser({
                 username: credentials.username,
                 password: credentials.password,
             });
-            localStorage.setItem('token', response.data.token);
-            onSuccess?.(); // тост успеха останется в App.tsx (если он там есть)
+            localStorage.setItem('token', res.data.token);
+            onSuccess?.();
             navigate('/app', { replace: true });
         } catch (err) {
-            // обработка ошибок логина
             if (err instanceof AxiosError) {
                 const status = err.response?.status;
-                const msgFromServer =
-                    (err.response?.data as { message?: string } | undefined)?.message;
+                const serverMsg = (err.response?.data as { message?: string } | undefined)?.message;
 
                 if (status === 400 || status === 401) {
-                    const msg = msgFromServer || 'Incorrect username or password';
-                    // Показываем форм-ошибку и подсветку поля пароля
+                    const msg = serverMsg || 'Incorrect username or password';
                     setFormError(msg);
-                    setFieldErrors({ username: undefined, password: msg });
+                    setFieldErrors({ password: msg }); // при желании добавь username: msg
                 } else if (!err.response) {
                     setFormError('Network error. Please check your connection and try again.');
                 } else {
-                    setFormError(msgFromServer || 'Something went wrong. Please try again.');
+                    setFormError(serverMsg || 'Something went wrong. Please try again.');
                 }
             } else {
                 setFormError('Unexpected error. Please try again.');
@@ -71,19 +70,28 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
         }
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            doLogin();
+        }
+    };
+
     return (
         <div className="auth-page">
             <div className="auth-card">
                 <img src={logo} alt="FlowQR" className="app-logo" />
 
-                {/* Общая ошибка формы */}
+                {/* Общая ошибка над формой */}
                 {formError && (
                     <div className="form-error" role="alert" aria-live="assertive">
                         {formError}
                     </div>
                 )}
 
-                <form className="auth-form" onSubmit={handleSubmit} noValidate>
+                {/* Это не нативная форма: onSubmit не используем, чтобы не было перезагрузки */}
+                <div className="auth-form" role="form" aria-label="Login form">
                     <div className="field">
                         <input
                             type="text"
@@ -91,6 +99,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                             placeholder="Email"
                             value={credentials.username}
                             onChange={handleChange}
+                            onKeyDown={handleKeyDown}
                             required
                             className={fieldErrors.username ? 'input-error' : ''}
                             aria-invalid={!!fieldErrors.username}
@@ -111,6 +120,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                             placeholder="Password"
                             value={credentials.password}
                             onChange={handleChange}
+                            onKeyDown={handleKeyDown}
                             required
                             className={fieldErrors.password ? 'input-error' : ''}
                             aria-invalid={!!fieldErrors.password}
@@ -124,10 +134,15 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                         )}
                     </div>
 
-                    <button type="submit" className="auth-button" disabled={isSubmitting}>
+                    <button
+                        type="button"
+                        className="auth-button"
+                        disabled={isSubmitting}
+                        onClick={doLogin}
+                    >
                         {isSubmitting ? 'LOGGING IN…' : 'LOGIN'}
                     </button>
-                </form>
+                </div>
 
                 <div className="auth-alt">
                     DON’T HAVE AN ACCOUNT?{' '}
