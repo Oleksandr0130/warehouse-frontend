@@ -24,16 +24,17 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setCredentials((prev) => ({ ...prev, [name]: value }));
-        // очищаем ошибку конкретного поля при вводе
+        // снимаем ошибки при вводе
         if (fieldErrors[name as keyof FieldErrors]) {
             setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
         }
-        // общую ошибку тоже убираем при любом вводе
         if (formError) setFormError(null);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const doLogin = async () => {
+        // не даём двойных кликов
+        if (isSubmitting) return;
+
         setIsSubmitting(true);
         setFormError(null);
         setFieldErrors({});
@@ -44,10 +45,9 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 password: credentials.password,
             });
             localStorage.setItem('token', response.data.token);
-            onSuccess?.(); // тост успеха останется в App.tsx (если он там есть)
+            onSuccess?.();
             navigate('/app', { replace: true });
         } catch (err) {
-            // обработка ошибок логина
             if (err instanceof AxiosError) {
                 const status = err.response?.status;
                 const msgFromServer =
@@ -55,9 +55,8 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
 
                 if (status === 400 || status === 401) {
                     const msg = msgFromServer || 'Incorrect username or password';
-                    // Показываем форм-ошибку и подсветку поля пароля
                     setFormError(msg);
-                    setFieldErrors({ username: undefined, password: msg });
+                    setFieldErrors({ password: msg }); // хочешь — продублируй и на username
                 } else if (!err.response) {
                     setFormError('Network error. Please check your connection and try again.');
                 } else {
@@ -68,6 +67,14 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
             }
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            doLogin();
         }
     };
 
@@ -83,7 +90,8 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                     </div>
                 )}
 
-                <form className="auth-form" onSubmit={handleSubmit} noValidate>
+                {/* ВАЖНО: это не «настоящий» сабмит. Мы не используем onSubmit. */}
+                <div className="auth-form" role="form" aria-label="Login form">
                     <div className="field">
                         <input
                             type="text"
@@ -91,6 +99,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                             placeholder="Email"
                             value={credentials.username}
                             onChange={handleChange}
+                            onKeyDown={handleKeyDown}
                             required
                             className={fieldErrors.username ? 'input-error' : ''}
                             aria-invalid={!!fieldErrors.username}
@@ -111,6 +120,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                             placeholder="Password"
                             value={credentials.password}
                             onChange={handleChange}
+                            onKeyDown={handleKeyDown}
                             required
                             className={fieldErrors.password ? 'input-error' : ''}
                             aria-invalid={!!fieldErrors.password}
@@ -124,10 +134,15 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                         )}
                     </div>
 
-                    <button type="submit" className="auth-button" disabled={isSubmitting}>
+                    <button
+                        type="button"
+                        className="auth-button"
+                        disabled={isSubmitting}
+                        onClick={doLogin}
+                    >
                         {isSubmitting ? 'LOGGING IN…' : 'LOGIN'}
                     </button>
-                </form>
+                </div>
 
                 <div className="auth-alt">
                     DON’T HAVE AN ACCOUNT?{' '}
