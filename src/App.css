@@ -31,3 +31,20 @@ body.no-scroll {
     display: none !important;
   }
 }
+
+/* Toastify поверх любых оверлеев/фоновых эффектов */
+.Toastify__toast-container {
+    position: fixed !important;
+    z-index: 2147483647 !important;
+    pointer-events: none;
+}
+.Toastify__toast {
+    pointer-events: auto;
+}
+
+/* На случай, если где-то висят transform/filter и ломают fixed-контекст */
+html, body, #root {
+    transform: none !important;
+    contain: initial !important;
+}
+
