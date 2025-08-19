@@ -37,20 +37,10 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 const errorData = err.response.data as { message?: string };
                 const msg = errorData?.message || 'Incorrect username or password';
                 console.error(`Login error ${status}:`, msg);
-                toast.error(`Login failed (${status}). ${msg}`, {
-                    containerId: 'app',
-                    toastId: loginToastId,
-                    autoClose: false,   // не закрывается сам — пользователь точно увидит
-                    closeOnClick: true,
-                });
+                toast.error(`Login failed (${status}). ${msg}`);
             } else {
                 console.error('Unknown login error:', err);
-                toast.error('Login failed. Please try again.', {
-                    containerId: 'app',
-                    toastId: loginToastId,
-                    autoClose: false,
-                    closeOnClick: true,
-                });
+                toast.error('Login failed. Please try again.');
             }
         }
     };
