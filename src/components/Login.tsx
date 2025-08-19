@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../api';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import '../styles/AuthLoginAndRegister.css';
 import { AxiosError } from 'axios';
 import logo from '../assets/flowqr-logo.png';

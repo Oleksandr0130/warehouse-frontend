@@ -31,3 +31,12 @@ body.no-scroll {
     display: none !important;
   }
 }
+
+/* Поверх любых оверлеев/модалок/хедеров */
+.Toastify__toast-container {
+    z-index: 999999 !important;
+}
+
+.Toastify__toast {
+    pointer-events: auto; /* на случай агрессивных глобальных правил */
+}
