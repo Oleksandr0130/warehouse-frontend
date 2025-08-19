@@ -37,7 +37,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 toast.error(`Login failed (${status}). ${msg}`);
             } else {
                 console.error('Unknown login error:', err);
-                toast.error('Login failed. Please try again.');
+                toast.error('Login failed. Please try again.',{autoClose: 3000, hideProgressBar: false, closeOnClick: true, pauseOnHover: true, draggable: true, progress: undefined, theme: "light"});
             }
         }
     };
