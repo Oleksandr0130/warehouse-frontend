@@ -30,7 +30,7 @@ const Confirmation: React.FC = () => {
                 setStatus('success');
 
                 // мягкий авто-редирект на логин через 5 секунд
-                timer = window.setTimeout(() => navigate('/login', { replace: true }), 5000);
+                timer = window.setTimeout(() => navigate('/login', { replace: true }), 25000);
             } catch {
                 setMessage('Не удалось подтвердить почту. Попробуйте ещё раз.');
                 setStatus('error');
