@@ -38,7 +38,7 @@ const Confirmation: React.FC = () => {
         };
 
         run();
-        timer = window.setTimeout(() => navigate('/login', {replace: true}), 5000)
+        timer = window.setTimeout(() => navigate('/login', {replace: true}), 25000)
         return () => {
             if (timer !== null) {
                 window.clearTimeout(timer);
