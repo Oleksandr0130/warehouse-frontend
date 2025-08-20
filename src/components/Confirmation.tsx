@@ -16,6 +16,7 @@ const Confirmation: React.FC = () => {
     const code = useMemo(() => new URLSearchParams(location.search).get('code'), [location.search]);
 
     useEffect(() => {
+        // в браузере так безопаснее по типам
         let timer: ReturnType<typeof window.setTimeout> | null = null;
 
         const run = async () => {
@@ -29,8 +30,8 @@ const Confirmation: React.FC = () => {
                 setMessage('Почта успешно подтверждена!');
                 setStatus('success');
 
-                // мягкий авто-редирект на логин через 5 секунд
-                timer = window.setTimeout(() => navigate('/login', { replace: true }), 60000);
+                // авто-редирект через 5с
+                timer = window.setTimeout(() => navigate('/login', { replace: true }), 5000);
             } catch {
                 setMessage('Не удалось подтвердить почту. Попробуйте ещё раз.');
                 setStatus('error');
@@ -38,12 +39,12 @@ const Confirmation: React.FC = () => {
         };
 
         run();
-        timer = window.setTimeout(() => navigate('/login', {replace: true}), 60000)
+
         return () => {
             if (timer !== null) {
                 window.clearTimeout(timer);
             }
-        }
+        };
     }, [code, navigate]);
 
     return (
