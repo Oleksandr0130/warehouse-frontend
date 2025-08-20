@@ -1,57 +1,34 @@
 // src/components/Confirmation.tsx
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { confirmEmail } from '../api';
 import '../styles/Confirmation.css';
-import { AiOutlineCheckCircle, AiOutlineCloseCircle, AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { AiOutlineCheckCircle, AiOutlineCloseCircle } from 'react-icons/ai';
 
 const Confirmation: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [message, setMessage] = useState<string>('Подтверждаем вашу почту…');
-    const [status, setStatus] = useState<'success' | 'error' | 'processing'>('processing');
-
-    // безопасно парсим код только один раз
-    const code = useMemo(() => new URLSearchParams(location.search).get('code'), [location.search]);
+    const [message, setMessage] = useState<string>('Проверяем статус подтверждения…');
+    const [status, setStatus] = useState<'success' | 'error'>('error');
 
     useEffect(() => {
-        // в браузере так безопаснее по типам
-        let timer: ReturnType<typeof window.setTimeout> | null = null;
+        const params = new URLSearchParams(location.search);
+        const statusParam = params.get('status');
 
-        const run = async () => {
-            if (!code) {
-                setMessage('Код подтверждения не найден.');
-                setStatus('error');
-                return;
-            }
-            try {
-                await confirmEmail(code);
-                setMessage('Почта успешно подтверждена!');
-                setStatus('success');
-
-                // авто-редирект через 5с
-                timer = window.setTimeout(() => navigate('/login', { replace: true }), 5000);
-            } catch {
-                setMessage('Не удалось подтвердить почту. Попробуйте ещё раз.');
-                setStatus('error');
-            }
-        };
-
-        run();
-
-        return () => {
-            if (timer !== null) {
-                window.clearTimeout(timer);
-            }
-        };
-    }, [code, navigate]);
+        if (statusParam === 'success') {
+            setMessage('Почта успешно подтверждена!');
+            setStatus('success');
+            setTimeout(() => navigate('/login', { replace: true }), 5000);
+        } else {
+            setMessage('Не удалось подтвердить почту. Попробуйте ещё раз.');
+            setStatus('error');
+        }
+    }, [location.search, navigate]);
 
     return (
         <div className="confirmation-page">
             <div className="confirmation-card">
                 <div className="confirmation-icon">
-                    {status === 'processing' && <AiOutlineLoading3Quarters className="spin" size={56} />}
                     {status === 'success' && <AiOutlineCheckCircle size={56} />}
                     {status === 'error' && <AiOutlineCloseCircle size={56} />}
                 </div>
@@ -60,15 +37,18 @@ const Confirmation: React.FC = () => {
                 <p className="confirmation-text">{message}</p>
 
                 <div className="confirmation-actions">
-                    {/* Кнопка в аккаунт (приватный роут). Если нет токена — твой guard перекинет на /login */}
-                    <button className="btn btn-primary" onClick={() => navigate('/app/account')}>Перейти в аккаунт</button>
-
-                    {/* Всегда есть быстрый путь на логин */}
-                    <button className="btn btn-outline" onClick={() => navigate('/login')}>Войти</button>
+                    <button className="btn btn-primary" onClick={() => navigate('/app/account')}>
+                        Перейти в аккаунт
+                    </button>
+                    <button className="btn btn-outline" onClick={() => navigate('/login')}>
+                        Войти
+                    </button>
                 </div>
 
                 {status === 'success' && (
-                    <p className="confirmation-hint">Сейчас автоматически перейдём на страницу входа…</p>
+                    <p className="confirmation-hint">
+                        Сейчас автоматически перейдём на страницу входа…
+                    </p>
                 )}
             </div>
         </div>
