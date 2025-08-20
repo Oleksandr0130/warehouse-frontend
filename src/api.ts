@@ -142,4 +142,9 @@ export async function adminCreateUser(req: AdminCreateUserRequest): Promise<MeDt
     return data;
 }
 
+export const openBillingPortal = async () => {
+    const resp = await api.get('/billing/portal');
+    return resp.data as { portalUrl: string };
+};
+
 export default api;

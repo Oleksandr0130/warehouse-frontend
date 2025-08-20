@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchBillingStatus, createCheckout } from '../api';
+import { fetchBillingStatus, createCheckout, openBillingPortal } from '../api';
 import { toast } from 'react-toastify';
 
 export interface BillingStatus {
@@ -25,7 +25,7 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
                 const res = await fetchBillingStatus();
                 setData(res);
             } catch {
-                // Тихо, чтобы не спамить — в аккаунте мы можем не показывать баннер при ошибке
+                // тихо игнорируем — не хотим спамить ошибками
             } finally {
                 setLoading(false);
             }
@@ -41,10 +41,11 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
         );
     }
 
-    if (!data || data.status === 'ACTIVE') return null;
+    if (!data) return null;
 
     const daysLeft = data.daysLeft ?? 0;
     const isAdmin = Boolean(data.isAdmin);
+    const isActive = data.status === 'ACTIVE';
 
     const label =
         data.status === 'TRIAL'
@@ -53,7 +54,9 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
                 ? 'Subscription has expired'
                 : data.status === 'NO_COMPANY'
                     ? 'No company affiliation'
-                    : 'Guest';
+                    : data.status === 'ACTIVE'
+                        ? 'Subscription is active'
+                        : 'Guest';
 
     const onPay = async () => {
         try {
@@ -64,19 +67,31 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
         }
     };
 
+    const onManage = async () => {
+        try {
+            const { portalUrl } = await openBillingPortal(); // GET /billing/portal
+            window.location.href = portalUrl;
+        } catch {
+            toast.error('Failed to open billing portal');
+        }
+    };
+
     return (
         <div className={embedded ? 'sub-card' : 'sub-banner'}>
             <div className="sub-header">
         <span className={`sub-pill ${data.status.toLowerCase()}`}>
           {data.status === 'TRIAL' && 'TRIAL'}
+            {data.status === 'ACTIVE' && 'ACTIVE'}
             {data.status === 'EXPIRED' && 'EXPIRED'}
             {data.status === 'NO_COMPANY' && 'NO COMPANY'}
             {data.status === 'ANON' && 'ANON'}
         </span>
+
                 {(data.trialEnd || data.currentPeriodEnd) && (
                     <span className="sub-dates">
             {data.status === 'TRIAL' && data.trialEnd && `to ${new Date(data.trialEnd).toLocaleDateString()}`}
                         {data.status === 'EXPIRED' && data.currentPeriodEnd && `ended ${new Date(data.currentPeriodEnd).toLocaleDateString()}`}
+                        {data.status === 'ACTIVE' && data.currentPeriodEnd && `to ${new Date(data.currentPeriodEnd).toLocaleDateString()}`}
           </span>
                 )}
             </div>
@@ -85,9 +100,15 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
 
             <div className="sub-actions">
                 {isAdmin ? (
-                    <button className="sub-btn" onClick={onPay}>
-                        Subscribe
-                    </button>
+                    isActive ? (
+                        <button className="sub-btn" onClick={onManage}>
+                            Manage / Cancel
+                        </button>
+                    ) : (
+                        <button className="sub-btn" onClick={onPay}>
+                            Subscribe
+                        </button>
+                    )
                 ) : (
                     <div className="sub-hint">Extension is available to the company administrator</div>
                 )}
