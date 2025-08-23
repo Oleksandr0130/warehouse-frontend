@@ -10,7 +10,7 @@ import AppContent from './components/AppContent';
 import Account from './components/Account';
 import AboutApp from './components/AboutApp';
 import { validateTokens, logout } from './types/AuthManager';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import { fetchBillingStatus } from './api';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
@@ -46,11 +46,10 @@ function App() {
         init();
     }, []);
 
-    // === ПРЕДУПРЕЖДЕНИЕ СРАЗУ ПОСЛЕ ЛОГИНА, КАЖДЫЙ РАЗ ===
+    // тост при входе, если осталось ≤ 2 дней (TRIAL/ACTIVE)
     const warnOnLogin = async () => {
         try {
             const res = await fetchBillingStatus();
-
             const endRaw =
                 res.status === 'TRIAL' ? res.trialEnd :
                     res.status === 'ACTIVE' ? res.currentPeriodEnd : undefined;
@@ -70,15 +69,15 @@ function App() {
                     : `Your subscription period ends in ${daysLeft} day(s).`
             );
         } catch {
-            /* ignore billing errors */
+            /* ignore */
         }
     };
 
     const handleAuthSuccess = () => {
         setIsAuthenticated(true);
         toast.success('Successful Login!');
-        // Показать предупреждение один раз — сразу после логина (каждый логин)
-        warnOnLogin();
+        // на всякий случай в следующий тик — чтобы токен точно попал в localStorage
+        setTimeout(() => warnOnLogin(), 0);
     };
 
     const handleLogout = () => {
@@ -89,30 +88,33 @@ function App() {
     };
 
     return (
-        <Routes>
-            {/* публичные */}
-            <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
-            <Route path="/register" element={<Register onSuccess={() => {}} />} />
-            <Route path="/confirmed" element={<Confirmation />} />
+        <>
+            <ToastContainer position="top-right" autoClose={4000} newestOnTop />
+            <Routes>
+                {/* публичные */}
+                <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
+                <Route path="/register" element={<Register onSuccess={() => {}} />} />
+                <Route path="/confirmed" element={<Confirmation />} />
 
-            {/* приватные под /app */}
-            <Route
-                path="/app"
-                element={
-                    <RequireAuth>
-                        <AppContent onLogout={handleLogout} />
-                    </RequireAuth>
-                }
-            >
-                <Route index element={<></>} />
-                <Route path="about" element={<AboutApp />} />
-                <Route path="account" element={<Account />} />
-            </Route>
+                {/* приватные под /app */}
+                <Route
+                    path="/app"
+                    element={
+                        <RequireAuth>
+                            <AppContent onLogout={handleLogout} />
+                        </RequireAuth>
+                    }
+                >
+                    <Route index element={<></>} />
+                    <Route path="about" element={<AboutApp />} />
+                    <Route path="account" element={<Account />} />
+                </Route>
 
-            {/* редиректы */}
-            <Route path="/" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
-            <Route path="*" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
-        </Routes>
+                {/* редиректы */}
+                <Route path="/" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
+                <Route path="*" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
+            </Routes>
+        </>
     );
 }
 

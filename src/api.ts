@@ -3,7 +3,7 @@ import axios from 'axios';
 import { ReservationData } from "./types/ReservationData.ts";
 import { Item } from "./types/Item.ts";
 
-// Гибкий BASE_URL: либо из переменной окружения, либо дефолт '/api'
+// BASE_URL: env или '/api'
 const BASE_URL = import.meta.env.VITE_API_BASE ?? '/api';
 
 const api = axios.create({
@@ -36,9 +36,9 @@ export const deleteQRCode = async (orderNumber: string): Promise<void> => {
     await api.delete(`/reservations/${orderNumber}/qrcode`);
 };
 
-// ⬇⬇⬇ БИЛЛИНГ — строго на корневые /billing/* (без /api) ⬇⬇⬇
+// ===== Billing — ТЕПЕРЬ через /api/billing/* =====
 export const fetchBillingStatus = async () => {
-    const resp = await api.get('/billing/status', { baseURL: '' });
+    const resp = await api.get('/billing/status'); // => /api/billing/status
     return resp.data as {
         status: 'TRIAL' | 'ACTIVE' | 'EXPIRED' | 'ANON' | 'NO_COMPANY';
         trialEnd?: string;
@@ -49,24 +49,23 @@ export const fetchBillingStatus = async () => {
 };
 
 export const createCheckout = async () => {
-    const resp = await api.post('/billing/checkout', null, { baseURL: '' });
+    const resp = await api.post('/billing/checkout'); // => /api/billing/checkout
     return resp.data as { checkoutUrl: string };
 };
 
 export const openBillingPortal = async () => {
-    const resp = await api.get('/billing/portal', { baseURL: '' });
+    // если у тебя на бэке GET — оставь GET; если POST — поменяй тут на post
+    const resp = await api.get('/billing/portal'); // => /api/billing/portal
     return resp.data as { portalUrl: string };
 };
-// ⬆⬆⬆ БИЛЛИНГ — строго на корневые /billing/* (без /api) ⬆⬆⬆
 
 // --- Интерцепторы ---
 api.interceptors.request.use(
     (config) => {
-        // поддерживаем и новую (accessToken), и старую (token) схему хранения
+        // поддерживаем и новую (accessToken), и старую (token)
         const raw = localStorage.getItem('accessToken') ?? localStorage.getItem('token');
         if (raw) {
-            // гарантируем, что не будет "Bearer Bearer ..."
-            const token = raw.startsWith('Bearer ') ? raw.slice(7) : raw;
+            const token = raw.startsWith('Bearer ') ? raw.slice(7) : raw; // не допускаем "Bearer Bearer ..."
             config.headers = config.headers ?? {};
             (config.headers as any).Authorization = `Bearer ${token}`;
         }
@@ -81,20 +80,17 @@ api.interceptors.response.use(
         const originalRequest: any = error?.config ?? {};
         const url: string = originalRequest?.url ?? '';
 
-        // 1) Не перехватываем 401 на сам логин/регу/рефреш/подтверждение — отдаём ошибку форме
+        // не трогаем 401 для /auth/*
         if (error?.response?.status === 401 && /\/auth\/login|\/auth\/register|\/auth\/refresh|\/confirmation/.test(url)) {
             return Promise.reject(error);
         }
 
-        // 2) Пробуем рефреш только один раз и только для защищённых эндпоинтов
+        // рефреш один раз
         if (error?.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
-
             try {
                 const refreshToken = localStorage.getItem('refreshToken');
-                if (!refreshToken) {
-                    throw new Error('No refresh token');
-                }
+                if (!refreshToken) throw new Error('No refresh token');
 
                 const { data } = await api.post('/auth/refresh', { refreshToken });
 
@@ -105,26 +101,20 @@ api.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
-                // 3) Рефреш не удался — чистим и даём приложению выполнить SPA-logout
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
-
-                // Не дёргаем редирект, если уже на /login — пусть форма останется как есть
                 if (window.location.pathname !== '/login') {
                     window.dispatchEvent(new Event('auth:logout'));
                 }
                 return Promise.reject(refreshError);
             }
         }
-
         return Promise.reject(error);
     }
 );
 
-// === 402 Payment Required → аккуратный редирект на /app/account ===
-// (ставим ПОСЛЕДНИМ, чтобы выполнился ПЕРВЫМ среди error-хендлеров)
+// 402 → мягкий редирект на /app/account (не для /api/billing/*)
 let subscriptionRedirectScheduled = false;
-
 api.interceptors.response.use(
     (res) => res,
     (err) => {
@@ -139,7 +129,7 @@ api.interceptors.response.use(
             data?.error === 'payment_required';
 
         const onAccountPage = window.location.pathname.startsWith('/app/account');
-        const isBillingCall = url.startsWith('/billing/'); // биллинговые не редиректим
+        const isBillingCall = url.startsWith('/billing/') || url.startsWith('/api/billing/');
 
         if (status === 402 && expired) {
             if (!onAccountPage && !isBillingCall && !subscriptionRedirectScheduled) {
@@ -149,7 +139,6 @@ api.interceptors.response.use(
                     finally { subscriptionRedirectScheduled = false; }
                 }, 100);
             }
-            // Возвращаем ошибку — не блокируем промисы
             return Promise.reject(err);
         }
         return Promise.reject(err);
