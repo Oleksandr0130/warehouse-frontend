@@ -10,6 +10,7 @@ export default defineConfig({
     preview: {
         host: '0.0.0.0',
         strictPort: true,
+        open: false,
         allowedHosts: [
             'warehouse-qr-app-8adwv.ondigitalocean.app', // ← только строки, без RegExp
         ],
@@ -18,7 +19,7 @@ export default defineConfig({
     // только для локальной разработки
     server: {
         port: 5173,
-        open: true,
+        open: false,
         proxy: {
             '/api': {
                 target: 'http://localhost:8080',
