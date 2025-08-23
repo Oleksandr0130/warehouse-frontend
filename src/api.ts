@@ -36,8 +36,9 @@ export const deleteQRCode = async (orderNumber: string): Promise<void> => {
     await api.delete(`/reservations/${orderNumber}/qrcode`);
 };
 
+// ⬇⬇⬇ БИЛЛИНГ — строго на корневые /billing/* (без /api) ⬇⬇⬇
 export const fetchBillingStatus = async () => {
-    const resp = await api.get('/billing/status');
+    const resp = await api.get('/billing/status', { baseURL: '' });
     return resp.data as {
         status: 'TRIAL' | 'ACTIVE' | 'EXPIRED' | 'ANON' | 'NO_COMPANY';
         trialEnd?: string;
@@ -48,9 +49,15 @@ export const fetchBillingStatus = async () => {
 };
 
 export const createCheckout = async () => {
-    const resp = await api.post('/billing/checkout');
+    const resp = await api.post('/billing/checkout', null, { baseURL: '' });
     return resp.data as { checkoutUrl: string };
 };
+
+export const openBillingPortal = async () => {
+    const resp = await api.get('/billing/portal', { baseURL: '' });
+    return resp.data as { portalUrl: string };
+};
+// ⬆⬆⬆ БИЛЛИНГ — строго на корневые /billing/* (без /api) ⬆⬆⬆
 
 // --- Интерцепторы ---
 api.interceptors.request.use(
@@ -112,6 +119,29 @@ api.interceptors.response.use(
     }
 );
 
+// ⬇ ДОБАВЛЕН ДОП. ПЕРЕХВАТЧИК 402 (ставим ПОСЛЕДНИМ, чтобы сработал первым) ⬇
+api.interceptors.response.use(
+    (res) => res,
+    (err) => {
+        const status  = err?.response?.status;
+        const headers = err?.response?.headers ?? {};
+        const data    = err?.response?.data ?? {};
+
+        const expired =
+            headers['x-subscription-expired'] === 'true' ||
+            (headers as any)['X-Subscription-Expired'] === 'true' ||
+            data?.error === 'payment_required';
+
+        if (status === 402 && expired && window.location.pathname !== '/app/account') {
+            window.location.href = '/app/account';
+            // Прерываем цепочку промисов, чтобы другие обработчики не мешали редиректу
+            return new Promise<never>(() => {});
+        }
+        return Promise.reject(err);
+    }
+);
+// ⬆ ДОБАВЛЕН ДОП. ПЕРЕХВАТЧИК 402 ⬆
+
 // --- Типы и методы профиля ---
 export interface MeDto {
     username: string;
@@ -135,10 +165,5 @@ export async function adminCreateUser(req: AdminCreateUserRequest): Promise<MeDt
     const { data } = await api.post<MeDto>('/admin/users', req);
     return data;
 }
-
-export const openBillingPortal = async () => {
-    const resp = await api.get('/billing/portal');
-    return resp.data as { portalUrl: string };
-};
 
 export default api;
