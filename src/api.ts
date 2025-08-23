@@ -119,29 +119,10 @@ api.interceptors.response.use(
     }
 );
 
-// ⬇ ДОБАВЛЕН ДОП. ПЕРЕХВАТЧИК 402 (ставим ПОСЛЕДНИМ, чтобы сработал первым) ⬇
-api.interceptors.response.use(
-    (res) => res,
-    (err) => {
-        const status  = err?.response?.status;
-        const headers = err?.response?.headers ?? {};
-        const data    = err?.response?.data ?? {};
+// === 402 Payment Required → аккуратный редирект на /app/account ===
+// (ставим ПОСЛЕДНИМ, чтобы выполнился ПЕРВЫМ среди error-хендлеров)
+let subscriptionRedirectScheduled = false;
 
-        const expired =
-            headers['x-subscription-expired'] === 'true' ||
-            (headers as any)['X-Subscription-Expired'] === 'true' ||
-            data?.error === 'payment_required';
-
-        if (status === 402 && expired && window.location.pathname !== '/app/account') {
-            window.location.href = '/app/account';
-            // Прерываем цепочку промисов, чтобы другие обработчики не мешали редиректу
-            return new Promise<never>(() => {});
-        }
-        return Promise.reject(err);
-    }
-);
-
-// === 402 Payment Required → редирект в аккаунт (последний интерцептор) ===
 api.interceptors.response.use(
     (res) => res,
     (err) => {
@@ -156,20 +137,23 @@ api.interceptors.response.use(
             data?.error === 'payment_required';
 
         const onAccountPage = window.location.pathname.startsWith('/app/account');
-        const isBillingCall = url.startsWith('/billing/'); // биллинговые не трогаем
+        const isBillingCall = url.startsWith('/billing/'); // биллинговые не редиректим
 
         if (status === 402 && expired) {
-            if (!onAccountPage && !isBillingCall) {
-                window.location.href = '/app/account';
+            if (!onAccountPage && !isBillingCall && !subscriptionRedirectScheduled) {
+                subscriptionRedirectScheduled = true;
+                // маленькая задержка, чтобы тост успел показаться после логина
+                setTimeout(() => {
+                    try { window.location.href = '/app/account'; }
+                    finally { subscriptionRedirectScheduled = false; }
+                }, 100);
             }
-            // Возвращаем ошибку, чтобы компоненты могли обработать её, а не «зависнуть»
+            // Возвращаем ошибку, чтобы компоненты могли отрендерить fallback, а не «повиснуть»
             return Promise.reject(err);
         }
         return Promise.reject(err);
     }
 );
-
-// ⬆ ДОБАВЛЕН ДОП. ПЕРЕХВАТЧИК 402 ⬆
 
 // --- Типы и методы профиля ---
 export interface MeDto {
