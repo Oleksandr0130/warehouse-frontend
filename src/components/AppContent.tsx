@@ -324,30 +324,6 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                                 setReservedItems={setReservedItems}
                                 onScan={handleReservedItemScan}
                                 onReservationRemoved={handleReservationRemoved}
-                                onWeekFilter={async (week) => {
-                                    setLoading(true);
-                                    try {
-                                        const res = await api.get<ReservationData[]>('/reservations/sorted', { params: { reservationWeek: week } });
-                                        const data = res.data
-                                            .filter((it) => !it.isSold)
-                                            .map((it) => ({
-                                                id: it.id?.toString() ?? '',
-                                                name: it.itemName ?? '',
-                                                quantity: it.reservedQuantity ?? 0,
-                                                orderNumber: it.orderNumber ?? '',
-                                                week: it.reservationWeek ?? '',
-                                            }));
-                                        setReservedItems(data);
-                                        toast.success(`Sorted by week ${week}`);
-                                    } catch (err) {
-                                        console.error(err);
-                                        toast.error('Failed to filter.');
-                                        setReservedItems([]);
-                                    } finally {
-                                        setLoading(false);
-                                    }
-                                }}
-                                onShowAll={fetchReservedItems}
                             />
                         )}
 

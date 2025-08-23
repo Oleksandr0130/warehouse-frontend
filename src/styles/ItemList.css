@@ -118,3 +118,50 @@
   font-size: 1rem;
   color: #555;
 }
+/* Поиск для ItemList */
+.item-search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 12px 0 16px;
+    gap: 10px;
+}
+
+.item-search-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.item-search-input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.item-search-count {
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+}
+
+/* Плавное появление элементов */
+.fade-in {
+    animation: itemFadeIn 0.25s ease-in-out;
+}
+
+@keyframes itemFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Небольшой твик выравнивания деталей */
+.item-details {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: baseline;
+}
