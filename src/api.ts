@@ -38,14 +38,15 @@ export const deleteQRCode = async (orderNumber: string): Promise<void> => {
 
 // ===== Billing — ТЕПЕРЬ через /api/billing/* =====
 export const fetchBillingStatus = async () => {
-    const resp = await api.get('/billing/status'); // => /api/billing/status
-    return resp.data as {
+    const { data } = await api.get('/billing/status');
+    return data as {
         status: 'TRIAL' | 'ACTIVE' | 'EXPIRED' | 'ANON' | 'NO_COMPANY';
         trialEnd?: string;
         currentPeriodEnd?: string;
         daysLeft?: number;
         isAdmin?: boolean;
-        pendingCheckoutUrl?: string; // <-- ДОБАВЛЕНО
+        pendingCheckoutUrl?: string;
+        pendingInvoiceUrl?: string; // НОВОЕ
     };
 };
 

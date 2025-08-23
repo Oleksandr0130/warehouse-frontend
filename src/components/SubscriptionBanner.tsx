@@ -8,7 +8,8 @@ export interface BillingStatus {
     currentPeriodEnd?: string;
     daysLeft?: number;
     isAdmin?: boolean;
-    pendingCheckoutUrl?: string; // <-- ДОБАВЛЕНО
+    pendingCheckoutUrl?: string;   // если открыт Stripe Checkout (пользователь не завершил)
+    pendingInvoiceUrl?: string;    // если счёт требует SCA/3DS (hosted_invoice_url)
 }
 
 interface Props {
@@ -61,6 +62,7 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
     const isAdmin = Boolean(data.isAdmin);
     const isActive = data.status === 'ACTIVE';
     const hasPendingCheckout = Boolean(data.pendingCheckoutUrl);
+    const hasPendingInvoice = Boolean(data.pendingInvoiceUrl);
 
     const label =
         data.status === 'TRIAL'
@@ -91,9 +93,15 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
         }
     };
 
-    const onContinue = () => {
+    const onContinueCheckout = () => {
         if (data?.pendingCheckoutUrl) {
             window.location.href = data.pendingCheckoutUrl;
+        }
+    };
+
+    const onCompleteAuth = () => {
+        if (data?.pendingInvoiceUrl) {
+            window.location.href = data.pendingInvoiceUrl;
         }
     };
 
@@ -125,8 +133,13 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
 
             <div className="sub-actions">
                 {isAdmin ? (
-                    hasPendingCheckout ? (
-                        <button className="sub-btn" onClick={onContinue}>
+                    // приоритет: если требуется SCA по счёту — предлагаем его завершить в первую очередь
+                    hasPendingInvoice ? (
+                        <button className="sub-btn" onClick={onCompleteAuth}>
+                            Complete authentication
+                        </button>
+                    ) : hasPendingCheckout ? (
+                        <button className="sub-btn" onClick={onContinueCheckout}>
                             Continue payment
                         </button>
                     ) : isActive ? (
