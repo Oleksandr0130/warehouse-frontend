@@ -1,5 +1,4 @@
-import { useMemo, useState } from 'react';
-import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import  { useMemo, useState } from 'react';
 import { SoldReservation } from '../types/SoldReservation';
 import '../styles/SoldItemsList.css';
 
@@ -14,15 +13,15 @@ function SoldItemsList({ reservations }: SoldItemsListProps) {
         const q = query.trim().toLowerCase();
         if (!q) return reservations;
 
-        const contains = (v?: string) => (v ?? '').toLowerCase().includes(q);
+        const contains = (v?: string | number) => String(v ?? '').toLowerCase().includes(q);
 
-        return reservations.filter((r) => {
-            const dateISO = new Date(r.saleDate).toISOString().slice(0, 10); // YYYY-MM-DD
-            const dateLocal = new Date(r.saleDate).toLocaleDateString();      // локальный формат
+        return reservations.filter((res) => {
+            const dateISO = new Date(res.saleDate).toISOString().slice(0, 10);
+            const dateLocal = new Date(res.saleDate).toLocaleDateString();
             return (
-                contains(r.orderNumber) ||
-                contains(r.itemName) ||
-                contains(r.reservationWeek?.toString()) ||
+                contains(res.orderNumber) ||
+                contains(res.itemName) ||
+                contains(res.reservationWeek) ||
                 dateISO.includes(q) ||
                 dateLocal.toLowerCase().includes(q)
             );
@@ -46,28 +45,26 @@ function SoldItemsList({ reservations }: SoldItemsListProps) {
                     placeholder="Search by order number, name, week, or date (e.g. 2025-08-23)"
                 />
                 <span className="sold-search-count">
-          {filtered.length} / {reservations.length}
-        </span>
+                    {filtered.length} / {reservations.length}
+                </span>
             </div>
 
             {filtered.length === 0 ? (
                 <p className="empty-message">No sold items match your search.</p>
             ) : (
-                <TransitionGroup component="ul" className="sold-list">
+                <ul className="sold-list">
                     {filtered.map((reservation) => (
-                        <CSSTransition key={reservation.id} classNames="fade" timeout={200}>
-                            <li className="sold-item">
-                                <span className="item-order-number">Order number: {reservation.orderNumber}</span>
-                                <span className="item-name">Name: {reservation.itemName}</span>
-                                <span className="item-quantity">Amount: {reservation.reservedQuantity}</span>
-                                <span className="item-sold-week">Week: {reservation.reservationWeek}</span>
-                                <span className="item-sale-date">
-                  Date: {new Date(reservation.saleDate).toLocaleString()}
-                </span>
-                            </li>
-                        </CSSTransition>
+                        <li key={reservation.id ?? reservation.orderNumber} className="sold-item fade-in">
+                            <span className="item-order-number">Order number: {reservation.orderNumber}</span>
+                            <span className="item-name">Name: {reservation.itemName}</span>
+                            <span className="item-quantity">Amount: {reservation.reservedQuantity}</span>
+                            <span className="item-sold-week">Week: {reservation.reservationWeek}</span>
+                            <span className="item-sale-date">
+                                Date: {new Date(reservation.saleDate).toLocaleString()}
+                            </span>
+                        </li>
                     ))}
-                </TransitionGroup>
+                </ul>
             )}
         </div>
     );
