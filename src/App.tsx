@@ -11,6 +11,7 @@ import Account from './components/Account';
 import AboutApp from './components/AboutApp';
 import { validateTokens, logout } from './types/AuthManager';
 import { toast } from 'react-toastify';
+import { fetchBillingStatus } from './api'; // ⬅️ добавили
 
 function RequireAuth({ children }: { children: JSX.Element }) {
     const token = localStorage.getItem('token');
@@ -21,24 +22,21 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate();
-    const location = useLocation(); // ⬅️ добавили
+    const location = useLocation();
 
     useEffect(() => {
         const onLogout = () => {
-            // если 401 прилетел на экране логина — не дёргаем навигацию/тост, просто чистим токен
             const alreadyOnLogin = location.pathname === '/login';
             logout();
             setIsAuthenticated(false);
-
             if (!alreadyOnLogin) {
                 toast.info('Сессия завершена. Войдите снова.');
                 navigate('/login', { replace: true });
             }
         };
-
         window.addEventListener('auth:logout', onLogout);
         return () => window.removeEventListener('auth:logout', onLogout);
-    }, [navigate, location.pathname]); // ⬅️ следим за путём
+    }, [navigate, location.pathname]);
 
     useEffect(() => {
         const init = async () => {
@@ -48,9 +46,44 @@ function App() {
         init();
     }, []);
 
+    // === ПРЕДУПРЕЖДЕНИЕ ТОЛЬКО ПОСЛЕ ЛОГИНА, ОДИН РАЗ ===
+    const warnOnceAfterLogin = async () => {
+        try {
+            const res = await fetchBillingStatus();
+            const endRaw =
+                res.status === 'TRIAL' ? res.trialEnd :
+                    res.status === 'ACTIVE' ? res.currentPeriodEnd : undefined;
+            if (!endRaw) return;
+
+            const daysLeft =
+                typeof res.daysLeft === 'number'
+                    ? Math.max(0, res.daysLeft)
+                    : Math.max(0, Math.ceil((new Date(endRaw).getTime() - Date.now()) / 86_400_000));
+
+            const shouldWarn = (res.status === 'TRIAL' || res.status === 'ACTIVE') && daysLeft <= 2;
+            if (!shouldWarn) return;
+
+            // Ключ привязан к дате окончания: если период обновится — покажем снова,
+            // иначе — никогда больше не повторяем.
+            const KEY = `billingWarnShown:${endRaw}`;
+            if (localStorage.getItem(KEY)) return;
+
+            toast.warn(
+                res.status === 'TRIAL'
+                    ? `Your trial ends in ${daysLeft} day(s).`
+                    : `Your subscription period ends in ${daysLeft} day(s).`
+            );
+            localStorage.setItem(KEY, '1');
+        } catch {
+            /* ignore billing errors */
+        }
+    };
+
     const handleAuthSuccess = () => {
         setIsAuthenticated(true);
         toast.success('Successful Login!');
+        // показать предупреждение один раз сразу после логина
+        warnOnceAfterLogin();
     };
 
     const handleLogout = () => {

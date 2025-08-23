@@ -6,19 +6,17 @@ export interface BillingStatus {
     status: 'TRIAL' | 'ACTIVE' | 'EXPIRED' | 'ANON' | 'NO_COMPANY';
     trialEnd?: string;
     currentPeriodEnd?: string;
-    daysLeft?: number;   // может прийти с бэка
+    daysLeft?: number;
     isAdmin?: boolean;
 }
 
 interface Props {
-    /** Встроенный компактный режим для личного кабинета */
     embedded?: boolean;
 }
 
 export default function SubscriptionBanner({ embedded = true }: Props) {
     const [data, setData] = useState<BillingStatus | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const [warned, setWarned] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -26,41 +24,29 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
                 const res = await fetchBillingStatus();
                 setData(res);
             } catch {
-                // тихо игнорируем — не хотим спамить ошибками
+                /* ignore */
             } finally {
                 setLoading(false);
             }
         })();
     }, []);
 
-    // запасной расчёт оставшихся дней, если daysLeft не пришёл
+    // безопасный расчёт daysLeft, если бэк не прислал
     const safeDaysLeft = useMemo(() => {
         if (!data) return 0;
         if (typeof data.daysLeft === 'number') return Math.max(0, data.daysLeft);
 
         const endRaw =
-            data.status === 'TRIAL' ? data.trialEnd : (data.status === 'ACTIVE' ? data.currentPeriodEnd : undefined);
+            data.status === 'TRIAL' ? data.trialEnd :
+                data.status === 'ACTIVE' ? data.currentPeriodEnd : undefined;
         if (!endRaw) return 0;
 
-        const now = new Date();
-        const end = new Date(endRaw);
-        const diffMs = end.getTime() - now.getTime();
-        return Math.max(0, Math.ceil(diffMs / 86_400_000)); // 1000*60*60*24
+        const diffMs = new Date(endRaw).getTime() - Date.now();
+        return Math.max(0, Math.ceil(diffMs / 86_400_000));
     }, [data]);
 
     const isEndingSoon =
         !!data && (data.status === 'TRIAL' || data.status === 'ACTIVE') && safeDaysLeft <= 2;
-
-    useEffect(() => {
-        if (data && isEndingSoon && !warned) {
-            const msg =
-                data.status === 'TRIAL'
-                    ? `Your trial ends in ${safeDaysLeft} day(s).`
-                    : `Your subscription period ends in ${safeDaysLeft} day(s).`;
-            toast.warn(msg);
-            setWarned(true);
-        }
-    }, [data, isEndingSoon, safeDaysLeft, warned]);
 
     if (loading) {
         return (
@@ -83,7 +69,7 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
                 : data.status === 'NO_COMPANY'
                     ? 'No company affiliation'
                     : data.status === 'ACTIVE'
-                        ? `Subscription is active${typeof safeDaysLeft === 'number' && safeDaysLeft > 0 ? `, ${safeDaysLeft} day(s) left` : ''}`
+                        ? `Subscription is active${safeDaysLeft ? `, ${safeDaysLeft} day(s) left` : ''}`
                         : 'Guest';
 
     const onPay = async () => {
@@ -137,13 +123,9 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
             <div className="sub-actions">
                 {isAdmin ? (
                     isActive ? (
-                        <button className="sub-btn" onClick={onManage}>
-                            Manage / Cancel
-                        </button>
+                        <button className="sub-btn" onClick={onManage}>Manage / Cancel</button>
                     ) : (
-                        <button className="sub-btn" onClick={onPay}>
-                            Subscribe
-                        </button>
+                        <button className="sub-btn" onClick={onPay}>Subscribe</button>
                     )
                 ) : (
                     <div className="sub-hint">Extension is available to the company administrator</div>
