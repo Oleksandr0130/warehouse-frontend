@@ -140,3 +140,44 @@
     .ri-modal{ width: 94vw; padding: 14px; }
     .ri-modal__viewport{ height: clamp(200px, 54vw, 280px); }
 }
+
+/* Поиск */
+.reserved-search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.reserved-search-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.reserved-search-input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.reserved-search-count {
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+}
+
+/* Анимация появления */
+.fade-in {
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
