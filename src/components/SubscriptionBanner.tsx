@@ -8,19 +8,12 @@ export interface BillingStatus {
     currentPeriodEnd?: string;
     daysLeft?: number;
     isAdmin?: boolean;
+    pendingCheckoutUrl?: string; // <-- ДОБАВЛЕНО
 }
 
 interface Props {
     embedded?: boolean;
 }
-
-// безопасные хелперы
-const lc = (v: unknown) => (typeof v === 'string' ? v.toLowerCase() : '');
-const safeDate = (iso?: string) => {
-    if (!iso) return '';
-    const d = new Date(iso);
-    return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
-};
 
 export default function SubscriptionBanner({ embedded = true }: Props) {
     const [data, setData] = useState<BillingStatus | null>(null);
@@ -39,7 +32,6 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
         })();
     }, []);
 
-    // безопасный расчёт daysLeft, если бэк не прислал
     const safeDaysLeft = useMemo(() => {
         if (!data) return 0;
         if (typeof data.daysLeft === 'number') return Math.max(0, data.daysLeft);
@@ -68,10 +60,11 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
 
     const isAdmin = Boolean(data.isAdmin);
     const isActive = data.status === 'ACTIVE';
+    const hasPendingCheckout = Boolean(data.pendingCheckoutUrl);
 
     const label =
         data.status === 'TRIAL'
-            ? `Trial period: remaining ${safeDaysLeft} days left.`
+            ? `Trial period: remaining ${safeDaysLeft} day(s).`
             : data.status === 'EXPIRED'
                 ? 'Subscription has expired'
                 : data.status === 'NO_COMPANY'
@@ -83,7 +76,7 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
     const onPay = async () => {
         try {
             const { checkoutUrl } = await createCheckout();
-            window.location.href = checkoutUrl;
+            window.location.href = checkoutUrl; // Stripe Checkout (SCA/3DS запустится при необходимости)
         } catch {
             toast.error('Failed to create payment');
         }
@@ -98,25 +91,25 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
         }
     };
 
-    const statusClass = lc(data?.status ?? 'ANON');
+    const onContinue = () => {
+        if (data?.pendingCheckoutUrl) {
+            window.location.href = data.pendingCheckoutUrl;
+        }
+    };
 
     return (
         <div className={`${embedded ? 'sub-card' : 'sub-banner'} ${isEndingSoon ? 'sub-ending' : ''}`}>
             <div className="sub-header">
-                <span className={`sub-pill ${statusClass} ${isEndingSoon ? 'ending' : ''}`}>
-                    {data.status === 'TRIAL' && 'TRIAL'}
-                    {data.status === 'ACTIVE' && 'ACTIVE'}
-                    {data.status === 'EXPIRED' && 'EXPIRED'}
-                    {data.status === 'NO_COMPANY' && 'NO COMPANY'}
-                    {data.status === 'ANON' && 'ANON'}
-                </span>
+        <span className={`sub-pill ${data.status.toLowerCase()} ${isEndingSoon ? 'ending' : ''}`}>
+          {data.status}
+        </span>
 
                 {(data.trialEnd || data.currentPeriodEnd) && (
                     <span className="sub-dates">
-                        {data.status === 'TRIAL'  && safeDate(data.trialEnd)         && `to ${safeDate(data.trialEnd)}`}
-                        {data.status === 'EXPIRED'&& safeDate(data.currentPeriodEnd) && `ended ${safeDate(data.currentPeriodEnd)}`}
-                        {data.status === 'ACTIVE' && safeDate(data.currentPeriodEnd) && `to ${safeDate(data.currentPeriodEnd)}`}
-                    </span>
+            {data.status === 'TRIAL'  && data.trialEnd         && `to ${new Date(data.trialEnd).toLocaleDateString()}`}
+                        {data.status === 'EXPIRED'&& data.currentPeriodEnd && `ended ${new Date(data.currentPeriodEnd).toLocaleDateString()}`}
+                        {data.status === 'ACTIVE' && data.currentPeriodEnd && `to ${new Date(data.currentPeriodEnd).toLocaleDateString()}`}
+          </span>
                 )}
             </div>
 
@@ -132,10 +125,18 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
 
             <div className="sub-actions">
                 {isAdmin ? (
-                    isActive ? (
-                        <button className="sub-btn" onClick={onManage}>Manage / Cancel</button>
+                    hasPendingCheckout ? (
+                        <button className="sub-btn" onClick={onContinue}>
+                            Continue payment
+                        </button>
+                    ) : isActive ? (
+                        <button className="sub-btn" onClick={onManage}>
+                            Manage / Cancel
+                        </button>
                     ) : (
-                        <button className="sub-btn" onClick={onPay}>Subscribe</button>
+                        <button className="sub-btn" onClick={onPay}>
+                            Subscribe
+                        </button>
                     )
                 ) : (
                     <div className="sub-hint">Extension is available to the company administrator</div>

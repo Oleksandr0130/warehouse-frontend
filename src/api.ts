@@ -45,6 +45,7 @@ export const fetchBillingStatus = async () => {
         currentPeriodEnd?: string;
         daysLeft?: number;
         isAdmin?: boolean;
+        pendingCheckoutUrl?: string; // <-- ДОБАВЛЕНО
     };
 };
 
