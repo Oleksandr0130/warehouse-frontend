@@ -21,6 +21,7 @@ import { Item } from '../types/Item';
 import { ReservedItem } from '../types/ReservedItem';
 import { ReservationData } from '../types/ReservationData';
 import { SoldReservation } from '../types/SoldReservation';
+import logo from '../assets/flowqr-logo.png';
 
 type MenuKey =
     | 'inventory'
@@ -220,7 +221,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             </header>
 
             <aside className={`sidebar ${isMenuOpen ? 'open' : ''}`}>
-                <h2 className="sidebar-title">FLOWQR</h2>
+                <img src={logo} alt="FLOWQR" className="sidebar-logo" />
                 <ul className="sidebar-menu">
                     <li
                         className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`}

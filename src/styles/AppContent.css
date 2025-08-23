@@ -57,15 +57,25 @@ body.no-scroll-scanner{
     align-items: center;
 }
 
-.sidebar-title{
-    font-size: 20px;
-    font-weight: 900;
-    text-transform: uppercase;
-    padding-bottom: 12px;
+/*.sidebar-title{*/
+/*    font-size: 20px;*/
+/*    font-weight: 900;*/
+/*    text-transform: uppercase;*/
+/*    padding-bottom: 12px;*/
+/*    margin: 0 0 14px;*/
+/*    width: 80%;*/
+/*    text-align: center;*/
+/*    border-bottom: 2px solid rgba(255,255,255,.8);*/
+/*}*/
+
+.sidebar-logo{
+    display: block;
+    width: min(72%, 180px);
+    height: auto;
     margin: 0 0 14px;
-    width: 80%;
-    text-align: center;
+    padding-bottom: 12px;
     border-bottom: 2px solid rgba(255,255,255,.8);
+    object-fit: contain;
 }
 
 .sidebar-menu{
