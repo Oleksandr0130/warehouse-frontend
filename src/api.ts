@@ -140,6 +140,35 @@ api.interceptors.response.use(
         return Promise.reject(err);
     }
 );
+
+// === 402 Payment Required → редирект в аккаунт (последний интерцептор) ===
+api.interceptors.response.use(
+    (res) => res,
+    (err) => {
+        const status  = err?.response?.status;
+        const headers = err?.response?.headers ?? {};
+        const data    = err?.response?.data ?? {};
+        const url     = (err?.config?.url ?? '') as string;
+
+        const expired =
+            headers['x-subscription-expired'] === 'true' ||
+            (headers as any)['X-Subscription-Expired'] === 'true' ||
+            data?.error === 'payment_required';
+
+        const onAccountPage = window.location.pathname.startsWith('/app/account');
+        const isBillingCall = url.startsWith('/billing/'); // биллинговые не трогаем
+
+        if (status === 402 && expired) {
+            if (!onAccountPage && !isBillingCall) {
+                window.location.href = '/app/account';
+            }
+            // Возвращаем ошибку, чтобы компоненты могли обработать её, а не «зависнуть»
+            return Promise.reject(err);
+        }
+        return Promise.reject(err);
+    }
+);
+
 // ⬆ ДОБАВЛЕН ДОП. ПЕРЕХВАТЧИК 402 ⬆
 
 // --- Типы и методы профиля ---
