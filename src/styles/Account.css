@@ -144,3 +144,22 @@
     border-radius: 12px;
     background: #fffdf5;
 }
+/* Внимание: период заканчивается скоро */
+.sub-warning {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: #fff3cd;           /* жёлтый alert */
+    border: 1px solid #ffecb5;
+    color: #664d03;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.sub-ending .sub-title { color: #8a6d1a; }
+
+/* Подсветка плашки статуса, когда скоро конец */
+.sub-pill.ending {
+    background: #ffc107 !important;
+    color: #222 !important;
+}
+
