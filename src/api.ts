@@ -63,10 +63,12 @@ export const openBillingPortal = async () => {
 api.interceptors.request.use(
     (config) => {
         // поддерживаем и новую (accessToken), и старую (token) схему хранения
-        const accessToken = localStorage.getItem('accessToken') ?? localStorage.getItem('token');
-        if (accessToken) {
+        const raw = localStorage.getItem('accessToken') ?? localStorage.getItem('token');
+        if (raw) {
+            // гарантируем, что не будет "Bearer Bearer ..."
+            const token = raw.startsWith('Bearer ') ? raw.slice(7) : raw;
             config.headers = config.headers ?? {};
-            (config.headers as any).Authorization = `Bearer ${accessToken}`;
+            (config.headers as any).Authorization = `Bearer ${token}`;
         }
         return config;
     },
