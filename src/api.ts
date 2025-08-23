@@ -1,6 +1,5 @@
 // src/api.ts
 import axios from 'axios';
-import { SoldReservation } from './types/SoldReservation.ts';
 import { ReservationData } from "./types/ReservationData.ts";
 import { Item } from "./types/Item.ts";
 
@@ -17,11 +16,6 @@ const api = axios.create({
 export const fetchItems = async (): Promise<Item[]> => {
     const resp = await api.get('/items');
     return resp.data as Item[];
-};
-
-export const fetchSoldReservations = async (): Promise<SoldReservation[]> => {
-    const response = await api.get('/sold');
-    return response.data;
 };
 
 export const fetchReservationsByOrderPrefix = async (prefix: string): Promise<ReservationData[]> => {

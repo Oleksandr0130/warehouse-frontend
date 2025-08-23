@@ -37,3 +37,64 @@
         padding: 10px;
     }
 }
+
+.sold-search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.sold-search-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.sold-search-input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.sold-search-count {
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+}
+
+/* Сброс для списка, чтобы анимации не "тряслись" из-за маргинов UL */
+.sold-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Анимация появления/исчезновения элементов */
+.fade-enter {
+    opacity: 0;
+    transform: translateY(4px);
+}
+.fade-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+.fade-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+.fade-exit-active {
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 160ms ease, transform 160ms ease;
+}
+
+/* Небольшой твик, чтобы элементы плавно занимали место */
+.sold-item {
+    will-change: opacity, transform;
+}
