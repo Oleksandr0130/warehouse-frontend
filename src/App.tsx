@@ -11,7 +11,7 @@ import Account from './components/Account';
 import AboutApp from './components/AboutApp';
 import { validateTokens, logout } from './types/AuthManager';
 import { toast } from 'react-toastify';
-import { fetchBillingStatus } from './api'; // ⬅️ добавили
+import { fetchBillingStatus } from './api';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
     const token = localStorage.getItem('token');
@@ -46,10 +46,11 @@ function App() {
         init();
     }, []);
 
-    // === ПРЕДУПРЕЖДЕНИЕ ТОЛЬКО ПОСЛЕ ЛОГИНА, ОДИН РАЗ ===
-    const warnOnceAfterLogin = async () => {
+    // === ПРЕДУПРЕЖДЕНИЕ СРАЗУ ПОСЛЕ ЛОГИНА, КАЖДЫЙ РАЗ ===
+    const warnOnLogin = async () => {
         try {
             const res = await fetchBillingStatus();
+
             const endRaw =
                 res.status === 'TRIAL' ? res.trialEnd :
                     res.status === 'ACTIVE' ? res.currentPeriodEnd : undefined;
@@ -63,17 +64,11 @@ function App() {
             const shouldWarn = (res.status === 'TRIAL' || res.status === 'ACTIVE') && daysLeft <= 2;
             if (!shouldWarn) return;
 
-            // Ключ привязан к дате окончания: если период обновится — покажем снова,
-            // иначе — никогда больше не повторяем.
-            const KEY = `billingWarnShown:${endRaw}`;
-            if (localStorage.getItem(KEY)) return;
-
             toast.warn(
                 res.status === 'TRIAL'
                     ? `Your trial ends in ${daysLeft} day(s).`
                     : `Your subscription period ends in ${daysLeft} day(s).`
             );
-            localStorage.setItem(KEY, '1');
         } catch {
             /* ignore billing errors */
         }
@@ -82,8 +77,8 @@ function App() {
     const handleAuthSuccess = () => {
         setIsAuthenticated(true);
         toast.success('Successful Login!');
-        // показать предупреждение один раз сразу после логина
-        warnOnceAfterLogin();
+        // Показать предупреждение один раз — сразу после логина (каждый логин)
+        warnOnLogin();
     };
 
     const handleLogout = () => {
