@@ -1,4 +1,4 @@
-import  { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { SoldReservation } from '../types/SoldReservation';
 import '../styles/SoldItemsList.css';
 
@@ -6,24 +6,30 @@ interface SoldItemsListProps {
     reservations: SoldReservation[];
 }
 
+const toSafeDate = (value: unknown): Date | null => {
+    const d = new Date(value as any);
+    return isNaN(d.getTime()) ? null : d;
+};
+
 function SoldItemsList({ reservations }: SoldItemsListProps) {
     const [query, setQuery] = useState('');
 
     const filtered = useMemo(() => {
-        const q = query.trim().toLowerCase();
+        const q = String(query ?? '').trim().toLowerCase();
         if (!q) return reservations;
 
-        const contains = (v?: string | number) => String(v ?? '').toLowerCase().includes(q);
+        const contains = (v?: string | number | null) => String(v ?? '').toLowerCase().includes(q);
 
         return reservations.filter((res) => {
-            const dateISO = new Date(res.saleDate).toISOString().slice(0, 10);
-            const dateLocal = new Date(res.saleDate).toLocaleDateString();
+            const d = toSafeDate(res.saleDate);
+            const dateISO = d ? d.toISOString().slice(0, 10) : '';
+            const dateLocalLower = d ? d.toLocaleDateString().toLowerCase() : '';
             return (
                 contains(res.orderNumber) ||
                 contains(res.itemName) ||
                 contains(res.reservationWeek) ||
                 dateISO.includes(q) ||
-                dateLocal.toLowerCase().includes(q)
+                dateLocalLower.includes(q)
             );
         });
     }, [reservations, query]);
@@ -53,17 +59,19 @@ function SoldItemsList({ reservations }: SoldItemsListProps) {
                 <p className="empty-message">No sold items match your search.</p>
             ) : (
                 <ul className="sold-list">
-                    {filtered.map((reservation) => (
-                        <li key={reservation.id ?? reservation.orderNumber} className="sold-item fade-in">
-                            <span className="item-order-number">Order number: {reservation.orderNumber}</span>
-                            <span className="item-name">Name: {reservation.itemName}</span>
-                            <span className="item-quantity">Amount: {reservation.reservedQuantity}</span>
-                            <span className="item-sold-week">Week: {reservation.reservationWeek}</span>
-                            <span className="item-sale-date">
-                                Date: {new Date(reservation.saleDate).toLocaleString()}
-                            </span>
-                        </li>
-                    ))}
+                    {filtered.map((reservation) => {
+                        const d = toSafeDate(reservation.saleDate);
+                        const saleDateLabel = d ? d.toLocaleString() : '—';
+                        return (
+                            <li key={reservation.id ?? reservation.orderNumber} className="sold-item fade-in">
+                                <span className="item-order-number">Order number: {reservation.orderNumber}</span>
+                                <span className="item-name">Name: {reservation.itemName}</span>
+                                <span className="item-quantity">Amount: {reservation.reservedQuantity}</span>
+                                <span className="item-sold-week">Week: {reservation.reservationWeek}</span>
+                                <span className="item-sale-date">Date: {saleDateLabel}</span>
+                            </li>
+                        );
+                    })}
                 </ul>
             )}
         </div>

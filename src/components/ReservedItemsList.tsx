@@ -24,10 +24,10 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
     const [query, setQuery] = useState('');
 
     const filtered = useMemo(() => {
-        const q = query.trim().toLowerCase();
+        const q = String(query ?? '').trim().toLowerCase();
         if (!q) return reservedItems;
 
-        const contains = (v?: string | number) => String(v ?? '').toLowerCase().includes(q);
+        const contains = (v?: string | number | null) => String(v ?? '').toLowerCase().includes(q);
 
         return reservedItems.filter((item) => {
             return (

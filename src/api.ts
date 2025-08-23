@@ -142,13 +142,12 @@ api.interceptors.response.use(
         if (status === 402 && expired) {
             if (!onAccountPage && !isBillingCall && !subscriptionRedirectScheduled) {
                 subscriptionRedirectScheduled = true;
-                // маленькая задержка, чтобы тост успел показаться после логина
                 setTimeout(() => {
                     try { window.location.href = '/app/account'; }
                     finally { subscriptionRedirectScheduled = false; }
                 }, 100);
             }
-            // Возвращаем ошибку, чтобы компоненты могли отрендерить fallback, а не «повиснуть»
+            // Возвращаем ошибку — не блокируем промисы
             return Promise.reject(err);
         }
         return Promise.reject(err);

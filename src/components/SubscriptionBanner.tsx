@@ -14,6 +14,14 @@ interface Props {
     embedded?: boolean;
 }
 
+// безопасные хелперы
+const lc = (v: unknown) => (typeof v === 'string' ? v.toLowerCase() : '');
+const safeDate = (iso?: string) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+};
+
 export default function SubscriptionBanner({ embedded = true }: Props) {
     const [data, setData] = useState<BillingStatus | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -90,23 +98,25 @@ export default function SubscriptionBanner({ embedded = true }: Props) {
         }
     };
 
+    const statusClass = lc(data?.status ?? 'ANON');
+
     return (
         <div className={`${embedded ? 'sub-card' : 'sub-banner'} ${isEndingSoon ? 'sub-ending' : ''}`}>
             <div className="sub-header">
-        <span className={`sub-pill ${data.status.toLowerCase()} ${isEndingSoon ? 'ending' : ''}`}>
-          {data.status === 'TRIAL' && 'TRIAL'}
-            {data.status === 'ACTIVE' && 'ACTIVE'}
-            {data.status === 'EXPIRED' && 'EXPIRED'}
-            {data.status === 'NO_COMPANY' && 'NO COMPANY'}
-            {data.status === 'ANON' && 'ANON'}
-        </span>
+                <span className={`sub-pill ${statusClass} ${isEndingSoon ? 'ending' : ''}`}>
+                    {data.status === 'TRIAL' && 'TRIAL'}
+                    {data.status === 'ACTIVE' && 'ACTIVE'}
+                    {data.status === 'EXPIRED' && 'EXPIRED'}
+                    {data.status === 'NO_COMPANY' && 'NO COMPANY'}
+                    {data.status === 'ANON' && 'ANON'}
+                </span>
 
                 {(data.trialEnd || data.currentPeriodEnd) && (
                     <span className="sub-dates">
-            {data.status === 'TRIAL' && data.trialEnd && `to ${new Date(data.trialEnd).toLocaleDateString()}`}
-                        {data.status === 'EXPIRED' && data.currentPeriodEnd && `ended ${new Date(data.currentPeriodEnd).toLocaleDateString()}`}
-                        {data.status === 'ACTIVE' && data.currentPeriodEnd && `to ${new Date(data.currentPeriodEnd).toLocaleDateString()}`}
-          </span>
+                        {data.status === 'TRIAL'  && safeDate(data.trialEnd)         && `to ${safeDate(data.trialEnd)}`}
+                        {data.status === 'EXPIRED'&& safeDate(data.currentPeriodEnd) && `ended ${safeDate(data.currentPeriodEnd)}`}
+                        {data.status === 'ACTIVE' && safeDate(data.currentPeriodEnd) && `to ${safeDate(data.currentPeriodEnd)}`}
+                    </span>
                 )}
             </div>
 
