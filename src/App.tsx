@@ -66,7 +66,8 @@ function App() {
             toast.warn(
                 res.status === 'TRIAL'
                     ? `Your trial ends in ${daysLeft} day(s).`
-                    : `Your subscription period ends in ${daysLeft} day(s).`
+                    : `Your subscription period ends in ${daysLeft} day(s).`,
+            { toastId: 'billing-warn' }
             );
         } catch {
             /* ignore */
@@ -75,7 +76,7 @@ function App() {
 
     const handleAuthSuccess = () => {
         setIsAuthenticated(true);
-        toast.success('Successful Login!');
+        toast.success('Successful Login!', { toastId: 'auth-login' });
         // на всякий случай в следующий тик — чтобы токен точно попал в localStorage
         setTimeout(() => warnOnLogin(), 0);
     };
@@ -83,7 +84,7 @@ function App() {
     const handleLogout = () => {
         logout();
         setIsAuthenticated(false);
-        toast.info('Successful Logout!');
+        toast.info('Successful Logout!', { toastId: 'auth-logout' });
         navigate('/login', { replace: true });
     };
 
