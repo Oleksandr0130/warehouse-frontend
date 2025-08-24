@@ -90,7 +90,7 @@ function App() {
 
     return (
         <>
-            <ToastContainer position="top-right" autoClose={4000} newestOnTop />
+            <ToastContainer position="top-right" autoClose={4000} newestOnTop limit={3} />
             <Routes>
                 {/* публичные */}
                 <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
