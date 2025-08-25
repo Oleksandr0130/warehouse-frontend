@@ -16,22 +16,68 @@ interface Props {
     embedded?: boolean;
 }
 
+function getQueryParam(name: string) {
+    const u = new URL(window.location.href);
+    return u.searchParams.get(name);
+}
+
+function dropQueryParam(name: string) {
+    const u = new URL(window.location.href);
+    u.searchParams.delete(name);
+    window.history.replaceState({}, '', u.pathname + (u.search ? `?${u.searchParams}` : '') + u.hash);
+}
+
 export default function SubscriptionBanner({ embedded = true }: Props) {
     const [data, setData] = useState<BillingStatus | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [busy, setBusy] = useState<null | 'sub' | 'one' | 'portal'>(null);
 
+    // единая функция подгрузки
+    const reload = async () => {
+        try {
+            const res = await fetchBillingStatus();
+            setData(res);
+        } catch { /* ignore */ }
+    };
+
     useEffect(() => {
-        (async () => {
-            try {
-                const res = await fetchBillingStatus();
-                setData(res);
-            } catch {
-                /* ignore */
-            } finally {
-                setLoading(false);
+        let cancelled = false;
+
+        const bootstrap = async () => {
+            setLoading(true);
+            await reload();
+            if (!cancelled) setLoading(false);
+
+            // если вернулись со Stripe — опросим статус несколько раз (вебхук может запоздать)
+            const billingFlag = getQueryParam('billing'); // success | cancel | null
+            if (billingFlag) {
+                // подчистим URL
+                dropQueryParam('billing');
+
+                let tries = 0;
+                const maxTries = 8;      // ~40 сек
+                const delayMs  = 5000;
+
+                while (!cancelled && tries < maxTries) {
+                    tries += 1;
+                    // если уже ACTIVE — хватит
+                    if (data?.status === 'ACTIVE') break;
+                    await new Promise(r => setTimeout(r, delayMs));
+                    await reload();
+                }
             }
-        })();
+        };
+
+        bootstrap();
+
+        // обновлять при возврате фокуса во вкладку
+        const onFocus = () => { reload(); };
+        window.addEventListener('focus', onFocus);
+
+        return () => {
+            cancelled = true;
+            window.removeEventListener('focus', onFocus);
+        };
     }, []);
 
     const safeDaysLeft = useMemo(() => {
