@@ -36,6 +36,17 @@ export const deleteQRCode = async (orderNumber: string): Promise<void> => {
     await api.delete(`/reservations/${orderNumber}/qrcode`);
 };
 
+export async function checkoutSubscription(): Promise<string> {
+    const { data } = await api.post('/billing/checkout'); // => /api/billing/checkout
+    return data.checkoutUrl as string;
+}
+
+// Разовая оплата (one-time price)
+export async function checkoutOneTime(): Promise<string> {
+    const { data } = await api.post('/billing/checkout-onetime'); // => /api/billing/checkout-onetime
+    return data.checkoutUrl as string;
+}
+
 // ===== Billing — ТЕПЕРЬ через /api/billing/* =====
 export const fetchBillingStatus = async () => {
     const { data } = await api.get('/billing/status');
