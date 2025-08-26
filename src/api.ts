@@ -1,7 +1,12 @@
 // src/api.ts
-import axios from 'axios';
-import { ReservationData } from "./types/ReservationData.ts";
-import { Item } from "./types/Item.ts";
+import axios, {
+    AxiosError,
+    AxiosRequestConfig,
+    InternalAxiosRequestConfig,
+    AxiosRequestHeaders,
+} from 'axios';
+import { ReservationData } from './types/ReservationData.ts';
+import { Item } from './types/Item.ts';
 
 // BASE_URL: env или '/api'
 const BASE_URL = import.meta.env.VITE_API_BASE ?? '/api';
@@ -12,19 +17,91 @@ const api = axios.create({
     withCredentials: true,
 });
 
-// --- API методы ---
-export const fetchItems = async (): Promise<Item[]> => {
-    const resp = await api.get('/items');
-    return resp.data as Item[];
+/* ===================== Типы ===================== */
+
+export type BillingState = 'TRIAL' | 'ACTIVE' | 'EXPIRED' | 'ANON' | 'NO_COMPANY';
+
+export interface BillingStatusDto {
+    status: BillingState;
+    trialEnd?: string;
+    currentPeriodEnd?: string;
+    daysLeft?: number;
+    isAdmin?: boolean;
+    pendingCheckoutUrl?: string;
+    pendingInvoiceUrl?: string;
+}
+
+export interface CheckoutResponse {
+    checkoutUrl: string;
+}
+
+export interface PortalResponse {
+    portalUrl: string;
+}
+
+export interface MeDto {
+    username: string;
+    email: string;
+    companyName: string | null;
+    admin: boolean;
+}
+
+export interface AdminCreateUserRequest {
+    username: string;
+    email: string;
+    password: string;
+}
+
+interface RefreshResponse {
+    accessToken: string;
+    refreshToken: string;
+}
+
+/* ===================== Helpers ===================== */
+
+export const getErrorMessage = (e: unknown): string => {
+    const err = e as AxiosError<{ message?: string; error?: string }>;
+    return (
+        err.response?.data?.message ??
+        err.response?.data?.error ??
+        err.message ??
+        'Unknown error'
+    );
 };
 
-export const fetchReservationsByOrderPrefix = async (prefix: string): Promise<ReservationData[]> => {
-    const response = await api.get(`/reservations/search/by-order-prefix`, { params: { orderPrefix: prefix } });
+const setAuthHeader = (headers: AxiosRequestHeaders, token: string) => {
+    // AxiosRequestHeaders поддерживает индекс по строковому ключу
+    headers['Authorization'] = `Bearer ${token}`;
+};
+
+/* ===================== API методы домена ===================== */
+
+export const fetchItems = async (): Promise<Item[]> => {
+    const resp = await api.get<Item[]>('/items');
+    return resp.data;
+};
+
+export const fetchReservationsByOrderPrefix = async (
+    prefix: string
+): Promise<ReservationData[]> => {
+    const response = await api.get<ReservationData[]>(
+        `/reservations/search/by-order-prefix`,
+        { params: { orderPrefix: prefix } }
+    );
     return response.data;
 };
 
-export const registerUser = (data: { username: string; email: string; password: string; companyName: string }) =>
-    api.post('/auth/register', data);
+export const createOneOffCheckout = async (): Promise<CheckoutResponse> => {
+    const { data } = await api.post<CheckoutResponse>('/billing/checkout-oneoff');
+    return data;
+};
+
+export const registerUser = (data: {
+    username: string;
+    email: string;
+    password: string;
+    companyName: string;
+}) => api.post('/auth/register', data);
 
 export const loginUser = (data: { username: string; password: string }) =>
     api.post('/auth/login', data);
@@ -36,71 +113,97 @@ export const deleteQRCode = async (orderNumber: string): Promise<void> => {
     await api.delete(`/reservations/${orderNumber}/qrcode`);
 };
 
-// ===== Billing — ТЕПЕРЬ через /api/billing/* =====
-export const fetchBillingStatus = async () => {
-    const { data } = await api.get('/billing/status');
-    return data as {
-        status: 'TRIAL' | 'ACTIVE' | 'EXPIRED' | 'ANON' | 'NO_COMPANY';
-        trialEnd?: string;
-        currentPeriodEnd?: string;
-        daysLeft?: number;
-        isAdmin?: boolean;
-        pendingCheckoutUrl?: string;
-        pendingInvoiceUrl?: string; // НОВОЕ
-    };
+/* ===================== Billing ===================== */
+
+export const fetchBillingStatus = async (): Promise<BillingStatusDto> => {
+    const { data } = await api.get<BillingStatusDto>('/billing/status');
+    return data;
 };
 
-export const createCheckout = async () => {
-    const resp = await api.post('/billing/checkout'); // => /api/billing/checkout
-    return resp.data as { checkoutUrl: string };
+export const createCheckout = async (): Promise<CheckoutResponse> => {
+    const { data } = await api.post<CheckoutResponse>('/billing/checkout');
+    return data;
 };
 
-export const openBillingPortal = async () => {
-    // если у тебя на бэке GET — оставь GET; если POST — поменяй тут на post
-    const resp = await api.get('/billing/portal'); // => /api/billing/portal
-    return resp.data as { portalUrl: string };
+export const openBillingPortal = async (
+    returnUrl: string
+): Promise<PortalResponse> => {
+    const { data } = await api.post<PortalResponse>('/billing/portal', {
+        return_url: returnUrl,
+    });
+    return data;
 };
 
-// --- Интерцепторы ---
+/* ===================== Профиль / Админ ===================== */
+
+export async function fetchMe(): Promise<MeDto> {
+    const { data } = await api.get<MeDto>('/users/me');
+    return data;
+}
+
+export async function adminCreateUser(
+    req: AdminCreateUserRequest
+): Promise<MeDto> {
+    const { data } = await api.post<MeDto>('/admin/users', req);
+    return data;
+}
+
+/* ===================== Интерцепторы ===================== */
+
+// request: проставляем Authorization, если токен есть
 api.interceptors.request.use(
-    (config) => {
-        // поддерживаем и новую (accessToken), и старую (token)
-        const raw = localStorage.getItem('accessToken') ?? localStorage.getItem('token');
+    (config: InternalAxiosRequestConfig) => {
+        const raw =
+            localStorage.getItem('accessToken') ?? localStorage.getItem('token');
         if (raw) {
-            const token = raw.startsWith('Bearer ') ? raw.slice(7) : raw; // не допускаем "Bearer Bearer ..."
-            config.headers = config.headers ?? {};
-            (config.headers as any).Authorization = `Bearer ${token}`;
+            const token = raw.startsWith('Bearer ') ? raw.slice(7) : raw;
+            if (!config.headers) {
+                config.headers = {} as AxiosRequestHeaders;
+            }
+            setAuthHeader(config.headers as AxiosRequestHeaders, token);
         }
         return config;
     },
     (error) => Promise.reject(error)
 );
 
+// response: обновление accessToken по 401 + мягкий редирект по 402
 api.interceptors.response.use(
     (response) => response,
-    async (error) => {
-        const originalRequest: any = error?.config ?? {};
-        const url: string = originalRequest?.url ?? '';
+    async (error: AxiosError) => {
+        const originalRequest = (error.config ?? {}) as AxiosRequestConfig & {
+            _retry?: boolean;
+        };
+        const url: string = typeof originalRequest.url === 'string' ? originalRequest.url : '';
 
         // не трогаем 401 для /auth/*
-        if (error?.response?.status === 401 && /\/auth\/login|\/auth\/register|\/auth\/refresh|\/confirmation/.test(url)) {
+        if (
+            error.response?.status === 401 &&
+            /\/auth\/login|\/auth\/register|\/auth\/refresh|\/confirmation/.test(url)
+        ) {
             return Promise.reject(error);
         }
 
-        // рефреш один раз
-        if (error?.response?.status === 401 && !originalRequest._retry) {
+        // один рефреш
+        if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
                 const refreshToken = localStorage.getItem('refreshToken');
                 if (!refreshToken) throw new Error('No refresh token');
 
-                const { data } = await api.post('/auth/refresh', { refreshToken });
+                const { data } = await api.post<RefreshResponse>('/auth/refresh', {
+                    refreshToken,
+                });
 
                 localStorage.setItem('accessToken', data.accessToken);
                 localStorage.setItem('refreshToken', data.refreshToken);
 
-                originalRequest.headers = originalRequest.headers ?? {};
-                originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+                // проставим заголовок и повторим запрос
+                originalRequest.headers = (originalRequest.headers ??
+                    {}) as AxiosRequestHeaders;
+                (originalRequest.headers as AxiosRequestHeaders)['Authorization'] =
+                    `Bearer ${data.accessToken}`;
+
                 return api(originalRequest);
             } catch (refreshError) {
                 localStorage.removeItem('accessToken');
@@ -111,6 +214,7 @@ api.interceptors.response.use(
                 return Promise.reject(refreshError);
             }
         }
+
         return Promise.reject(error);
     }
 );
@@ -119,26 +223,32 @@ api.interceptors.response.use(
 let subscriptionRedirectScheduled = false;
 api.interceptors.response.use(
     (res) => res,
-    (err) => {
-        const status  = err?.response?.status;
-        const headers = err?.response?.headers ?? {};
-        const data    = err?.response?.data ?? {};
-        const url     = (err?.config?.url ?? '') as string;
+    (err: AxiosError) => {
+        const status = err.response?.status;
+        const headersObj: Record<string, unknown> =
+            (err.response?.headers as Record<string, unknown>) ?? {};
+        const dataObj: Record<string, unknown> =
+            (err.response?.data as Record<string, unknown>) ?? {};
+        const url = typeof err.config?.url === 'string' ? err.config!.url! : '';
 
         const expired =
-            headers['x-subscription-expired'] === 'true' ||
-            (headers as any)['X-Subscription-Expired'] === 'true' ||
-            data?.error === 'payment_required';
+            headersObj['x-subscription-expired'] === 'true' ||
+            headersObj['X-Subscription-Expired'] === 'true' ||
+            dataObj['error'] === 'payment_required';
 
         const onAccountPage = window.location.pathname.startsWith('/app/account');
-        const isBillingCall = url.startsWith('/billing/') || url.startsWith('/api/billing/');
+        const isBillingCall =
+            url.startsWith('/billing/') || url.startsWith('/api/billing/');
 
         if (status === 402 && expired) {
             if (!onAccountPage && !isBillingCall && !subscriptionRedirectScheduled) {
                 subscriptionRedirectScheduled = true;
                 setTimeout(() => {
-                    try { window.location.href = '/app/account'; }
-                    finally { subscriptionRedirectScheduled = false; }
+                    try {
+                        window.location.href = '/app/account';
+                    } finally {
+                        subscriptionRedirectScheduled = false;
+                    }
                 }, 100);
             }
             return Promise.reject(err);
@@ -146,29 +256,5 @@ api.interceptors.response.use(
         return Promise.reject(err);
     }
 );
-
-// --- Типы и методы профиля ---
-export interface MeDto {
-    username: string;
-    email: string;
-    companyName: string | null;
-    admin: boolean;
-}
-
-export async function fetchMe(): Promise<MeDto> {
-    const { data } = await api.get<MeDto>('/users/me');
-    return data;
-}
-
-export interface AdminCreateUserRequest {
-    username: string;
-    email: string;
-    password: string;
-}
-
-export async function adminCreateUser(req: AdminCreateUserRequest): Promise<MeDto> {
-    const { data } = await api.post<MeDto>('/admin/users', req);
-    return data;
-}
 
 export default api;
