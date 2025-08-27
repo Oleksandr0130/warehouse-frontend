@@ -1,6 +1,5 @@
 // src/components/SubscriptionBanner.tsx
 import { useEffect, useMemo, useState } from 'react';
-import '../styles/SubscriptionBanner.css';
 import {
     fetchBillingStatus,
     createCheckout,
