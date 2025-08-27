@@ -1,6 +1,5 @@
 // src/components/SubscriptionBanner.tsx
 import { useEffect, useMemo, useState } from 'react';
-import '../styles/SubscriptionBanner.css';
 import {
     fetchBillingStatus,
     createCheckout,
@@ -89,7 +88,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
     if (!status) return null;
 
     return (
-        <div className={`sub-banner ${embedded ? 'embedded' : ''}`}>
+        <div className={`subscription-banner ${embedded ? 'embedded' : ''}`}>
             <div className="sub-title">{title}</div>
 
             {!!status.pendingInvoiceUrl && (
@@ -104,12 +103,12 @@ export default function SubscriptionBanner({ embedded }: Props) {
             <div className="sub-actions">
                 {status.isAdmin ? (
                     status.status === 'ACTIVE' ? (
-                        <button className="sub-btn secondary" onClick={onManage} disabled={loading}>
+                        <button className="subscription-banner button" onClick={onManage} disabled={loading}>
                             Manage / Cancel
                         </button>
                     ) : (
                         <>
-                            <button className="sub-btn" onClick={onPay} disabled={loading}>
+                            <button className="subscription-banner button" onClick={onPay} disabled={loading}>
                                 Subscribe
                             </button>
                             <button
