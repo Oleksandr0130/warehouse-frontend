@@ -78,6 +78,23 @@ export const fetchReservationsByOrderPrefix = async (prefix: string): Promise<Re
     return response.data;
 };
 
+export const deleteQRCode = async (orderNumber: string): Promise<void> => {
+    await api.delete(`/reservations/${orderNumber}/qrcode`);
+};
+
+/* ===================== Auth ===================== */
+
+export const registerUser = (data: {
+    username: string;
+    email: string;
+    password: string;
+    companyName: string;
+}) => api.post('/auth/register', data);
+
+export const loginUser = (data: { username: string; password: string }) => api.post('/auth/login', data);
+
+export const confirmEmail = (code: string) => api.get(`/confirmation?code=${code}`);
+
 /* ===================== Billing ===================== */
 
 export const fetchBillingStatus = async (): Promise<BillingStatusDto> => {
@@ -92,7 +109,7 @@ export const createCheckout = async (): Promise<CheckoutResponse> => {
 
 // One-off (BLIK/PLN)
 export const createOneOffCheckout = async (): Promise<CheckoutResponse> => {
-    const { data } = await api.post<CheckoutResponse>('/billing/oneoff'); // <-- синхронизировано с бэком
+    const { data } = await api.post<CheckoutResponse>('/billing/oneoff'); // синхронизировано с бэком
     return data;
 };
 
