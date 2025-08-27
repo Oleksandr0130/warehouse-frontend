@@ -1,6 +1,10 @@
 // src/api.ts
-import axios, { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
-import type { AxiosRequestHeaders } from 'axios';
+import axios, {
+    AxiosError,
+    AxiosRequestConfig,
+    InternalAxiosRequestConfig,
+    AxiosRequestHeaders,
+} from 'axios';
 import { ReservationData } from './types/ReservationData.ts';
 import { Item } from './types/Item.ts';
 
@@ -57,10 +61,16 @@ interface RefreshResponse {
 
 export const getErrorMessage = (e: unknown): string => {
     const err = e as AxiosError<{ message?: string; error?: string }>;
-    return err.response?.data?.message ?? err.response?.data?.error ?? err.message ?? 'Unknown error';
+    return (
+        err.response?.data?.message ??
+        err.response?.data?.error ??
+        err.message ??
+        'Unknown error'
+    );
 };
 
 const setAuthHeader = (headers: AxiosRequestHeaders, token: string) => {
+    // AxiosRequestHeaders поддерживает индекс по строковому ключу
     headers['Authorization'] = `Bearer ${token}`;
 };
 
@@ -71,18 +81,20 @@ export const fetchItems = async (): Promise<Item[]> => {
     return resp.data;
 };
 
-export const fetchReservationsByOrderPrefix = async (prefix: string): Promise<ReservationData[]> => {
-    const response = await api.get<ReservationData[]>(`/reservations/search/by-order-prefix`, {
-        params: { orderPrefix: prefix },
-    });
+export const fetchReservationsByOrderPrefix = async (
+    prefix: string
+): Promise<ReservationData[]> => {
+    const response = await api.get<ReservationData[]>(
+        `/reservations/search/by-order-prefix`,
+        { params: { orderPrefix: prefix } }
+    );
     return response.data;
 };
 
-export const deleteQRCode = async (orderNumber: string): Promise<void> => {
-    await api.delete(`/reservations/${orderNumber}/qrcode`);
+export const createOneOffCheckout = async (): Promise<CheckoutResponse> => {
+    const { data } = await api.post<CheckoutResponse>('/billing/checkout-oneoff');
+    return data;
 };
-
-/* ===================== Auth ===================== */
 
 export const registerUser = (data: {
     username: string;
@@ -91,9 +103,15 @@ export const registerUser = (data: {
     companyName: string;
 }) => api.post('/auth/register', data);
 
-export const loginUser = (data: { username: string; password: string }) => api.post('/auth/login', data);
+export const loginUser = (data: { username: string; password: string }) =>
+    api.post('/auth/login', data);
 
-export const confirmEmail = (code: string) => api.get(`/confirmation?code=${code}`);
+export const confirmEmail = (code: string) =>
+    api.get(`/confirmation?code=${code}`);
+
+export const deleteQRCode = async (orderNumber: string): Promise<void> => {
+    await api.delete(`/reservations/${orderNumber}/qrcode`);
+};
 
 /* ===================== Billing ===================== */
 
@@ -107,15 +125,12 @@ export const createCheckout = async (): Promise<CheckoutResponse> => {
     return data;
 };
 
-// One-off (BLIK/PLN)
-export const createOneOffCheckout = async (): Promise<CheckoutResponse> => {
-    const { data } = await api.post<CheckoutResponse>('/billing/oneoff'); // синхронизировано с бэком
-    return data;
-};
-
-export const openBillingPortal = async (returnUrl: string): Promise<PortalResponse> => {
-    const safeReturn = returnUrl && typeof returnUrl === 'string' ? returnUrl : window.location.href;
-    const { data } = await api.post<PortalResponse>('/billing/portal', { return_url: safeReturn });
+export const openBillingPortal = async (
+    returnUrl: string
+): Promise<PortalResponse> => {
+    const { data } = await api.post<PortalResponse>('/billing/portal', {
+        return_url: returnUrl,
+    });
     return data;
 };
 
@@ -126,7 +141,9 @@ export async function fetchMe(): Promise<MeDto> {
     return data;
 }
 
-export async function adminCreateUser(req: AdminCreateUserRequest): Promise<MeDto> {
+export async function adminCreateUser(
+    req: AdminCreateUserRequest
+): Promise<MeDto> {
     const { data } = await api.post<MeDto>('/admin/users', req);
     return data;
 }
@@ -136,23 +153,27 @@ export async function adminCreateUser(req: AdminCreateUserRequest): Promise<MeDt
 // request: проставляем Authorization, если токен есть
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const raw = localStorage.getItem('accessToken') ?? localStorage.getItem('token');
+        const raw =
+            localStorage.getItem('accessToken') ?? localStorage.getItem('token');
         if (raw) {
             const token = raw.startsWith('Bearer ') ? raw.slice(7) : raw;
-            const headers = (config.headers ?? {}) as AxiosRequestHeaders;
-            setAuthHeader(headers, token);
-            config.headers = headers;
+            if (!config.headers) {
+                config.headers = {} as AxiosRequestHeaders;
+            }
+            setAuthHeader(config.headers as AxiosRequestHeaders, token);
         }
         return config;
     },
-    (error) => Promise.reject(error),
+    (error) => Promise.reject(error)
 );
 
 // response: обновление accessToken по 401 + мягкий редирект по 402
 api.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
-        const originalRequest = (error.config ?? {}) as AxiosRequestConfig & { _retry?: boolean };
+        const originalRequest = (error.config ?? {}) as AxiosRequestConfig & {
+            _retry?: boolean;
+        };
         const url: string = typeof originalRequest.url === 'string' ? originalRequest.url : '';
 
         // не трогаем 401 для /auth/*
@@ -170,14 +191,18 @@ api.interceptors.response.use(
                 const refreshToken = localStorage.getItem('refreshToken');
                 if (!refreshToken) throw new Error('No refresh token');
 
-                const { data } = await api.post<RefreshResponse>('/auth/refresh', { refreshToken });
+                const { data } = await api.post<RefreshResponse>('/auth/refresh', {
+                    refreshToken,
+                });
 
                 localStorage.setItem('accessToken', data.accessToken);
                 localStorage.setItem('refreshToken', data.refreshToken);
 
                 // проставим заголовок и повторим запрос
-                originalRequest.headers = (originalRequest.headers ?? {}) as AxiosRequestHeaders;
-                (originalRequest.headers as AxiosRequestHeaders)['Authorization'] = `Bearer ${data.accessToken}`;
+                originalRequest.headers = (originalRequest.headers ??
+                    {}) as AxiosRequestHeaders;
+                (originalRequest.headers as AxiosRequestHeaders)['Authorization'] =
+                    `Bearer ${data.accessToken}`;
 
                 return api(originalRequest);
             } catch (refreshError) {
@@ -191,7 +216,7 @@ api.interceptors.response.use(
         }
 
         return Promise.reject(error);
-    },
+    }
 );
 
 // 402 → мягкий редирект на /app/account (не для /api/billing/*)
@@ -200,8 +225,10 @@ api.interceptors.response.use(
     (res) => res,
     (err: AxiosError) => {
         const status = err.response?.status;
-        const headersObj: Record<string, unknown> = (err.response?.headers as Record<string, unknown>) ?? {};
-        const dataObj: Record<string, unknown> = (err.response?.data as Record<string, unknown>) ?? {};
+        const headersObj: Record<string, unknown> =
+            (err.response?.headers as Record<string, unknown>) ?? {};
+        const dataObj: Record<string, unknown> =
+            (err.response?.data as Record<string, unknown>) ?? {};
         const url = typeof err.config?.url === 'string' ? err.config!.url! : '';
 
         const expired =
@@ -210,7 +237,8 @@ api.interceptors.response.use(
             dataObj['error'] === 'payment_required';
 
         const onAccountPage = window.location.pathname.startsWith('/app/account');
-        const isBillingCall = url.startsWith('/billing/') || url.startsWith('/api/billing/');
+        const isBillingCall =
+            url.startsWith('/billing/') || url.startsWith('/api/billing/');
 
         if (status === 402 && expired) {
             if (!onAccountPage && !isBillingCall && !subscriptionRedirectScheduled) {
@@ -226,7 +254,7 @@ api.interceptors.response.use(
             return Promise.reject(err);
         }
         return Promise.reject(err);
-    },
+    }
 );
 
 export default api;
