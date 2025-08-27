@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { fetchMe, adminCreateUser, AdminCreateUserRequest, MeDto } from '../api';
 import { toast } from 'react-toastify';
-import '../styles/Account.css'
-import SubscriptionBanner from "./SubscriptionBanner.tsx";
+import '../styles/Account.css';
+import SubscriptionBanner from './SubscriptionBanner';
 
 const Account: React.FC = () => {
     const [me, setMe] = useState<MeDto | null>(null);
@@ -11,7 +11,7 @@ const Account: React.FC = () => {
     const [newUser, setNewUser] = useState<AdminCreateUserRequest>({
         username: '',
         email: '',
-        password: ''
+        password: '',
     });
     const [loading, setLoading] = useState(false);
 
@@ -28,7 +28,7 @@ const Account: React.FC = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setNewUser(prev => ({ ...prev, [name]: value }));
+        setNewUser((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -56,10 +56,22 @@ const Account: React.FC = () => {
             ) : (
                 <>
                     <div className="account-card">
-                        <div className="row"><span>User:</span><b>{me.username}</b></div>
-                        <div className="row"><span>Email:</span><b>{me.email}</b></div>
-                        <div className="row"><span>Company:</span><b>{me.companyName ?? '—'}</b></div>
-                        <div className="row"><span>Role:</span><b>{me.admin ? 'Admin' : 'User'}</b></div>
+                        <div className="row">
+                            <span>User:</span>
+                            <b>{me.username}</b>
+                        </div>
+                        <div className="row">
+                            <span>Email:</span>
+                            <b>{me.email}</b>
+                        </div>
+                        <div className="row">
+                            <span>Company:</span>
+                            <b>{me.companyName ?? '—'}</b>
+                        </div>
+                        <div className="row">
+                            <span>Role:</span>
+                            <b>{me.admin ? 'Admin' : 'User'}</b>
+                        </div>
                     </div>
 
                     {me.admin && (

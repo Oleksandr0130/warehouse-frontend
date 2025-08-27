@@ -7,13 +7,36 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
-.subscription-banner b {
-    color: #856404;
+.subscription-banner.ending {
+    background: #ffe8a1;
+    border-color: #ffd66b;
 }
 
-.subscription-banner button {
+.sub-title {
+    font-weight: 600;
+    color: #6b5300;
+}
+
+.sub-warning {
+    font-size: 0.95rem;
+    color: #6b5300;
+}
+
+.sub-warning a {
+    text-decoration: underline;
+}
+
+.sub-actions {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.subscription-banner .button {
     margin-left: 12px;
     background: #ffc107;
     color: #212529;
@@ -23,6 +46,20 @@
     cursor: pointer;
 }
 
-.subscription-banner button:hover {
+.subscription-banner .button:hover {
     background: #e0a800;
+}
+
+.subscription-banner .button.outline {
+    background: transparent;
+    border: 1px solid #e0a800;
+}
+
+.subscription-banner .button.outline:hover {
+    background: #fff7d1;
+}
+
+.sub-hint {
+    color: #6b5300;
+    opacity: 0.9;
 }

@@ -9,6 +9,7 @@ import {
     getErrorMessage,
 } from '../api';
 import { toast } from 'react-toastify';
+import '../styles/SubscriptionBanner.css';
 
 interface Props {
     embedded?: boolean;
@@ -31,6 +32,12 @@ export default function SubscriptionBanner({ embedded }: Props) {
         void load();
     }, []);
 
+    const endingSoon = useMemo(() => {
+        if (!status) return false;
+        const days = typeof status.daysLeft === 'number' ? status.daysLeft : 9999;
+        return (status.status === 'TRIAL' || status.status === 'ACTIVE') && days <= 2;
+    }, [status]);
+
     const title = useMemo(() => {
         if (!status) return '';
         switch (status.status) {
@@ -44,6 +51,8 @@ export default function SubscriptionBanner({ embedded }: Props) {
                 return 'Sign in to subscribe';
             case 'NO_COMPANY':
                 return 'No company';
+            default:
+                return '';
         }
     }, [status]);
 
@@ -59,7 +68,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
         }
     };
 
-    // One-off: BLIK/PLN (и Przelewy24)
+    // One-off: BLIK/PLN
     const onPayBlik = async () => {
         try {
             setLoading(true);
@@ -75,7 +84,6 @@ export default function SubscriptionBanner({ embedded }: Props) {
     const onManage = async () => {
         try {
             setLoading(true);
-            // Вариант 1: используем portalUrl (без изменения бэка)
             const { portalUrl } = await openBillingPortal(window.location.href);
             window.location.href = portalUrl;
         } catch (e: unknown) {
@@ -88,7 +96,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
     if (!status) return null;
 
     return (
-        <div className={`subscription-banner ${embedded ? 'embedded' : ''}`}>
+        <div className={`subscription-banner ${embedded ? 'embedded' : ''} ${endingSoon ? 'ending' : ''}`}>
             <div className="sub-title">{title}</div>
 
             {!!status.pendingInvoiceUrl && (
@@ -103,20 +111,15 @@ export default function SubscriptionBanner({ embedded }: Props) {
             <div className="sub-actions">
                 {status.isAdmin ? (
                     status.status === 'ACTIVE' ? (
-                        <button className="subscription-banner button" onClick={onManage} disabled={loading}>
+                        <button className="button" onClick={onManage} disabled={loading}>
                             Manage / Cancel
                         </button>
                     ) : (
                         <>
-                            <button className="subscription-banner button" onClick={onPay} disabled={loading}>
+                            <button className="button" onClick={onPay} disabled={loading}>
                                 Subscribe
                             </button>
-                            <button
-                                className="sub-btn outline"
-                                onClick={onPayBlik}
-                                disabled={loading}
-                                style={{ marginLeft: 8 }}
-                            >
+                            <button className="button outline" onClick={onPayBlik} disabled={loading} style={{ marginLeft: 8 }}>
                                 Pay with BLIK (PLN)
                             </button>
                         </>
