@@ -1,4 +1,3 @@
-// src/api.ts
 import axios, {
     AxiosError,
     AxiosRequestConfig,
@@ -27,16 +26,11 @@ export interface BillingStatusDto {
     currentPeriodEnd?: string;
     daysLeft?: number;
     isAdmin?: boolean;
-    pendingCheckoutUrl?: string;
-    pendingInvoiceUrl?: string;
+    // billingCurrency?: 'PLN' | 'EUR'; // опционально, если начнёшь отдавать с бэка
 }
 
 export interface CheckoutResponse {
     checkoutUrl: string;
-}
-
-export interface PortalResponse {
-    portalUrl: string;
 }
 
 export interface MeDto {
@@ -70,7 +64,6 @@ export const getErrorMessage = (e: unknown): string => {
 };
 
 const setAuthHeader = (headers: AxiosRequestHeaders, token: string) => {
-    // AxiosRequestHeaders поддерживает индекс по строковому ключу
     headers['Authorization'] = `Bearer ${token}`;
 };
 
@@ -91,8 +84,11 @@ export const fetchReservationsByOrderPrefix = async (
     return response.data;
 };
 
-export const createOneOffCheckout = async (): Promise<CheckoutResponse> => {
-    const { data } = await api.post<CheckoutResponse>('/billing/checkout-oneoff');
+export const createOneOffCheckout = async (
+    currency?: 'PLN' | 'EUR'
+): Promise<CheckoutResponse> => {
+    const query = currency ? `?currency=${encodeURIComponent(currency)}` : '';
+    const { data } = await api.post<CheckoutResponse>(`/billing/checkout-oneoff${query}`);
     return data;
 };
 
@@ -120,19 +116,8 @@ export const fetchBillingStatus = async (): Promise<BillingStatusDto> => {
     return data;
 };
 
-export const createCheckout = async (): Promise<CheckoutResponse> => {
-    const { data } = await api.post<CheckoutResponse>('/billing/checkout');
-    return data;
-};
-
-export const openBillingPortal = async (
-    returnUrl: string
-): Promise<PortalResponse> => {
-    const { data } = await api.post<PortalResponse>('/billing/portal', {
-        return_url: returnUrl,
-    });
-    return data;
-};
+// УДАЛЕНО: createCheckout()
+// УДАЛЕНО: openBillingPortal()
 
 /* ===================== Профиль / Админ ===================== */
 

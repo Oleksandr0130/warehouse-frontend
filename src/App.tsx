@@ -1,4 +1,3 @@
-// src/App.tsx
 import { JSX, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
@@ -66,8 +65,8 @@ function App() {
             toast.warn(
                 res.status === 'TRIAL'
                     ? `Your trial ends in ${daysLeft} day(s).`
-                    : `Your subscription period ends in ${daysLeft} day(s).`,
-            { toastId: 'billing-warn' }
+                    : `Your access period ends in ${daysLeft} day(s).`,
+                { toastId: 'billing-warn' }
             );
         } catch {
             /* ignore */

@@ -1,10 +1,7 @@
-// src/components/SubscriptionBanner.tsx
 import { useEffect, useMemo, useState } from 'react';
 import '../styles/SubscriptionBanner.css';
 import {
     fetchBillingStatus,
-    createCheckout,
-    openBillingPortal,
     createOneOffCheckout,
     BillingStatusDto,
     getErrorMessage,
@@ -15,14 +12,25 @@ interface Props {
     embedded?: boolean;
 }
 
+type Currency = 'PLN' | 'EUR';
+
 export default function SubscriptionBanner({ embedded }: Props) {
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState<BillingStatusDto | null>(null);
+    const [currency, setCurrency] = useState<Currency>('EUR');
 
     const load = async () => {
         try {
             const s = await fetchBillingStatus();
             setStatus(s);
+
+            // если бек уже начнёт отдавать валюту компании — подхватим её
+            const anyS = s as any;
+            if (anyS?.billingCurrency === 'PLN' || anyS?.billingCurrency === 'EUR') {
+                setCurrency(anyS.billingCurrency);
+            } else if (navigator.language?.toLowerCase().startsWith('pl')) {
+                setCurrency('PLN');
+            }
         } catch (e: unknown) {
             toast.error(getErrorMessage(e));
         }
@@ -43,11 +51,11 @@ export default function SubscriptionBanner({ embedded }: Props) {
             case 'TRIAL':
                 return `Trial • ${status.daysLeft ?? 0} days left`;
             case 'ACTIVE':
-                return `Subscription active • ${status.daysLeft ?? 0} days left`;
+                return `Access active • ${status.daysLeft ?? 0} days left`;
             case 'EXPIRED':
-                return 'Subscription expired';
+                return 'Access expired';
             case 'ANON':
-                return 'Sign in to subscribe';
+                return 'Sign in to purchase';
             case 'NO_COMPANY':
                 return 'No company';
         }
@@ -66,36 +74,11 @@ export default function SubscriptionBanner({ embedded }: Props) {
         return isEnding ? `${base} ending` : base;
     }, [status, isEnding]);
 
-    const onPay = async () => {
+    const onPayCurrency = async (cur: Currency) => {
         try {
             setLoading(true);
-            const { checkoutUrl } = await createCheckout();
+            const { checkoutUrl } = await createOneOffCheckout(cur);
             window.location.href = checkoutUrl;
-        } catch (e: unknown) {
-            toast.error(getErrorMessage(e));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // One-off: BLIK/PLN (и Przelewy24)
-    const onPayBlik = async () => {
-        try {
-            setLoading(true);
-            const { checkoutUrl } = await createOneOffCheckout();
-            window.location.href = checkoutUrl;
-        } catch (e: unknown) {
-            toast.error(getErrorMessage(e));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const onManage = async () => {
-        try {
-            setLoading(true);
-            const { portalUrl } = await openBillingPortal(window.location.href);
-            window.location.href = portalUrl;
         } catch (e: unknown) {
             toast.error(getErrorMessage(e));
         } finally {
@@ -134,31 +117,38 @@ export default function SubscriptionBanner({ embedded }: Props) {
                     </div>
                 )}
 
-                {!!status.pendingInvoiceUrl && (
-                    <div className="sub-warning">
-                        Payment requires additional confirmation.&nbsp;
-                        <a href={status.pendingInvoiceUrl} target="_blank" rel="noreferrer">
-                            Complete authentication
-                        </a>
-                    </div>
-                )}
-
                 <div className="sub-actions">
                     {status.isAdmin ? (
-                        status.status === 'ACTIVE' ? (
-                            <button className="sub-btn" onClick={onManage} disabled={loading}>
-                                Manage / Cancel
-                            </button>
-                        ) : (
-                            <div>
-                                <button className="sub-btn" onClick={onPay} disabled={loading}>
-                                    Subscribe
-                                </button>
-                                <button className="sub-btn" onClick={onPayBlik} disabled={loading} style={{ marginLeft: 8 }}>
-                                    Pay with BLIK (PLN)
+                        <div className="sub-actions-row">
+                            <div className="sub-currency-toggle">
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="currency"
+                                        value="EUR"
+                                        checked={currency === 'EUR'}
+                                        onChange={() => setCurrency('EUR')}
+                                    />
+                                    EUR
+                                </label>
+                                <label style={{ marginLeft: 12 }}>
+                                    <input
+                                        type="radio"
+                                        name="currency"
+                                        value="PLN"
+                                        checked={currency === 'PLN'}
+                                        onChange={() => setCurrency('PLN')}
+                                    />
+                                    PLN
+                                </label>
+                            </div>
+
+                            <div style={{ marginTop: 8 }}>
+                                <button className="sub-btn" onClick={() => onPayCurrency(currency)} disabled={loading}>
+                                    {currency === 'EUR' ? 'Buy 1 month (EUR · card)' : 'Zapłać 1 miesiąc (PLN · karta/BLIK)'}
                                 </button>
                             </div>
-                        )
+                        </div>
                     ) : (
                         <div className="sub-hint">Extension is available to the company administrator</div>
                     )}
@@ -172,32 +162,38 @@ export default function SubscriptionBanner({ embedded }: Props) {
         <div className={`subscription-banner ${isEnding ? 'sub-ending' : ''}`}>
             <div>
                 <div className="sub-title">{title}</div>
-                {!!status.pendingInvoiceUrl && (
-                    <div className="sub-warning" style={{ marginBottom: 0 }}>
-                        Payment requires additional confirmation.&nbsp;
-                        <a href={status.pendingInvoiceUrl} target="_blank" rel="noreferrer">
-                            Complete authentication
-                        </a>
-                    </div>
-                )}
             </div>
 
             <div className="sub-actions">
                 {status.isAdmin ? (
-                    status.status === 'ACTIVE' ? (
-                        <button className="subscription-banner button" onClick={onManage} disabled={loading}>
-                            Manage / Cancel
+                    <>
+                        <div className="sub-currency-toggle" style={{ marginRight: 12 }}>
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="currency"
+                                    value="EUR"
+                                    checked={currency === 'EUR'}
+                                    onChange={() => setCurrency('EUR')}
+                                />
+                                EUR
+                            </label>
+                            <label style={{ marginLeft: 12 }}>
+                                <input
+                                    type="radio"
+                                    name="currency"
+                                    value="PLN"
+                                    checked={currency === 'PLN'}
+                                    onChange={() => setCurrency('PLN')}
+                                />
+                                PLN
+                            </label>
+                        </div>
+
+                        <button className="subscription-banner button" onClick={() => onPayCurrency(currency)} disabled={loading}>
+                            {currency === 'EUR' ? 'Buy 1 month (EUR · card)' : 'Zapłać 1 miesiąc (PLN · karta/BLIK)'}
                         </button>
-                    ) : (
-                        <>
-                            <button className="subscription-banner button" onClick={onPay} disabled={loading}>
-                                Subscribe
-                            </button>
-                            <button className="subscription-banner button" onClick={onPayBlik} disabled={loading}>
-                                Pay with BLIK (PLN)
-                            </button>
-                        </>
-                    )
+                    </>
                 ) : (
                     <div className="sub-hint">Extension is available to the company administrator</div>
                 )}
