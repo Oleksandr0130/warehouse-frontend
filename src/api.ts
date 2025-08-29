@@ -19,6 +19,7 @@ const api = axios.create({
 /* ===================== Типы ===================== */
 
 export type BillingState = 'TRIAL' | 'ACTIVE' | 'EXPIRED' | 'ANON' | 'NO_COMPANY';
+export type Currency = 'PLN' | 'EUR';
 
 export interface BillingStatusDto {
     status: BillingState;
@@ -26,7 +27,8 @@ export interface BillingStatusDto {
     currentPeriodEnd?: string;
     daysLeft?: number;
     isAdmin?: boolean;
-    // billingCurrency?: 'PLN' | 'EUR'; // опционально, если начнёшь отдавать с бэка
+    /** если бэк отдаёт закреплённую валюту компании */
+    billingCurrency?: Currency;
 }
 
 export interface CheckoutResponse {
@@ -85,7 +87,7 @@ export const fetchReservationsByOrderPrefix = async (
 };
 
 export const createOneOffCheckout = async (
-    currency?: 'PLN' | 'EUR'
+    currency?: Currency
 ): Promise<CheckoutResponse> => {
     const query = currency ? `?currency=${encodeURIComponent(currency)}` : '';
     const { data } = await api.post<CheckoutResponse>(`/billing/checkout-oneoff${query}`);
@@ -116,8 +118,7 @@ export const fetchBillingStatus = async (): Promise<BillingStatusDto> => {
     return data;
 };
 
-// УДАЛЕНО: createCheckout()
-// УДАЛЕНО: openBillingPortal()
+// подписочные методы удалены
 
 /* ===================== Профиль / Админ ===================== */
 
@@ -153,8 +154,10 @@ api.interceptors.request.use(
 );
 
 // response: обновление accessToken по 401 + мягкий редирект по 402
+import type { AxiosResponse } from 'axios'; // чтобы не было any в коллбеках
+
 api.interceptors.response.use(
-    (response) => response,
+    (response: AxiosResponse) => response,
     async (error: AxiosError) => {
         const originalRequest = (error.config ?? {}) as AxiosRequestConfig & {
             _retry?: boolean;
@@ -207,7 +210,7 @@ api.interceptors.response.use(
 // 402 → мягкий редирект на /app/account (не для /api/billing/*)
 let subscriptionRedirectScheduled = false;
 api.interceptors.response.use(
-    (res) => res,
+    (res: AxiosResponse) => res,
     (err: AxiosError) => {
         const status = err.response?.status;
         const headersObj: Record<string, unknown> =

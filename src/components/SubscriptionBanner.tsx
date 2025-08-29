@@ -4,6 +4,7 @@ import {
     fetchBillingStatus,
     createOneOffCheckout,
     BillingStatusDto,
+    Currency,
     getErrorMessage,
 } from '../api';
 import { toast } from 'react-toastify';
@@ -12,7 +13,9 @@ interface Props {
     embedded?: boolean;
 }
 
-type Currency = 'PLN' | 'EUR';
+function isCurrency(v: unknown): v is Currency {
+    return v === 'PLN' || v === 'EUR';
+}
 
 export default function SubscriptionBanner({ embedded }: Props) {
     const [loading, setLoading] = useState(false);
@@ -24,10 +27,9 @@ export default function SubscriptionBanner({ embedded }: Props) {
             const s = await fetchBillingStatus();
             setStatus(s);
 
-            // если бек уже начнёт отдавать валюту компании — подхватим её
-            const anyS = s as any;
-            if (anyS?.billingCurrency === 'PLN' || anyS?.billingCurrency === 'EUR') {
-                setCurrency(anyS.billingCurrency);
+            // без any: используем type guard
+            if (isCurrency(s.billingCurrency)) {
+                setCurrency(s.billingCurrency);
             } else if (navigator.language?.toLowerCase().startsWith('pl')) {
                 setCurrency('PLN');
             }
@@ -86,7 +88,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
         }
     };
 
-    // Skeleton пока статус грузится
+    // Skeleton
     if (!status) {
         return (
             <div className={embedded ? 'sub-card sub-skeleton' : 'subscription-banner sub-skeleton'}>
@@ -96,7 +98,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
         );
     }
 
-    // === EMBEDDED ВАРИАНТ (карточка) ===
+    // Embedded
     if (embedded) {
         return (
             <div className={`sub-card ${isEnding ? 'sub-ending' : ''}`}>
@@ -157,7 +159,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
         );
     }
 
-    // === КОМПАКТНЫЙ БАННЕР ===
+    // Banner
     return (
         <div className={`subscription-banner ${isEnding ? 'sub-ending' : ''}`}>
             <div>
