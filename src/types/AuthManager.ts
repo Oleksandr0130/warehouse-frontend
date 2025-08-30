@@ -1,25 +1,57 @@
+// AuthManager.ts
 import axios from 'axios';
 
-/**
- * Cookie-only схема:
- * - НЕ используем localStorage
- * - НЕ выставляем Authorization
- * - Просто проверяем сессию запросом к /users/me
- */
+const BASE_URL = '/api'; // Базовый URL для обработки токенов
 
-const BASE_URL = import.meta.env.VITE_API_BASE ?? '/api';
+const getAccessToken = () => localStorage.getItem('accessToken');
+const getRefreshToken = () => localStorage.getItem('refreshToken');
 
-export const validateTokens = async (): Promise<boolean> => {
-    try {
-        await axios.get(`${BASE_URL}/users/me`, { withCredentials: true });
-        return true;
-    } catch {
-        return false;
+const setTokens = (accessToken: string, refreshToken: string) => {
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+};
+
+const clearTokens = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+};
+
+// Проверка токенов
+const validateTokens = async (): Promise<boolean> => {
+    const accessToken = getAccessToken();
+    const refreshToken = getRefreshToken();
+
+    if (!refreshToken) {
+        return false; // Refresh Token отсутствует
+    }
+
+    if (!accessToken) {
+        // Если Access Token истёк, пытаемся обновить
+        try {
+            const response = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
+            setTokens(response.data.accessToken, response.data.refreshToken);
+            return true;
+        } catch (error) {
+            console.error('Ошибка обновления токенов:', error);
+            clearTokens();
+            return false;
+        }
+    }
+
+    return true; // Токены валидны
+};
+
+// Автоматическое обновление токена
+const refreshTokensIfNeeded = async () => {
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+        await validateTokens();
     }
 };
 
-export const logout = () => {
-    // В cookie-схеме обычно серверный logout не обязателен.
-    // Если на бэке будет /auth/logout (чистит cookies) — можно дернуть его тут.
-    // axios.post(`${BASE_URL}/auth/logout`, null, { withCredentials: true }).catch(() => {});
+// Выход
+const logout = () => {
+    clearTokens();
 };
+
+export { validateTokens, refreshTokensIfNeeded, logout };
