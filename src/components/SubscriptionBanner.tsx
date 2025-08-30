@@ -27,7 +27,6 @@ export default function SubscriptionBanner({ embedded }: Props) {
             const s = await fetchBillingStatus();
             setStatus(s);
 
-            // без any: используем type guard
             if (isCurrency(s.billingCurrency)) {
                 setCurrency(s.billingCurrency);
             } else if (navigator.language?.toLowerCase().startsWith('pl')) {
@@ -76,6 +75,16 @@ export default function SubscriptionBanner({ embedded }: Props) {
         return isEnding ? `${base} ending` : base;
     }, [status, isEnding]);
 
+    // === Расчёт прогресса (для тёмной карточки)
+    // Показываем ДОЛЮ оставшихся дней. Базовый период — 30 дн. (fallback).
+    const progressPct = useMemo(() => {
+        if (!status || (status.status !== 'TRIAL' && status.status !== 'ACTIVE')) return 0;
+        const daysLeft = typeof status.daysLeft === 'number' ? status.daysLeft : 0;
+        const base = 30; // если API не даёт длительность периода, берём 30
+        const pct = Math.max(0, Math.min(100, (daysLeft / base) * 100));
+        return pct;
+    }, [status]);
+
     const onPayCurrency = async (cur: Currency) => {
         try {
             setLoading(true);
@@ -98,25 +107,31 @@ export default function SubscriptionBanner({ embedded }: Props) {
         );
     }
 
-    // Embedded
+    // Embedded (тёмная карточка + прогресс)
     if (embedded) {
         return (
             <div className={`sub-card ${isEnding ? 'sub-ending' : ''}`}>
                 <div className="sub-header">
-          <span className={pillClass}>
-            {status.status === 'TRIAL' && 'Trial'}
-              {status.status === 'ACTIVE' && 'Active'}
-              {status.status === 'EXPIRED' && 'Expired'}
-              {status.status === 'ANON' && 'Anon'}
-              {status.status === 'NO_COMPANY' && 'No company'}
-          </span>
                     <div className="sub-title">{title}</div>
+                    <span className={pillClass}>
+            {status.status === 'TRIAL' && 'Trial'}
+                        {status.status === 'ACTIVE' && 'Active'}
+                        {status.status === 'EXPIRED' && 'Expired'}
+                        {status.status === 'ANON' && 'Anon'}
+                        {status.status === 'NO_COMPANY' && 'No company'}
+          </span>
                 </div>
 
                 {(status.status === 'TRIAL' || status.status === 'ACTIVE') && (
-                    <div className="sub-dates">
-                        {typeof status.daysLeft === 'number' ? `${status.daysLeft} days left` : ''}
-                    </div>
+                    <>
+                        <div className="sub-dates">
+                            {typeof status.daysLeft === 'number' ? `${status.daysLeft} days left` : ''}
+                        </div>
+
+                        <div className="sub-progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progressPct)}>
+                            <div className="sub-progress-fill" style={{ width: `${progressPct}%` }} />
+                        </div>
+                    </>
                 )}
 
                 <div className="sub-actions">
@@ -159,7 +174,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
         );
     }
 
-    // Banner
+    // Banner (оставил как было)
     return (
         <div className={`subscription-banner ${isEnding ? 'sub-ending' : ''}`}>
             <div>

@@ -1,3 +1,4 @@
+/* ===== Banner (вне embedded) — без изменений ===== */
 .subscription-banner {
     padding: 12px;
     background: #fff3cd;
@@ -9,9 +10,7 @@
     justify-content: space-between;
 }
 
-.subscription-banner b {
-    color: #856404;
-}
+.subscription-banner b { color: #856404; }
 
 .subscription-banner button {
     margin-left: 12px;
@@ -22,55 +21,69 @@
     border-radius: 6px;
     cursor: pointer;
 }
+.subscription-banner button:hover { background: #e0a800; }
 
-.subscription-banner button:hover {
-    background: #e0a800;
-}
-/* === Subscription (embedded) === */
+/* ===== Embedded (Вариант 1: тёмная карточка + прогресс) ===== */
 .sub-card {
-    background: linear-gradient(180deg, #fff7e6 0%, #fff 100%);
-    border: 1px solid #ffe7ba;
+    background: #0f172a;                 /* глубокий тёмный */
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: 14px;
-    padding: 16px;
+    padding: 20px;
     display: grid;
-    gap: 10px;
-    box-shadow: 0 4px 14px rgba(255, 193, 7, 0.12);
+    gap: 12px;
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
 }
 
 .sub-header {
     display: flex;
-    gap: 10px;
     align-items: center;
-}
-
-.sub-pill {
-    font-size: 12px;
-    line-height: 1;
-    padding: 6px 10px;
-    border-radius: 999px;
-    border: 1px solid rgba(0,0,0,0.08);
-    background: #fffbe6;
-}
-
-.sub-pill.trial { background: #e7f5ff; }
-.sub-pill.expired { background: #fff1f0; }
-.sub-pill.anon, .sub-pill.no_company { background: #f8f9fa; }
-
-.sub-dates {
-    font-size: 12px;
-    color: #667085;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .sub-title {
     font-weight: 600;
     font-size: 16px;
+    color: #e5e7eb;
 }
 
-.sub-actions {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.sub-pill {
+    font-size: 12px;
+    line-height: 1;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: #16a34a;                 /* Active — зелёная */
+    color: #fff;
+    font-weight: 600;
 }
+.sub-pill.trial { background: #0ea5e9; }     /* Trial — голубая */
+.sub-pill.expired { background: #ef4444; }   /* Expired — красная */
+.sub-pill.anon, .sub-pill.no_company { background: #334155; }
+
+.sub-dates {
+    font-size: 13px;
+    color: #cbd5e1;
+}
+
+/* Прогресс-бар (показывает ОСТАТОК дней) */
+.sub-progress {
+    background: #1f2937;
+    border-radius: 8px;
+    height: 8px;
+    overflow: hidden;
+}
+.sub-progress-fill {
+    background: #0d6efd;
+    height: 100%;
+    width: 0%;                             /* задаём inline-стилем из TS */
+    border-radius: 8px;
+    transition: width .3s ease;
+}
+
+/* Блок действий */
+.sub-actions { display: grid; gap: 8px; }
 
 .sub-btn {
     padding: 10px 14px;
@@ -79,54 +92,42 @@
     background: #0d6efd;
     color: #fff;
     cursor: pointer;
+    font-weight: 600;
 }
+.sub-btn:hover { opacity: .92; }
 
-.sub-btn:hover { opacity: .95; }
-
-.sub-hint {
-    font-size: 13px;
-    color: #6c757d;
+/* Тоггл валюты */
+.sub-currency-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #e5e7eb;
 }
+.sub-currency-toggle input { accent-color: #0d6efd; }
+
+.sub-hint { font-size: 13px; color: #9ca3af; }
 
 /* Skeleton */
-.sub-skeleton {
-    position: relative;
-    overflow: hidden;
-}
-
+.sub-skeleton { position: relative; overflow: hidden; }
 .sub-skel-line {
     height: 14px;
-    background: #f1f3f5;
+    background: #1f2937;
     border-radius: 6px;
     margin-bottom: 8px;
 }
+.sub-skel-line.short { width: 40%; }
 
-.sub-skel-line.short {
-    width: 40%;
+/* Когда период вот-вот закончится */
+.sub-ending .sub-title { color: #fde68a; }
+.sub-pill.ending {
+    background: #f59e0b !important;
+    color: #111827 !important;
 }
 
-/* Вариант на всю ширину (если когда-то решите показывать вне аккаунта) */
+/* Доп. вариант баннера на всю ширину — оставлен без изменений */
 .sub-banner {
     padding: 14px 16px;
     border: 1px dashed #ffe7ba;
     border-radius: 12px;
     background: #fffdf5;
-}
-/* Внимание: период заканчивается скоро */
-.sub-warning {
-    margin-top: 8px;
-    padding: 10px 12px;
-    background: #fff3cd;           /* жёлтый alert */
-    border: 1px solid #ffecb5;
-    color: #664d03;
-    border-radius: 8px;
-    font-weight: 600;
-}
-
-.sub-ending .sub-title { color: #8a6d1a; }
-
-/* Подсветка плашки статуса, когда скоро конец */
-.sub-pill.ending {
-    background: #ffc107 !important;
-    color: #222 !important;
 }
