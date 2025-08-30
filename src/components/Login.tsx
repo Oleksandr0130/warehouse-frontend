@@ -93,7 +93,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                         <input
                             type="text"
                             name="username"
-                            placeholder="Email"
+                            placeholder="User"
                             value={credentials.username}
                             onChange={handleChange}
                             onKeyDown={handleKeyDown}
