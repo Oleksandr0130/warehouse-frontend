@@ -1,12 +1,5 @@
 import { JSX, useEffect, useState } from 'react';
-import {
-    BrowserRouter as Router,
-    Routes,
-    Route,
-    Navigate,
-    useNavigate,
-    useLocation,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import Register from './components/Register';
@@ -20,19 +13,8 @@ import { toast, ToastContainer } from 'react-toastify';
 import { fetchBillingStatus } from './api';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
-    const [ready, setReady] = useState(false);
-    const [ok, setOk] = useState<boolean | null>(null);
-
-    useEffect(() => {
-        (async () => {
-            const valid = await validateTokens();
-            setOk(valid);
-            setReady(true);
-        })();
-    }, []);
-
-    if (!ready) return null; // сюда можно вставить спиннер/скелетон
-    if (!ok) return <Navigate to="/login" replace />;
+    const token = localStorage.getItem('token');
+    if (!token) return <Navigate to="/login" replace />;
     return children;
 }
 
@@ -68,11 +50,8 @@ function App() {
         try {
             const res = await fetchBillingStatus();
             const endRaw =
-                res.status === 'TRIAL'
-                    ? res.trialEnd
-                    : res.status === 'ACTIVE'
-                        ? res.currentPeriodEnd
-                        : undefined;
+                res.status === 'TRIAL' ? res.trialEnd :
+                    res.status === 'ACTIVE' ? res.currentPeriodEnd : undefined;
             if (!endRaw) return;
 
             const daysLeft =
@@ -97,7 +76,7 @@ function App() {
     const handleAuthSuccess = () => {
         setIsAuthenticated(true);
         toast.success('Successful Login!', { toastId: 'auth-login' });
-        // куки уже выставлены сервером; просто покажем предупреждение при необходимости
+        // на всякий случай в следующий тик — чтобы токен точно попал в localStorage
         setTimeout(() => warnOnLogin(), 0);
     };
 
