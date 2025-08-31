@@ -23,6 +23,7 @@ function App() {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // глобальный выход по событию
     useEffect(() => {
         const onLogout = () => {
             setIsAuthenticated(false);
@@ -37,16 +38,23 @@ function App() {
         return () => window.removeEventListener('auth:logout', onLogout);
     }, [navigate, location.pathname]);
 
+    // инициализация: пытаемся освежить сессию и проверить её
     useEffect(() => {
         const init = async () => {
-            // Попробуем «подтянуть» сессию, если есть refresh-кука
-            await touchSession();
-            const valid = await validateSession();
+            await touchSession(); // если был refresh-куки — обновит AccessToken
+            const valid = await validateSession(); // GET /users/me
             setIsAuthenticated(valid);
             if (valid) sessionStorage.setItem('isAuthed', '1');
         };
         init();
     }, []);
+
+    // если уже аутентифицированы и на /login — переходим в /app
+    useEffect(() => {
+        if (isAuthenticated && location.pathname === '/login') {
+            navigate('/app', { replace: true });
+        }
+    }, [isAuthenticated, location.pathname, navigate]);
 
     // тост при входе, если осталось ≤ 2 дней (TRIAL/ACTIVE)
     const warnOnLogin = async () => {
@@ -76,19 +84,28 @@ function App() {
         }
     };
 
+    // вызывается компонентом <Login /> после 200 OK от /auth/login
     const handleAuthSuccess = async () => {
-        // После успешного /auth/login проверим сессию
+        // 1) на всякий случай освежим сессию и проверим её
+        await touchSession();
         const valid = await validateSession();
+        // 2) считаем пользователя аутентифицированным, ставим флаг и тост
         setIsAuthenticated(valid);
         if (valid) {
             sessionStorage.setItem('isAuthed', '1');
             toast.success('Successful Login!', { toastId: 'auth-login' });
-            setTimeout(() => warnOnLogin(), 0);
+            // 3) сразу переводим на /app (не ждём внешних редиректов)
+            navigate('/app', { replace: true });
+            // 4) поднимем предупреждение по биллингу
+            setTimeout(() => { void warnOnLogin(); }, 0);
+        } else {
+            // если вдруг куки не встали — сообщим и оставим на /login
+            toast.error('Login failed: no session detected.');
         }
     };
 
     const handleLogout = async () => {
-        await apiLogout(); // попросим сервер «почистить» куки
+        await apiLogout(); // попросим сервер очистить куки
         setIsAuthenticated(false);
         sessionStorage.removeItem('isAuthed');
         toast.info('Successful Logout!', { toastId: 'auth-logout' });
@@ -97,10 +114,17 @@ function App() {
 
     return (
         <>
-            <ToastContainer position="top-right" autoClose={4000} newestOnTop limit={3} />
+            <ToastContainer position="top-right" autoClose={2000} newestOnTop limit={3} />
             <Routes>
-                {/* публичные */}
-                <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
+                {/* /login: если уже вошёл — редиректим в /app */}
+                <Route
+                    path="/login"
+                    element={
+                        isAuthenticated
+                            ? <Navigate to="/app" replace />
+                            : <Login onSuccess={handleAuthSuccess} />
+                    }
+                />
                 <Route path="/register" element={<Register onSuccess={() => {}} />} />
                 <Route path="/confirmed" element={<Confirmation />} />
 
