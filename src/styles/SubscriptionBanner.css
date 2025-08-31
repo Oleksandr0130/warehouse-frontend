@@ -84,6 +84,20 @@
     color: var(--sb-fg);
     background: rgba(148,163,184,.1);
 }
+.sub-pill.active{
+    color: #22c55e;                                   /* текст */
+    border-color: rgba(34,197,94,.35);                /* рамка */
+    background: rgba(34,197,94,.12);                  /* фон */
+}
+
+/* (необязательно) маленькая зелёная точка слева */
+.sub-pill.active::before{
+    content:"";
+    width:6px; height:6px;
+    border-radius:999px;
+    background:#22c55e;
+    box-shadow:0 0 0 3px rgba(34,197,94,.18);
+}
 .sub-pill.trial     { color: #fbbf24; border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.12); }
 .sub-pill.expired   { color: var(--sb-red); border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.12); }
 .sub-pill.anon      { color: #38bdf8; border-color: rgba(56,189,248,.35); background: rgba(56,189,248,.12); }

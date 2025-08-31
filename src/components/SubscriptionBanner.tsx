@@ -66,7 +66,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
         if (!status) return 'sub-pill';
         const map: Record<NonNullable<BillingStatusDto['status']>, string> = {
             TRIAL: 'sub-pill trial',
-            ACTIVE: 'sub-pill',
+            ACTIVE: 'sub-pill active',
             EXPIRED: 'sub-pill expired',
             ANON: 'sub-pill anon',
             NO_COMPANY: 'sub-pill no_company',

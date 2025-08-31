@@ -1,16 +1,18 @@
-/* src/styles/AddItemForm.css */
-
 .add-item-form {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     padding: 24px;
-    max-width: 480px;
-    margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: 18px;
+    box-sizing: border-box;
+    overflow-x: hidden; /* защита от горизонтального скролла */
 }
+.add-item-form *, .add-item-form *::before, .add-item-form *::after { box-sizing: border-box; }
 
 .add-item-title {
     font-size: 1.3rem;
@@ -22,15 +24,15 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+    min-width: 0;
 }
-
 .form-group label {
     font-size: 0.9rem;
     font-weight: 500;
     color: #334155;
 }
-
 .form-group input {
+    width: 100%;          /* важное: не выходить за края */
     height: 44px;
     border-radius: 12px;
     border: 1px solid #e5e7eb;
@@ -39,7 +41,6 @@
     background: #f9fafb;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
 .form-group input:focus {
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37,99,235,0.25);
@@ -57,12 +58,13 @@
     font-size: 1rem;
     cursor: pointer;
     transition: background 0.2s ease, transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
 }
+.submit-btn:hover { background: #1e40af; }
+.submit-btn:active { transform: scale(0.98); }
 
-.submit-btn:hover {
-    background: #1e40af;
-}
-
-.submit-btn:active {
-    transform: scale(0.98);
+/* мобильные правки */
+@media (max-width: 480px) {
+    .add-item-form { padding: 16px; gap: 14px; }
+    .add-item-title { font-size: 1.15rem; }
 }
