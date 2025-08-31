@@ -1,5 +1,5 @@
 import React from 'react';
-import './DashboardCards.css';
+import '../styles/DashboardCards.css';
 
 type Props = {
     itemsCount: number;
