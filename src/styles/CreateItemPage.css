@@ -1,0 +1,68 @@
+/* CreateItemPage.css */
+/* Страница прозрачная — фон глобальный через body::before */
+.item-page{
+    position: relative;
+    width: 100%;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    color: #333;
+    overflow-x: hidden;
+    background: transparent;
+}
+
+/* НЕТ собственных градиентов/::before — используем глобальный фон */
+
+/* Карточка */
+.item-card{
+    width: 100%;
+    max-width: 560px;
+    padding: 24px 20px 16px;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 16px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+}
+
+/* Кнопка сабмита формы */
+.item-card .add-item-form .submit-btn{
+    border-radius: 12px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+.item-card .add-item-form .submit-btn:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+/* Кнопки сканера */
+.item-card .scanner-buttons{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+}
+.item-card .scanner-buttons .btn{
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease, opacity .2s ease;
+}
+.item-card .scanner-buttons .btn:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+@media (max-width:480px){
+    .item-card{ padding: 18px 16px; }
+    .item-card .scanner-buttons{ grid-template-columns: 1fr; }
+}
