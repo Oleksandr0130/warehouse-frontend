@@ -6,7 +6,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { ReservedItem } from '../types/ReservedItem';
 import '../styles/ReservedItemList.css';
-
 import QRScanner from './QRScanner';
 
 interface ReservedItemsListProps {
@@ -18,6 +17,7 @@ interface ReservedItemsListProps {
 
 const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                                                                  reservedItems,
+                                                                 setReservedItems,
                                                                  onScan,
                                                                  onReservationRemoved,
                                                              }) => {
@@ -28,25 +28,50 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
         const q = String(query ?? '').trim().toLowerCase();
         if (!q) return reservedItems;
 
-        const contains = (v?: string | number | null) =>
-            String(v ?? '').toLowerCase().includes(q);
+        const contains = (v?: string | number | null) => String(v ?? '').toLowerCase().includes(q);
 
-        return reservedItems.filter(
-            (item) =>
-                contains(item.orderNumber) ||
-                contains(item.name) ||
-                contains(item.week) ||
-                contains(item.quantity)
+        return reservedItems.filter((item) =>
+            contains(item.orderNumber) ||
+            contains(item.name) ||
+            contains(item.week) ||
+            contains(item.quantity)
         );
     }, [reservedItems, query]);
 
+    // ---- удаление резервации (устойчивое к 204/текстовым ответам)
     const handleDelete = async (id: string) => {
         if (!confirm('Do you really want to delete this reservation?')) return;
+
         try {
             const res = await fetch(`/api/reservations/${id}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error('Failed to delete reservation');
+
+            if (!res.ok) {
+                // даже если сервер вернул текст ошибки — попробуем вытащить и показать
+                const maybeText = await res.text().catch(() => '');
+                throw new Error(maybeText || 'Failed to delete reservation');
+            }
+
+            const ct = res.headers.get('content-type') || '';
+
+            if (res.status === 204 || !ct.includes('application/json')) {
+                // Сервер ничего не вернул или вернул не-JSON -> убираем локально
+                const newList = reservedItems.filter((r) => r.id !== id);
+                setReservedItems(newList);
+                // Если нужно откатить количество на складе прямо сейчас,
+                // тут нечем кормить onReservationRemoved (нет itemId/returnedQuantity).
+                // Количество обновится при следующей загрузке или если бэкенд будет возвращать JSON.
+                toast.success('Reservation successfully deleted.');
+                return;
+            }
+
+            // Нормальный JSON-ответ с полями itemId и returnedQuantity
             const updated = await res.json();
-            onReservationRemoved(updated.itemId, updated.returnedQuantity);
+            if (updated?.itemId != null && updated?.returnedQuantity != null) {
+                onReservationRemoved(updated.itemId, updated.returnedQuantity);
+            }
+            // На всякий случай удалим локально и из списка
+            const newList = reservedItems.filter((r) => r.id !== id);
+            setReservedItems(newList);
             toast.success('Reservation successfully deleted.');
         } catch (err) {
             console.error(err);
@@ -84,16 +109,10 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                 </span>
                             </div>
                             <div className="reserved-item-actions">
-                                <button
-                                    onClick={() => setShowScanner(true)}
-                                    className="reserved-btn scan"
-                                >
+                                <button onClick={() => setShowScanner(true)} className="reserved-btn scan">
                                     Complete via QR
                                 </button>
-                                <button
-                                    onClick={() => handleDelete(item.id)}
-                                    className="reserved-btn delete"
-                                >
+                                <button onClick={() => handleDelete(item.id)} className="reserved-btn delete">
                                     Remove
                                 </button>
                             </div>
