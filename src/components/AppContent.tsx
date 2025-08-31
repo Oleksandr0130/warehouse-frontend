@@ -4,7 +4,6 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import '../styles/AppContent.css';
 import '../styles/CreateReservationPage.css';
-import '../styles/CreateItemPage.css';
 
 import ItemList from './ItemList';
 import ReservedItemsList from './ReservedItemsList';
