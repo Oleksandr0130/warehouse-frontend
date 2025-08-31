@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import '../styles/FileViewer.css'; // 👈 фикс опечатки в имени
+import '../styles/FileViewer.css';
 import api from '../api';
 
 interface QRFile {
@@ -64,6 +64,7 @@ const FileViewer: React.FC = () => {
         fetchReservationFiles();
     }, []);
 
+    // блокируем прокрутку под модалкой
     useEffect(() => {
         if (showModal) document.body.style.overflow = 'hidden';
         else document.body.style.overflow = '';
@@ -72,6 +73,7 @@ const FileViewer: React.FC = () => {
         };
     }, [showModal]);
 
+    // рисуем превью в canvas
     useEffect(() => {
         if (!showModal || !activeQrCode) return;
 
@@ -83,7 +85,7 @@ const FileViewer: React.FC = () => {
         const img = new Image();
         img.onload = () => {
             const maxW = Math.min(window.innerWidth * 0.92, 520);
-            const maxH = Math.min(window.innerHeight * 0.60, 520);
+            const maxH = Math.min(window.innerHeight * 0.6, 520);
             let drawW = img.width;
             let drawH = img.height;
 
@@ -142,9 +144,7 @@ const FileViewer: React.FC = () => {
     };
 
     const toggleSelectFile = (id: string) => {
-        setSelectedFiles((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-        );
+        setSelectedFiles((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
     };
 
     const toggleSelectReservation = (id: string) => {
@@ -219,9 +219,7 @@ const FileViewer: React.FC = () => {
         }
     };
 
-    const filteredQrFiles = qrFiles.filter((file) =>
-        file.id.toLowerCase().includes(searchTerm)
-    );
+    const filteredQrFiles = qrFiles.filter((file) => file.id.toLowerCase().includes(searchTerm));
 
     return (
         <div className="file-viewer">
@@ -239,8 +237,8 @@ const FileViewer: React.FC = () => {
                 </button>
             </div>
 
-            <section className="file-section">
-                <h2 className="file-title">Warehouse QR</h2>
+            <section className="file-section" role="region" aria-labelledby="fv-wh-title">
+                <h2 id="fv-wh-title" className="file-title">Warehouse QR</h2>
                 <ul className="file-grid">
                     {filteredQrFiles.map((file) => (
                         <li className="file-card" key={file.id}>
@@ -275,8 +273,8 @@ const FileViewer: React.FC = () => {
                 </ul>
             </section>
 
-            <section className="file-section">
-                <h2 className="file-title">Reserved QR</h2>
+            <section className="file-section" role="region" aria-labelledby="fv-rsv-title">
+                <h2 id="fv-rsv-title" className="file-title">Reserved QR</h2>
                 <ul className="file-grid">
                     {reservationFiles.map((file) => (
                         <li className="file-card reservation" key={file.id}>

@@ -1,21 +1,28 @@
-/* src/styles/FileViewer.css */
-
+/* Контейнер страницы FileViewer */
 .file-viewer {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     padding: 20px 24px;
+    box-sizing: border-box;
+    overflow-x: hidden; /* защита от горизонтального скролла на мобилках */
 }
 
-/* toolbar */
+/* ===== toolbar ===== */
 .file-toolbar {
     display: flex;
-    gap: 12px;
     align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;        /* кнопка переносится вниз на узких экранах */
     margin-bottom: 16px;
 }
-.search-input {
-    flex: 1;
+
+.file-viewer .search-input {
+    flex: 1 1 320px;
+    min-width: 0;
     height: 40px;
     padding: 0 14px;
     border-radius: 12px;
@@ -24,13 +31,14 @@
     font-size: 0.95rem;
     transition: border-color .2s ease, box-shadow .2s ease;
 }
-.search-input:focus {
+.file-viewer .search-input:focus {
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37,99,235,.2);
     outline: none;
 }
 
-.btn {
+/* локально-скомпонованные кнопки, чтобы не конфликтовали с другими .btn */
+.file-viewer .btn {
     height: 40px;
     padding: 0 16px;
     border-radius: 12px;
@@ -39,25 +47,26 @@
     cursor: pointer;
     border: 1px solid transparent;
     transition: .2s ease;
+    -webkit-tap-highlight-color: transparent;
 }
-.btn-primary {
+.file-viewer .btn-primary {
     background: #2563eb;
     color: #fff;
 }
-.btn-primary:hover { background: #1e40af; }
-.btn-outline {
+.file-viewer .btn-primary:hover { background: #1e40af; }
+.file-viewer .btn-outline {
     background: #f9fafb;
     color: #0f172a;
     border-color: #e5e7eb;
 }
-.btn-outline:hover { background: #f1f5f9; }
-.btn-danger {
+.file-viewer .btn-outline:hover { background: #f1f5f9; }
+.file-viewer .btn-danger {
     background: #ef4444;
     color: #fff;
 }
-.btn-danger:hover { background: #dc2626; }
+.file-viewer .btn-danger:hover { background: #dc2626; }
 
-/* sections */
+/* ===== секции ===== */
 .file-section + .file-section {
     margin-top: 20px;
 }
@@ -67,7 +76,7 @@
     margin-bottom: 12px;
 }
 
-/* grid of cards */
+/* ===== сетка карточек ===== */
 .file-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -75,7 +84,9 @@
     list-style: none;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
+
 .file-card {
     border: 1px solid #e5e7eb;
     border-radius: 14px;
@@ -86,6 +97,7 @@
     grid-template-rows: auto 1fr auto;
     gap: 10px;
     transition: transform .15s ease, box-shadow .15s ease;
+    min-width: 0; /* чтобы длинные имена не растягивали колонки */
 }
 .file-card:hover {
     transform: translateY(-2px);
@@ -96,7 +108,7 @@
     background: #eff6ff;
 }
 
-/* checkbox */
+/* чекбокс */
 .checkbox {
     display: inline-flex;
     align-items: center;
@@ -127,7 +139,7 @@
     transform: rotate(45deg);
 }
 
-/* QR thumbnail */
+/* превью QR */
 .qr-thumb {
     width: 100%;
     aspect-ratio: 1 / 1;
@@ -153,7 +165,7 @@
     white-space: nowrap;
 }
 
-/* modal preview */
+/* ===== модалка ===== */
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -169,11 +181,12 @@
     border-radius: 16px;
     padding: 16px;
     box-shadow: 0 12px 30px rgba(0,0,0,.15);
-    width: 92%;
-    max-width: 560px;
+    width: min(560px, 92vw);
+    max-height: 80vh;
     display: grid;
     gap: 12px;
     justify-items: center;
+    overflow: hidden;
 }
 .modal-canvas {
     width: 100%;
@@ -189,9 +202,25 @@
     width: 100%;
 }
 
-/* small tweaks */
-@media (max-width: 520px) {
-    .file-grid {
-        grid-template-columns: 1fr 1fr;
+/* ===== мобильные правки ===== */
+@media (max-width: 640px) {
+    .file-viewer { padding: 14px; }
+
+    .file-toolbar { gap: 10px; }
+
+    .file-viewer .search-input {
+        flex: 1 1 100%;
+        width: 100%;
     }
+    .file-viewer .btn-primary {
+        width: 100%;
+    }
+
+    .file-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+    }
+}
+@media (max-width: 520px) {
+    .file-grid { grid-template-columns: 1fr 1fr; }
 }

@@ -247,9 +247,9 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                                     onGoQRCodes={() => goInternal('files')}
                                 />
 
-                                <div className="sort-row">
-                                    <div className="sort-dropdown">
-                                        <label htmlFor="sort-menu">Sort by:</label>
+                                <div className="app-toolbar">
+                                    <div className="sort-dropdown" role="group" aria-label="Sort items">
+                                        <span className="sort-label">Sort by</span>
                                         <select
                                             id="sort-menu"
                                             className="sort-select"
@@ -262,7 +262,10 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                                             <option value="sold">Sold</option>
                                         </select>
                                     </div>
-                                    <div className="excel-button-wrapper"><DownloadExcelButton /></div>
+
+                                    <div className="excel-button-wrapper">
+                                        <DownloadExcelButton />
+                                    </div>
                                 </div>
 
                                 <ItemList items={items} />
