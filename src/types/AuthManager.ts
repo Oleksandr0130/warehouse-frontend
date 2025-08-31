@@ -1,57 +1,33 @@
-// AuthManager.ts
 import axios from 'axios';
 
-const BASE_URL = '/api'; // Базовый URL для обработки токенов
+const BASE_URL = '/api';
 
-const getAccessToken = () => localStorage.getItem('accessToken');
-const getRefreshToken = () => localStorage.getItem('refreshToken');
-
-const setTokens = (accessToken: string, refreshToken: string) => {
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
-};
-
-const clearTokens = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-};
-
-// Проверка токенов
-const validateTokens = async (): Promise<boolean> => {
-    const accessToken = getAccessToken();
-    const refreshToken = getRefreshToken();
-
-    if (!refreshToken) {
-        return false; // Refresh Token отсутствует
-    }
-
-    if (!accessToken) {
-        // Если Access Token истёк, пытаемся обновить
-        try {
-            const response = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
-            setTokens(response.data.accessToken, response.data.refreshToken);
-            return true;
-        } catch (error) {
-            console.error('Ошибка обновления токенов:', error);
-            clearTokens();
-            return false;
-        }
-    }
-
-    return true; // Токены валидны
-};
-
-// Автоматическое обновление токена
-const refreshTokensIfNeeded = async () => {
-    const accessToken = getAccessToken();
-    if (!accessToken) {
-        await validateTokens();
+/** Быстрая проверка: есть ли рабочая сессия (по кукам) */
+const validateSession = async (): Promise<boolean> => {
+    try {
+        await axios.get(`${BASE_URL}/users/me`, { withCredentials: true });
+        return true;
+    } catch {
+        return false;
     }
 };
 
-// Выход
-const logout = () => {
-    clearTokens();
+/** Мягко продлить сессию (обновить AccessToken по RefreshToken), если нужно */
+const touchSession = async (): Promise<void> => {
+    try {
+        await axios.post(`${BASE_URL}/auth/refresh`, null, { withCredentials: true });
+    } catch {
+        /* ignore */
+    }
 };
 
-export { validateTokens, refreshTokensIfNeeded, logout };
+/** Выход: попросим сервер стереть куки */
+const logout = async () => {
+    try {
+        await axios.post(`${BASE_URL}/auth/logout`, null, { withCredentials: true });
+    } catch {
+        /* ignore */
+    }
+};
+
+export { validateSession, touchSession, logout };

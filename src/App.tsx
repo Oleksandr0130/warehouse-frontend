@@ -8,13 +8,13 @@ import Confirmation from './components/Confirmation';
 import AppContent from './components/AppContent';
 import Account from './components/Account';
 import AboutApp from './components/AboutApp';
-import { validateTokens, logout } from './types/AuthManager';
+import { validateSession, touchSession, logout as apiLogout } from './types/AuthManager';
 import { toast, ToastContainer } from 'react-toastify';
 import { fetchBillingStatus } from './api';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
-    const token = localStorage.getItem('token');
-    if (!token) return <Navigate to="/login" replace />;
+    const isAuthed = sessionStorage.getItem('isAuthed') === '1';
+    if (!isAuthed) return <Navigate to="/login" replace />;
     return children;
 }
 
@@ -25,9 +25,9 @@ function App() {
 
     useEffect(() => {
         const onLogout = () => {
-            const alreadyOnLogin = location.pathname === '/login';
-            logout();
             setIsAuthenticated(false);
+            sessionStorage.removeItem('isAuthed');
+            const alreadyOnLogin = location.pathname === '/login';
             if (!alreadyOnLogin) {
                 toast.info('Сессия завершена. Войдите снова.');
                 navigate('/login', { replace: true });
@@ -39,8 +39,11 @@ function App() {
 
     useEffect(() => {
         const init = async () => {
-            const valid = await validateTokens();
+            // Попробуем «подтянуть» сессию, если есть refresh-кука
+            await touchSession();
+            const valid = await validateSession();
             setIsAuthenticated(valid);
+            if (valid) sessionStorage.setItem('isAuthed', '1');
         };
         init();
     }, []);
@@ -73,16 +76,21 @@ function App() {
         }
     };
 
-    const handleAuthSuccess = () => {
-        setIsAuthenticated(true);
-        toast.success('Successful Login!', { toastId: 'auth-login' });
-        // на всякий случай в следующий тик — чтобы токен точно попал в localStorage
-        setTimeout(() => warnOnLogin(), 0);
+    const handleAuthSuccess = async () => {
+        // После успешного /auth/login проверим сессию
+        const valid = await validateSession();
+        setIsAuthenticated(valid);
+        if (valid) {
+            sessionStorage.setItem('isAuthed', '1');
+            toast.success('Successful Login!', { toastId: 'auth-login' });
+            setTimeout(() => warnOnLogin(), 0);
+        }
     };
 
-    const handleLogout = () => {
-        logout();
+    const handleLogout = async () => {
+        await apiLogout(); // попросим сервер «почистить» куки
         setIsAuthenticated(false);
+        sessionStorage.removeItem('isAuthed');
         toast.info('Successful Logout!', { toastId: 'auth-logout' });
         navigate('/login', { replace: true });
     };

@@ -1,19 +1,15 @@
-import axios, {
-    AxiosError,
-    AxiosRequestConfig,
-    InternalAxiosRequestConfig,
-    AxiosRequestHeaders,
-} from 'axios';
-import { ReservationData } from './types/ReservationData.ts';
-import { Item } from './types/Item.ts';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import type { AxiosResponse } from 'axios';
+import { ReservationData } from './types/ReservationData';
+import { Item } from './types/Item';
 
-// BASE_URL: env или '/api'
+/** BASE_URL: env или '/api' */
 const BASE_URL = import.meta.env.VITE_API_BASE ?? '/api';
 
 const api = axios.create({
     baseURL: BASE_URL,
     timeout: 10000,
-    withCredentials: true,
+    withCredentials: true, // важно для работы с HttpOnly-куками
 });
 
 /* ===================== Типы ===================== */
@@ -48,11 +44,6 @@ export interface AdminCreateUserRequest {
     password: string;
 }
 
-interface RefreshResponse {
-    accessToken: string;
-    refreshToken: string;
-}
-
 /* ===================== Helpers ===================== */
 
 export const getErrorMessage = (e: unknown): string => {
@@ -63,10 +54,6 @@ export const getErrorMessage = (e: unknown): string => {
         err.message ??
         'Unknown error'
     );
-};
-
-const setAuthHeader = (headers: AxiosRequestHeaders, token: string) => {
-    headers['Authorization'] = `Bearer ${token}`;
 };
 
 /* ===================== API методы домена ===================== */
@@ -101,11 +88,12 @@ export const registerUser = (data: {
     companyName: string;
 }) => api.post('/auth/register', data);
 
+/** Вариант через куки: /auth/login просто вернёт 200 и выставит куки */
 export const loginUser = (data: { username: string; password: string }) =>
     api.post('/auth/login', data);
 
-export const confirmEmail = (code: string) =>
-    api.get(`/confirmation?code=${code}`);
+/** подтверждение email */
+export const confirmEmail = (code: string) => api.get(`/confirmation?code=${code}`);
 
 export const deleteQRCode = async (orderNumber: string): Promise<void> => {
     await api.delete(`/reservations/${orderNumber}/qrcode`);
@@ -117,8 +105,6 @@ export const fetchBillingStatus = async (): Promise<BillingStatusDto> => {
     const { data } = await api.get<BillingStatusDto>('/billing/status');
     return data;
 };
-
-// подписочные методы удалены
 
 /* ===================== Профиль / Админ ===================== */
 
@@ -136,66 +122,31 @@ export async function adminCreateUser(
 
 /* ===================== Интерцепторы ===================== */
 
-// request: проставляем Authorization, если токен есть
-api.interceptors.request.use(
-    (config: InternalAxiosRequestConfig) => {
-        const raw =
-            localStorage.getItem('accessToken') ?? localStorage.getItem('token');
-        if (raw) {
-            const token = raw.startsWith('Bearer ') ? raw.slice(7) : raw;
-            if (!config.headers) {
-                config.headers = {} as AxiosRequestHeaders;
-            }
-            setAuthHeader(config.headers as AxiosRequestHeaders, token);
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
+// Никаких Authorization и localStorage: всё по кукaм
 
-// response: обновление accessToken по 401 + мягкий редирект по 402
-import type { AxiosResponse } from 'axios'; // чтобы не было any в коллбеках
-
+// 401 → попробуем один раз обновить куки через /auth/refresh и повторим запрос
 api.interceptors.response.use(
     (response: AxiosResponse) => response,
     async (error: AxiosError) => {
         const originalRequest = (error.config ?? {}) as AxiosRequestConfig & {
             _retry?: boolean;
         };
-        const url: string = typeof originalRequest.url === 'string' ? originalRequest.url : '';
+        const status = error.response?.status ?? 0;
+        const url = typeof originalRequest.url === 'string' ? originalRequest.url : '';
 
-        // не трогаем 401 для /auth/*
-        if (
-            error.response?.status === 401 &&
-            /\/auth\/login|\/auth\/register|\/auth\/refresh|\/confirmation/.test(url)
-        ) {
+        // 401 для /auth/* не трогаем
+        if (status === 401 && /\/auth\//.test(url)) {
             return Promise.reject(error);
         }
 
-        // один рефреш
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
-                const refreshToken = localStorage.getItem('refreshToken');
-                if (!refreshToken) throw new Error('No refresh token');
-
-                const { data } = await api.post<RefreshResponse>('/auth/refresh', {
-                    refreshToken,
-                });
-
-                localStorage.setItem('accessToken', data.accessToken);
-                localStorage.setItem('refreshToken', data.refreshToken);
-
-                // проставим заголовок и повторим запрос
-                originalRequest.headers = (originalRequest.headers ??
-                    {}) as AxiosRequestHeaders;
-                (originalRequest.headers as AxiosRequestHeaders)['Authorization'] =
-                    `Bearer ${data.accessToken}`;
-
+                // refresh по куке RefreshToken (тело не нужно)
+                await api.post('/auth/refresh');
                 return api(originalRequest);
             } catch (refreshError) {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
+                // не удалось — сообщим приложению, что надо на /login
                 if (window.location.pathname !== '/login') {
                     window.dispatchEvent(new Event('auth:logout'));
                 }
@@ -207,7 +158,7 @@ api.interceptors.response.use(
     }
 );
 
-// 402 → мягкий редирект на /app/account (не для /api/billing/*)
+// 402 → мягкий редирект на /app/account (не для /billing/*)
 let subscriptionRedirectScheduled = false;
 api.interceptors.response.use(
     (res: AxiosResponse) => res,
@@ -225,8 +176,7 @@ api.interceptors.response.use(
             dataObj['error'] === 'payment_required';
 
         const onAccountPage = window.location.pathname.startsWith('/app/account');
-        const isBillingCall =
-            url.startsWith('/billing/') || url.startsWith('/api/billing/');
+        const isBillingCall = url.startsWith('/billing/') || url.startsWith('/api/billing/');
 
         if (status === 402 && expired) {
             if (!onAccountPage && !isBillingCall && !subscriptionRedirectScheduled) {
