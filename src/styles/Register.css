@@ -1,71 +1,89 @@
-/* src/components/Register.css */
-.register-container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 30px;
-    background: #ddd;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    transition: all 0.3s ease;
+/* src/styles/Register.css */
+
+.register-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #eff6ff, #e0f2fe);
+    padding: 20px;
 }
 
-.register-container h2 {
+.register-card {
+    width: 100%;
+    max-width: 440px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    padding: 32px 24px;
     text-align: center;
+}
+
+.register-logo {
+    height: 60px;
     margin-bottom: 20px;
-    color: #333;
-    font-size: 24px;
+}
+
+.register-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
 }
 
 .register-form {
     display: flex;
     flex-direction: column;
+    gap: 16px;
 }
 
-.register-container input,
-.register-container select {
-    padding: 12px 15px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+.register-input {
+    height: 48px;
+    padding: 0 16px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    font-size: 15px;
+    transition: 0.2s ease;
 }
 
-.register-container input:focus,
-.register-container select:focus {
+.register-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
     outline: none;
-    border-color: #4CAF50;
-    box-shadow: 0 0 8px rgba(76, 175, 80, 0.2);
 }
 
-.register-container button {
-    padding: 14px;
-    background: linear-gradient(135deg, #4CAF50, #81C784);
+.register-button {
+    height: 48px;
+    border-radius: 12px;
+    background: #2563eb;
     color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
+    font-weight: 600;
+    font-size: 15px;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    border: none;
+    transition: 0.2s ease;
 }
 
-.register-container button:hover {
-    background: linear-gradient(135deg, #45a049, #66bb6a);
-    transform: translateY(-2px);
+.register-button:hover {
+    background: #1e40af;
 }
 
-/* Стили для переноса текста об авторских правах вниз */
+.register-alt {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.register-alt button {
+    background: none;
+    border: none;
+    color: #2563eb;
+    cursor: pointer;
+    font-weight: 600;
+}
+
 .register-footer {
-    text-align: center; /* Центрируем текст */
-    font-size: 14px; /* Размер шрифта */
-    color: #888; /* Цвет текста */
-    margin-top: 10px;
-    line-height: 1.5; /* Увеличиваем расстояние между строками */
-}
-
-/* Опционально: если нужно стилизовать перенос отдельно */
-.register-footer span {
-    font-weight: bold; /* Выделить текст жирным шрифтом */
-    color: #555; /* Сделать нижнюю строку другим цветом */
+    margin-top: 20px;
+    font-size: 12px;
+    color: #94a3b8;
 }

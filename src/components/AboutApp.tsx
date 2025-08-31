@@ -4,8 +4,8 @@ import '../styles/AboutApp.css';
 
 const AboutApp: React.FC = () => {
     return (
-        <div className="about-app-container">
-            <h1>About FLOWQR</h1>
+        <div className="about-app">
+            <h1 className="about-title">About FLOWQR</h1>
 
             <section className="about-section">
                 <h2>What is FLOWQR?</h2>

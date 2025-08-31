@@ -1,115 +1,109 @@
+/* src/styles/SoldItemsList.css */
+
 .sold-items-list {
-    margin: 20px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fafafa;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 20px 24px;
+    margin-bottom: 24px;
 }
 
-.sold-item {
-    display: flex;
-    flex-direction: row;
-    gap: 50px;
-    margin-bottom: 20px;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
-}
-
-.sold-item > span {
-    margin: 5px 0;
-}
-
-.empty-message {
-    color: #999;
-    font-size: 16px;
-    text-align: center;
-    margin-top: 20px;
-}
-
-/* Адаптивные настройки */
-@media (max-width: 768px) {
-    .sold-item {
-        flex-direction: column; /* Изменяем на колонку на мелких экранах */
-        gap: 20px;
-    }
-
-    .sold-items-list {
-        padding: 10px;
-    }
+.sold-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 16px;
 }
 
 .sold-search {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    gap: 10px;
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
 .sold-search-input {
     flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .sold-search-input:focus {
-    border-color: #007bff;
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.25);
     outline: none;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
 }
 
 .sold-search-count {
-    font-size: 13px;
-    color: #666;
+    font-size: 0.85rem;
+    color: #64748b;
     white-space: nowrap;
 }
 
-/* Сброс для списка, чтобы анимации не "тряслись" из-за маргинов UL */
 .sold-list {
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-/* Анимация появления/исчезновения элементов */
-.fade-enter {
-    opacity: 0;
-    transform: translateY(4px);
-}
-.fade-enter-active {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 180ms ease, transform 180ms ease;
-}
-.fade-exit {
-    opacity: 1;
-    transform: translateY(0);
-}
-.fade-exit-active {
-    opacity: 0;
-    transform: translateY(-4px);
-    transition: opacity 160ms ease, transform 160ms ease;
-}
-
-/* Небольшой твик, чтобы элементы плавно занимали место */
 .sold-item {
-    will-change: opacity, transform;
-}
-/* Плавное появление элементов */
-.fade-in {
-    animation: fadeIn 0.25s ease-in-out;
+    padding: 14px 16px;
+    border: 1px solid #dcfce7;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    background: #f0fdf4;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+.sold-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.sold-item-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.sold-order {
+    font-weight: 600;
+    color: #166534;
+}
+
+.sold-date {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.sold-item-body {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+    color: #334155;
+}
+
+.sold-name {
+    font-weight: 500;
+}
+
+.empty-message {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 20px 0;
+}
+
+/* Анимация появления */
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(4px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
 }

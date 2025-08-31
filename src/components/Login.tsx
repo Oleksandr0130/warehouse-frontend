@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { loginUser } from '../api';
-import '../styles/AuthLoginAndRegister.css';
+import '../styles/Login.css';   // 👈 отдельный файл только для логина
 import logo from '../assets/flowqr-logo.png';
 
 interface LoginProps {
@@ -33,7 +33,6 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
 
     const doLogin = async () => {
         if (isSubmitting) return;
-
         setIsSubmitting(true);
         setFormError(null);
         setFieldErrors({});
@@ -54,7 +53,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 if (status === 400 || status === 401) {
                     const msg = serverMsg || 'Incorrect username or password';
                     setFormError(msg);
-                    setFieldErrors({ password: msg }); // при желании добавь username: msg
+                    setFieldErrors({ password: msg });
                 } else if (!err.response) {
                     setFormError('Network error. Please check your connection and try again.');
                 } else {
@@ -77,9 +76,11 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
     };
 
     return (
-        <div className="auth-page">
-            <div className="auth-card">
-                <img src={logo} alt="FlowQR" className="app-logo" />
+        <div className="login-page">
+            <div className="login-card">
+                <img src={logo} alt="FlowQR" className="login-logo" />
+
+                <h1 className="login-title">Welcome back</h1>
 
                 {formError && (
                     <div className="form-error" role="alert" aria-live="assertive">
@@ -87,8 +88,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                     </div>
                 )}
 
-                {/* не используем onSubmit, чтобы браузер ничего не «сабмитил» сам */}
-                <div className="auth-form" role="form" aria-label="Login form">
+                <div className="login-form" role="form" aria-label="Login form">
                     <div className="field">
                         <input
                             type="text"
@@ -99,12 +99,10 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                             onKeyDown={handleKeyDown}
                             required
                             className={fieldErrors.username ? 'input-error' : ''}
-                            aria-invalid={!!fieldErrors.username}
-                            aria-describedby={fieldErrors.username ? 'username-error' : undefined}
                             autoComplete="username"
                         />
                         {fieldErrors.username && (
-                            <div id="username-error" className="error-text" role="alert">
+                            <div className="error-text" role="alert">
                                 {fieldErrors.username}
                             </div>
                         )}
@@ -120,12 +118,10 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                             onKeyDown={handleKeyDown}
                             required
                             className={fieldErrors.password ? 'input-error' : ''}
-                            aria-invalid={!!fieldErrors.password}
-                            aria-describedby={fieldErrors.password ? 'password-error' : undefined}
                             autoComplete="current-password"
                         />
                         {fieldErrors.password && (
-                            <div id="password-error" className="error-text" role="alert">
+                            <div className="error-text" role="alert">
                                 {fieldErrors.password}
                             </div>
                         )}
@@ -133,22 +129,22 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
 
                     <button
                         type="button"
-                        className="auth-button"
+                        className="login-button"
                         disabled={isSubmitting}
                         onClick={doLogin}
                     >
-                        {isSubmitting ? 'LOGGING IN…' : 'LOGIN'}
+                        {isSubmitting ? 'Logging in…' : 'Login'}
                     </button>
                 </div>
 
-                <div className="auth-alt">
-                    DON’T HAVE AN ACCOUNT?{' '}
+                <div className="login-alt">
+                    Don’t have an account?{' '}
                     <button type="button" onClick={() => navigate('/register')}>
-                        SIGN UP
+                        Sign up
                     </button>
                 </div>
 
-                <footer className="auth-footer">
+                <footer className="login-footer">
                     © 2025 Aleksander Starikov. <span>All rights reserved.</span>
                 </footer>
             </div>

@@ -1,152 +1,83 @@
-.confirmation-container {
+/* src/styles/Confirmation.css */
+
+.confirmation-page {
+    min-height: 100vh;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
-    height: 100vh;
-    background: linear-gradient(135deg, #4caf50, #81c784);
-    color: #fff;
-    font-family: 'Arial', sans-serif;
-    text-align: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #eff6ff, #e0f2fe);
     padding: 20px;
-    box-sizing: border-box;
 }
 
-.confirmation-container h2 {
-    font-size: 2.2em;
+.confirmation-card {
+    width: 100%;
+    max-width: 440px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    padding: 32px 24px;
+    text-align: center;
+}
+
+.confirmation-icon {
+    margin-bottom: 16px;
+    font-size: 64px;
+}
+.confirmation-icon.success {
+    color: #22c55e; /* зелёный */
+}
+.confirmation-icon.error {
+    color: #ef4444; /* красный */
+}
+
+.confirmation-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.confirmation-text {
+    font-size: 1rem;
+    color: #475569;
     margin-bottom: 20px;
 }
 
-.confirmation-container p {
-    font-size: 1.2em;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 15px 25px;
-    border-radius: 8px;
-    display: inline-block;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Адаптивные настройки */
-@media (max-width: 600px) {
-    .confirmation-container h2 {
-        font-size: 1.8em;
-    }
-
-    .confirmation-container p {
-        font-size: 1em;
-        padding: 10px 15px;
-    }
-}
-
-/* Страница и фон */
-.confirmation-page {
-    min-height: 100vh;
-    display: grid;
-    place-items: center;
-    background: radial-gradient(1200px 600px at 10% -10%, rgba(76, 175, 80, 0.35), transparent 50%),
-    radial-gradient(1000px 500px at 110% 110%, rgba(129, 199, 132, 0.35), transparent 50%),
-    linear-gradient(135deg, #0f172a, #111827);
-    padding: 24px;
-    box-sizing: border-box;
-}
-
-/* Карточка */
-.confirmation-card {
-    width: 100%;
-    max-width: 560px;
-    background: #0b1220;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    color: #e5e7eb;
-    padding: 28px;
-    text-align: center;
-}
-
-/* Иконка и состояния */
-.confirmation-icon {
-    display: grid;
-    place-items: center;
-    margin-bottom: 16px;
-}
-.confirmation-icon svg {
-    color: #22c55e; /* по умолчанию зелёный для success */
-}
-.confirmation-icon svg:nth-child(1).spin {
-    color: #93c5fd; /* спиннер */
-}
-.confirmation-icon svg:nth-child(1) ~ svg {
-    color: #ef4444; /* error */
-}
-.spin {
-    animation: spin 1s linear infinite;
-}
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* Текст */
-.confirmation-title {
-    font-size: 24px;
-    font-weight: 700;
-    margin: 8px 0 10px;
-}
-.confirmation-text {
-    font-size: 16px;
-    line-height: 1.6;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin: 0 auto 18px;
-    max-width: 460px;
-}
-.confirmation-hint {
-    opacity: 0.7;
-    font-size: 13px;
-    margin-top: 10px;
-}
-
-/* Кнопки */
 .confirmation-actions {
     display: flex;
     gap: 12px;
     justify-content: center;
-    flex-wrap: wrap;
-}
-.btn {
-    appearance: none;
-    border: 0;
-    border-radius: 12px;
-    padding: 12px 18px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: transform .06s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
-    box-shadow: 0 6px 18px rgba(0,0,0,.25);
-}
-.btn:active {
-    transform: translateY(1px);
-}
-.btn-primary {
-    background: #22c55e;
-    color: #0a0f1c;
-}
-.btn-primary:hover {
-    background: #16a34a;
-}
-.btn-outline {
-    background: transparent;
-    color: #e5e7eb;
-    border: 1px solid rgba(229,231,235,0.18);
-}
-.btn-outline:hover {
-    background: rgba(255,255,255,0.05);
+    margin-bottom: 16px;
 }
 
-/* Мобильные правки */
-@media (max-width: 560px) {
-    .confirmation-card { padding: 22px; }
-    .confirmation-title { font-size: 20px; }
-    .confirmation-text { font-size: 14px; padding: 12px 14px; }
+.confirmation-btn {
+    height: 44px;
+    padding: 0 20px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: 0.2s ease;
+}
+
+.confirmation-btn.primary {
+    background: #2563eb;
+    color: #fff;
+}
+.confirmation-btn.primary:hover {
+    background: #1e40af;
+}
+
+.confirmation-btn.outline {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    color: #2563eb;
+}
+.confirmation-btn.outline:hover {
+    background: #f1f5f9;
+}
+
+.confirmation-hint {
+    font-size: 0.9rem;
+    color: #94a3b8;
 }

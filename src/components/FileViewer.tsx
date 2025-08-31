@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import '../styles/FileViever.css';
+import '../styles/FileViewer.css'; // 👈 фикс опечатки в имени
 import api from '../api';
 
 interface QRFile {
@@ -24,7 +24,6 @@ const FileViewer: React.FC = () => {
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
     const [selectedReservations, setSelectedReservations] = useState<string[]>([]);
 
-    // canvas для предпросмотра
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [canvasReady, setCanvasReady] = useState(false);
 
@@ -65,7 +64,6 @@ const FileViewer: React.FC = () => {
         fetchReservationFiles();
     }, []);
 
-    // Блокируем прокрутку под модалкой
     useEffect(() => {
         if (showModal) document.body.style.overflow = 'hidden';
         else document.body.style.overflow = '';
@@ -74,7 +72,6 @@ const FileViewer: React.FC = () => {
         };
     }, [showModal]);
 
-    // Рисуем QR в canvas, когда модалка открыта
     useEffect(() => {
         if (!showModal || !activeQrCode) return;
 
@@ -85,18 +82,15 @@ const FileViewer: React.FC = () => {
 
         const img = new Image();
         img.onload = () => {
-            // размеры карточки
-            const maxW = Math.min(window.innerWidth * 0.92, 520); // ширина .modal-content
-            const maxH = Math.min(window.innerHeight * 0.60, 520); // не выше 60% экрана
+            const maxW = Math.min(window.innerWidth * 0.92, 520);
+            const maxH = Math.min(window.innerHeight * 0.60, 520);
             let drawW = img.width;
             let drawH = img.height;
 
-            // впишем в рамки с сохранением пропорций
             const ratio = Math.min(maxW / drawW, maxH / drawH, 1);
             drawW = Math.floor(drawW * ratio);
             drawH = Math.floor(drawH * ratio);
 
-            // задаём реальные размеры canvas в пикселях
             canvas.width = drawW;
             canvas.height = drawH;
 
@@ -230,75 +224,92 @@ const FileViewer: React.FC = () => {
     );
 
     return (
-        <div className="file-viewer-container">
-            <input
-                type="text"
-                placeholder="Search by name..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="search-input"
-                aria-label="Search by name"
-            />
+        <div className="file-viewer">
+            <div className="file-toolbar">
+                <input
+                    type="text"
+                    placeholder="Search by name..."
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    className="search-input"
+                    aria-label="Search by name"
+                />
+                <button className="btn btn-primary" onClick={handlePrintSelected}>
+                    Print
+                </button>
+            </div>
 
-            <button className="print-button" onClick={handlePrintSelected}>
-                Print
-            </button>
+            <section className="file-section">
+                <h2 className="file-title">Warehouse QR</h2>
+                <ul className="file-grid">
+                    {filteredQrFiles.map((file) => (
+                        <li className="file-card" key={file.id}>
+                            <label className="checkbox">
+                                <input
+                                    type="checkbox"
+                                    className="select-checkbox"
+                                    checked={selectedFiles.includes(file.id)}
+                                    onChange={() => toggleSelectFile(file.id)}
+                                    aria-label={`Select ${file.id} for print`}
+                                />
+                                <span />
+                            </label>
 
-            <h1 className="file-viewer-title">Warehouse QR</h1>
-            <ul className="file-list">
-                {filteredQrFiles.map((file) => (
-                    <li className="file-item" key={file.id}>
-                        <input
-                            type="checkbox"
-                            className="select-checkbox"
-                            checked={selectedFiles.includes(file.id)}
-                            onChange={() => toggleSelectFile(file.id)}
-                            aria-label={`Select ${file.id} for print`}
-                        />
-                        <img
-                            src={`data:image/png;base64,${file.qrCode}`}
-                            alt={`QR code of item ${file.id}`}
-                            className="qr-image"
-                            onClick={() => handleImageClick(file.qrCode)}
-                        />
-                        <span className="file-name">{file.id}</span>
-                        <button
-                            className="download-button"
-                            onClick={() => handleDownloadQRCode(file.id, 'item')}
-                        >
-                            Load
-                        </button>
-                    </li>
-                ))}
-            </ul>
+                            <img
+                                src={`data:image/png;base64,${file.qrCode}`}
+                                alt={`QR code of item ${file.id}`}
+                                className="qr-thumb"
+                                onClick={() => handleImageClick(file.qrCode)}
+                            />
+                            <div className="file-meta">
+                                <span className="file-name">{file.name || file.id}</span>
+                                <button
+                                    className="btn btn-outline"
+                                    onClick={() => handleDownloadQRCode(file.id, 'item')}
+                                >
+                                    Load
+                                </button>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </section>
 
-            <h1 className="file-viewer-title">Reserved QR</h1>
-            <ul className="file-list">
-                {reservationFiles.map((file) => (
-                    <li className="file-item reservation" key={file.id}>
-                        <input
-                            type="checkbox"
-                            className="select-checkbox"
-                            checked={selectedReservations.includes(file.id)}
-                            onChange={() => toggleSelectReservation(file.id)}
-                            aria-label={`Select reservation ${file.orderNumber} for print`}
-                        />
-                        <img
-                            src={`data:image/png;base64,${file.qrCode}`}
-                            alt={`QR code for reservation ${file.orderNumber}`}
-                            className="qr-image"
-                            onClick={() => handleImageClick(file.qrCode)}
-                        />
-                        <span className="file-name">Order number: {file.orderNumber}</span>
-                        <button
-                            className="download-button"
-                            onClick={() => handleDownloadQRCode(file.id, 'reservation')}
-                        >
-                            Load
-                        </button>
-                    </li>
-                ))}
-            </ul>
+            <section className="file-section">
+                <h2 className="file-title">Reserved QR</h2>
+                <ul className="file-grid">
+                    {reservationFiles.map((file) => (
+                        <li className="file-card reservation" key={file.id}>
+                            <label className="checkbox">
+                                <input
+                                    type="checkbox"
+                                    className="select-checkbox"
+                                    checked={selectedReservations.includes(file.id)}
+                                    onChange={() => toggleSelectReservation(file.id)}
+                                    aria-label={`Select reservation ${file.orderNumber} for print`}
+                                />
+                                <span />
+                            </label>
+
+                            <img
+                                src={`data:image/png;base64,${file.qrCode}`}
+                                alt={`QR code for reservation ${file.orderNumber}`}
+                                className="qr-thumb"
+                                onClick={() => handleImageClick(file.qrCode)}
+                            />
+                            <div className="file-meta">
+                                <span className="file-name">Order number: {file.orderNumber}</span>
+                                <button
+                                    className="btn btn-outline"
+                                    onClick={() => handleDownloadQRCode(file.id, 'reservation')}
+                                >
+                                    Load
+                                </button>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </section>
 
             {showModal && (
                 <div
@@ -308,20 +319,10 @@ const FileViewer: React.FC = () => {
                     aria-modal="true"
                     aria-label="QR preview"
                 >
-                    <div
-                        className="modal-content"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        {/* Canvas вместо <img> — надёжно в WebView */}
-                        <canvas
-                            ref={canvasRef}
-                            className="modal-canvas"
-                            aria-label="QR preview canvas"
-                        />
-                        {!canvasReady && (
-                            <div className="modal-loading">Loading…</div>
-                        )}
-                        <button className="close-button" onClick={handleCloseModal}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <canvas ref={canvasRef} className="modal-canvas" aria-label="QR preview canvas" />
+                        {!canvasReady && <div className="modal-loading">Loading…</div>}
+                        <button className="btn btn-danger modal-close" onClick={handleCloseModal}>
                             Close
                         </button>
                     </div>

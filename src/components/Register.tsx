@@ -1,9 +1,10 @@
+// src/components/Register.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../api';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../styles/AuthLoginAndRegister.css';
+import '../styles/Register.css';   // 👈 отдельный css только для регистрации
 import logo from '../assets/flowqr-logo.png';
 
 interface RegisterProps {
@@ -45,12 +46,15 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
     };
 
     return (
-        <div className="auth-page">
-            <div className="auth-card">
-                <img src={logo} alt="FlowQR" className="app-logo" />
+        <div className="register-page">
+            <div className="register-card">
+                <img src={logo} alt="FlowQR" className="register-logo" />
 
-                <form className="auth-form" onSubmit={handleSubmit}>
+                <h1 className="register-title">Create your account</h1>
+
+                <form className="register-form" onSubmit={handleSubmit}>
                     <input
+                        className="register-input"
                         name="username"
                         placeholder="User"
                         value={form.username}
@@ -58,6 +62,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
                         required
                     />
                     <input
+                        className="register-input"
                         name="email"
                         type="email"
                         placeholder="Email"
@@ -66,6 +71,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
                         required
                     />
                     <input
+                        className="register-input"
                         name="password"
                         type="password"
                         placeholder="Password"
@@ -74,21 +80,25 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
                         required
                     />
                     <input
+                        className="register-input"
                         name="companyName"
                         placeholder="Company name"
                         value={form.companyName}
                         onChange={handleChange}
                         required
                     />
-                    <button type="submit" className="auth-button">SIGN UP</button>
+
+                    <button type="submit" className="register-button">Sign up</button>
                 </form>
 
-                <div className="auth-alt">
-                    ALREADY HAVE AN ACCOUNT?{' '}
-                    <button type="button" onClick={() => navigate('/login')}>LOGIN</button>
+                <div className="register-alt">
+                    Already have an account?{' '}
+                    <button type="button" onClick={() => navigate('/login')}>
+                        Login
+                    </button>
                 </div>
 
-                <footer className="auth-footer">
+                <footer className="register-footer">
                     © 2025 Aleksander Starikov. <span>All rights reserved.</span>
                 </footer>
             </div>

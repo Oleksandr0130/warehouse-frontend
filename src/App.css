@@ -1,33 +1,103 @@
 :root {
-  --radius: 16px;
-  --topbar-h: 56px;
-}
-
-* {
-  box-sizing: border-box;
+    --brand: #2563eb;
+    --brand-dark: #1e3a8a;
+    --bg: #f5f7fb;
+    --surface: #ffffff;
+    --surface-alt: #f9fafb;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --border: #e5e7eb;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --radius: 16px;
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+    --transition: 0.2s ease;
+    --topbar-h: 56px;
 }
 
 html, body, #root {
-  height: 100%;
-  margin: 0;
+    height: 100%;
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
 }
 
-body.no-scroll {
-  overflow: hidden;
-  touch-action: none;
+/* Card */
+.ui-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    padding: 1.5rem;
 }
 
-#root {
-  display: block;
+/* Button */
+.ui-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.ui-btn--primary {
+    background: var(--brand);
+    color: #fff;
+}
+.ui-btn--primary:hover {
+    background: var(--brand-dark);
+}
+.ui-btn--outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+.ui-btn--outline:hover {
+    background: var(--surface-alt);
 }
 
-.hidden {
-  display: none !important;
+/* Input */
+.ui-field { display: grid; gap: .4rem; }
+.ui-label { font-size: 0.9rem; color: var(--text-muted); }
+.ui-input {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+    transition: var(--transition);
+}
+.ui-input:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
-/* Скрываем старое фиксированное меню на мобилках, если где-то осталось */
-@media (max-width: 1024px) {
-  .fixed-sidebar {
-    display: none !important;
-  }
+/* Auth layout */
+.auth {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #eff6ff, #e0f2fe);
+}
+.auth-card {
+    width: min(420px, 95%);
+}
+.auth-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+.auth-actions {
+    margin-top: 1.2rem;
+    display: grid;
+    gap: 0.8rem;
 }

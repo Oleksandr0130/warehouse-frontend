@@ -28,19 +28,25 @@ const Confirmation: React.FC = () => {
     return (
         <div className="confirmation-page">
             <div className="confirmation-card">
-                <div className="confirmation-icon">
-                    {status === 'success' && <AiOutlineCheckCircle size={56} />}
-                    {status === 'error' && <AiOutlineCloseCircle size={56} />}
+                <div className={`confirmation-icon ${status}`}>
+                    {status === 'success' && <AiOutlineCheckCircle size={64} />}
+                    {status === 'error' && <AiOutlineCloseCircle size={64} />}
                 </div>
 
                 <h2 className="confirmation-title">Подтверждение почты</h2>
                 <p className="confirmation-text">{message}</p>
 
                 <div className="confirmation-actions">
-                    <button className="btn btn-primary" onClick={() => navigate('/app/account')}>
+                    <button
+                        className="confirmation-btn primary"
+                        onClick={() => navigate('/app/account')}
+                    >
                         Перейти в аккаунт
                     </button>
-                    <button className="btn btn-outline" onClick={() => navigate('/login')}>
+                    <button
+                        className="confirmation-btn outline"
+                        onClick={() => navigate('/login')}
+                    >
                         Войти
                     </button>
                 </div>

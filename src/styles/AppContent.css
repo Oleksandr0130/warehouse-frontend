@@ -1,383 +1,157 @@
-/* ====== GLOBAL ====== */
-:root{
-    --app-bg:
-            radial-gradient(150% 80% at 50% 50%, #d9c8ab 0%, rgba(217,200,171,0) 70%),
-            linear-gradient(140deg, #d2b892 0%, #c7a87e 40%, #b9946a 100%);
-    --topbar-h: 56px;
-}
+/* src/styles/AppContent.css */
 
-html, body { height: 100%; margin: 0; }
-#root, .app-root { min-height: 100%; }
-
-/* Глобальный фон */
-body::before{
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background: var(--app-bg);
-    background-position: center top;
-    background-size: cover;
-    background-repeat: no-repeat;
-}
-
-/* Блокировки прокрутки */
-body.no-scroll-menu,
-body.no-scroll-scanner{
-    overflow: hidden;
-    touch-action: none;
-}
-
-/* ===== Desktop layout ===== */
-.app-container{
-    display: grid;
-    grid-template-columns: 260px 1fr;
+.app-container {
+    display: flex;
     min-height: 100vh;
-    color: #1f1f1f;
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    background: transparent;
+    background: #f9fafb;
 }
 
-.topbar{ display:none; }
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    z-index: 1000;
+}
 
-/* ===== Sidebar ===== */
-/*.sidebar{*/
-/*    position: sticky;*/
-/*    top: 0;*/
-/*    height: 100vh;*/
-/*    padding: 22px 0;*/
-/*    color: #fff;*/
-/*    background: rgba(18,35,46,.28);*/
-/*    border-right: 1.5px solid rgba(255,255,255,.55);*/
-/*    box-shadow: inset -1px 0 8px rgba(0,0,0,.18);*/
-/*    -webkit-backdrop-filter: blur(10px) saturate(150%);*/
-/*    backdrop-filter: blur(10px) saturate(150%);*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*    align-items: center;*/
-/*}*/
+.topbar-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 auto;
+}
 
-.sidebar{
-    position: relative;
-    top: auto;
-    height: auto;        /* ключевой момент */
-    min-height: 100%;    /* тянется по высоте строки грида */
-    padding: 22px 0;
-    color: #fff;
-    background: rgba(18,35,46,0.28);              /* поправил альфу */
-    border-right: 1.5px solid rgba(255,255,255,0.55);
-    box-shadow: inset -1px 0 8px rgba(0,0,0,0.18);
-    -webkit-backdrop-filter: blur(10px) saturate(150%);
-    backdrop-filter: blur(10px) saturate(150%);
+.hamburger-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    justify-content: center;
+    gap: 4px;
 }
-
-/*.sidebar-title{*/
-/*    font-size: 20px;*/
-/*    font-weight: 900;*/
-/*    text-transform: uppercase;*/
-/*    padding-bottom: 12px;*/
-/*    margin: 0 0 14px;*/
-/*    width: 80%;*/
-/*    text-align: center;*/
-/*    border-bottom: 2px solid rgba(255,255,255,.8);*/
-/*}*/
-
-.sidebar-logo{
+.hamburger-btn span {
+    width: 20px;
+    height: 2px;
+    background: #0f172a;
     display: block;
-    width: min(72%, 180px);
-    height: auto;
-    margin: 0 0 14px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid rgba(255,255,255,.8);
-    object-fit: contain;
+}
+.hamburger-btn.is-open span:nth-child(2) {
+    opacity: 0;
+}
+.hamburger-btn.is-open span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+}
+.hamburger-btn.is-open span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
 }
 
-.sidebar-menu{
-    width: 100%;
+.sidebar {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    bottom: 0;
+    width: 240px;
+    background: #fff;
+    border-right: 1px solid #e5e7eb;
+    padding: 20px 12px;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 999;
+}
+.sidebar.open {
+    transform: translateX(0);
+}
+.sidebar-logo {
+    height: 48px;
+    margin-bottom: 20px;
+}
+.sidebar-menu {
     list-style: none;
-    margin: 8px 0 0;
     padding: 0;
+    margin: 0;
 }
-
-.menu-item{
-    font-size: 15px;
-    padding: 14px 16px;
-    text-align: center;
-    cursor: pointer;
-    margin: 8px 14px;
-    border-radius: 14px;
-    color: rgba(255,255,255,.95);
-    background: rgba(255,255,255,.10);
-    border: 1.5px solid transparent;
-    transition: all .3s ease;
-}
-.menu-item:hover{
-    background: rgba(255,255,255,.25);
-    border-color: rgba(255,255,255,.85);
-    transform: translateY(-2px);
-}
-.menu-item.active{
-    background: rgba(255,255,255,.22);
-    border-color: rgba(255,255,255,.9);
-}
-
-.logout-item{
-    margin-top: auto;
-    width: calc(100% - 28px);
-    align-self: center;
-    padding: 12px 0;
-    border-radius: 14px;
-    text-align: center;
-    background: rgba(192,57,43,.85);
-    border: 1.5px solid rgba(255,255,255,.75);
-    color: #fff;
-    cursor: pointer;
-    transition: all .3s ease;
-}
-.logout-item:hover{
-    background: rgba(231,76,60,.95);
-    transform: translateY(-2px);
-}
-
-.app-main{ padding: 24px; }
-
-/* ===== Buttons / selects ===== */
-.btn{
-    padding: 12px 16px;
-    font-size: 14px;
-    font-weight: 800;
-    border-radius: 16px;
-    border: 1.5px solid rgba(255,255,255,.65);
-    background: rgba(255,255,255,.12);
-    color: #fff;
-    transition: all .3s ease;
-}
-.btn:hover{
-    background: rgba(255,255,255,.25);
-    transform: translateY(-2px);
-}
-.btn.btn-add{ background: rgba(40,167,69,.25); }
-.btn.btn-add:hover{ background: rgba(40,167,69,.4); }
-.btn.btn-remove{ background: rgba(220,53,69,.28); }
-.btn.btn-remove:hover{ background: rgba(220,53,69,.45); }
-
-.scanner-buttons{ display:flex; gap:10px; margin:10px 0 18px; }
-
-.sort-dropdown{ margin:12px 0 18px; display:flex; align-items:center; gap:10px; color:#fff; }
-.sort-select{
+.menu-item,
+.logout-item {
     padding: 10px 14px;
-    border-radius: 16px;
-    border: 1.5px solid rgba(255,255,255,.65);
-    background: rgba(255,255,255,.12);
-    color: #fff;
-    transition: all .3s ease;
-}
-.sort-select:hover{ background: rgba(255,255,255,.25); }
-
-.loading-overlay{
-    position: fixed;
-    inset: 0;
-    background: rgba(255,255,255,.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 22px;
-    color: #555;
-    z-index: 9990;
-}
-
-/* ===== Hamburger ===== */
-.hamburger-btn{
-    display: inline-flex;
-    width: 42px;
-    height: 42px;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    border: 1.5px solid rgba(255,255,255,.65);
-    background: rgba(255,255,255,.12);
+    border-radius: 8px;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: all .3s ease;
+    margin-bottom: 6px;
+    transition: background 0.2s ease, color 0.2s ease;
 }
-.hamburger-btn:hover{
-    background: rgba(255,255,255,.25);
-    transform: scale(1.05);
+.menu-item:hover,
+.logout-item:hover {
+    background: #f1f5f9;
 }
-.hamburger-btn span{
-    display:block;
-    width:20px; height:2px;
-    margin:2.5px 0;
-    background:#fff;
-    transition: transform .3s ease, opacity .3s ease;
-}
-.hamburger-btn.is-open span:nth-child(1){ transform: translateY(4.5px) rotate(45deg); }
-.hamburger-btn.is-open span:nth-child(2){ opacity:0; }
-.hamburger-btn.is-open span:nth-child(3){ transform: translateY(-4.5px) rotate(-45deg); }
-
-.topbar-title{
-    margin: 0 0 0 12px;
-    font-size: 18px;
-    font-weight: 800;
+.menu-item.active {
+    background: #2563eb;
     color: #fff;
-    text-transform: uppercase;
 }
 
-/* ===== Accessibility ===== */
-@media (prefers-reduced-motion: reduce){
-    .sidebar, .backdrop, .hamburger-btn, .menu-item, .logout-item, .btn, .sort-select{ transition:none; }
+.logout-item {
+    color: #dc2626;
+    font-weight: 600;
 }
 
-/* ===== Mobile / Tablet ===== */
-@supports (height: 100svh){
-    .app-container{ min-height: 100svh; }
+.app-main {
+    flex: 1;
+    margin-top: 56px;
+    padding: 24px;
 }
 
-@media (max-width:1024px){
-    .app-container{
-        grid-template-columns: 1fr;
-        min-height: 100svh;
-        overflow-x: hidden;
-        background: transparent;
-    }
-
-    .topbar{
-        display: flex;
-        position: sticky;
-        top: 0;
-        min-height: var(--topbar-h);
-        padding: 12px 16px;
-        padding-top: 40px;
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-        background: rgba(255,255,255,0.18) !important;
-        border-bottom: 1px solid rgba(0,0,0,0.08) !important;
-        z-index: 1000 !important;
-    }
-
-    .hamburger-btn{
-        color:#1f1f1f !important;
-        border-color: rgba(0,0,0,0.15) !important;
-        background: rgba(255,255,255,0.4);
-    }
-
-    .sidebar{
-        position: fixed;
-        left: 0; top: 0; bottom: 0;
-        height: auto;
-        min-height: 100svh;
-        width: 86%;
-        max-width: 320px;
-        transform: translateX(-100%);
-        transition: transform .25s ease;
-        z-index: 2147483646;
-        background: #12232e47;
-        border-right: 1.5px solid rgba(255,255,255,.75);
-        will-change: transform;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    .sidebar.open{ transform: translateX(0); }
-
-    .app-main{ padding-top: 12px; }
-}
-
-/* ===== Backdrop меню ===== */
-.backdrop{
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.25);
-    z-index: 2147483645;
-    cursor: pointer;
-}
-.backdrop.backdrop--blur{
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
-}
-
-/* ===== Scanner Modal ===== */
-.scanner-modal{
-    position: fixed;
-    inset: 0;
-    z-index: 2147483646;
-    background: rgba(0,0,0,.55);
+.loading-overlay {
+    position: absolute;
+    top: 56px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.7);
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 2000;
+}
+
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 998;
+}
+.backdrop--blur {
+    backdrop-filter: blur(2px);
+}
+
+.scanner-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+.scanner-dialog {
+    background: #fff;
     padding: 20px;
-}
-.scanner-dialog{
-    position: relative;
-    width: 92vw;
-    max-width: 720px;
-    background: #111;
-    color: #fff;
     border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.4);
-    overflow: hidden;
+    width: 90%;
+    max-width: 480px;
+    position: relative;
 }
-
-/* явное окно для видео сканера — ДОЛЖЕН быть фиксированный размер */
-.scanner-viewport{
-    width: 100%;
-    height: min(78vh, 560px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-    box-sizing: border-box;
-}
-
-/* делаем любое видео/канвас растягиваемым */
-.scanner-viewport video,
-.scanner-viewport canvas,
-.scanner-viewport .qr-video,
-.scanner-viewport .qr-canvas{
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 10px;
-}
-
-/* иногда библиотеки добавляют внутренние контейнеры — не позволяем им схлопываться */
-.scanner-viewport > *{
-    flex: 1 1 auto;
-    min-width: 0;
-    min-height: 0;
-}
-
-.scanner-close{
+.scanner-close {
     position: absolute;
     top: 8px;
-    right: 10px;
-    width: 36px;
-    height: 36px;
+    right: 12px;
+    background: none;
     border: none;
-    border-radius: 10px;
-    background: rgba(255,255,255,.15);
-    color: #fff;
-    font-size: 24px;
-    line-height: 1;
+    font-size: 20px;
     cursor: pointer;
-    transition: background .2s ease, transform .2s ease;
 }
-.scanner-close:hover{ background: rgba(255,255,255,.25); transform: scale(1.05); }
-
-@media (max-width: 600px){
-    .scanner-modal{ padding: 12px; }
-    .scanner-dialog{
-        width: 100vw;
-        max-width: none;
-        border-radius: 14px;
-    }
-    .scanner-viewport{
-        height: 70vh; /* побольше места под видео на телефонах */
-        padding: 8px;
-    }
-}
-
-/* Тосты всегда сверху */
-.Toastify__toast-container{ z-index: 2147483647 !important; }

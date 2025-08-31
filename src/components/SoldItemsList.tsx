@@ -1,3 +1,4 @@
+// src/components/SoldItemsList.tsx
 import { useMemo, useState } from 'react';
 import { SoldReservation } from '../types/SoldReservation';
 import '../styles/SoldItemsList.css';
@@ -18,7 +19,8 @@ function SoldItemsList({ reservations }: SoldItemsListProps) {
         const q = String(query ?? '').trim().toLowerCase();
         if (!q) return reservations;
 
-        const contains = (v?: string | number | null) => String(v ?? '').toLowerCase().includes(q);
+        const contains = (v?: string | number | null) =>
+            String(v ?? '').toLowerCase().includes(q);
 
         return reservations.filter((res) => {
             const d = toSafeDate(res.saleDate);
@@ -40,7 +42,7 @@ function SoldItemsList({ reservations }: SoldItemsListProps) {
 
     return (
         <div className="sold-items-list">
-            <h2>Sold items</h2>
+            <h2 className="sold-title">Sold items</h2>
 
             <div className="sold-search">
                 <input
@@ -51,8 +53,8 @@ function SoldItemsList({ reservations }: SoldItemsListProps) {
                     placeholder="Search by order number, name, week, or date (e.g. 2025-08-23)"
                 />
                 <span className="sold-search-count">
-                    {filtered.length} / {reservations.length}
-                </span>
+          {filtered.length} / {reservations.length}
+        </span>
             </div>
 
             {filtered.length === 0 ? (
@@ -64,11 +66,15 @@ function SoldItemsList({ reservations }: SoldItemsListProps) {
                         const saleDateLabel = d ? d.toLocaleString() : '—';
                         return (
                             <li key={reservation.id ?? reservation.orderNumber} className="sold-item fade-in">
-                                <span className="item-order-number">Order number: {reservation.orderNumber}</span>
-                                <span className="item-name">Name: {reservation.itemName}</span>
-                                <span className="item-quantity">Amount: {reservation.reservedQuantity}</span>
-                                <span className="item-sold-week">Week: {reservation.reservationWeek}</span>
-                                <span className="item-sale-date">Date: {saleDateLabel}</span>
+                                <div className="sold-item-header">
+                                    <span className="sold-order">Order № {reservation.orderNumber}</span>
+                                    <span className="sold-date">{saleDateLabel}</span>
+                                </div>
+                                <div className="sold-item-body">
+                                    <span className="sold-name">{reservation.itemName}</span>
+                                    <span className="sold-qty">Amount: {reservation.reservedQuantity}</span>
+                                    <span className="sold-week">Week: {reservation.reservationWeek}</span>
+                                </div>
                             </li>
                         );
                     })}

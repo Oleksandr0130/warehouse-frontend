@@ -1,7 +1,8 @@
+// src/components/Account.tsx
 import React, { useEffect, useState } from 'react';
 import { fetchMe, adminCreateUser, AdminCreateUserRequest, MeDto } from '../api';
 import { toast } from 'react-toastify';
-import '../styles/Account.css'
+import '../styles/Account.css';
 import SubscriptionBanner from "./SubscriptionBanner.tsx";
 
 const Account: React.FC = () => {
@@ -46,8 +47,8 @@ const Account: React.FC = () => {
     };
 
     return (
-        <div className="account-wrap">
-            <h2>Personal account</h2>
+        <div className="account-page">
+            <h2 className="account-title">Personal account</h2>
 
             <SubscriptionBanner embedded />
 
@@ -64,9 +65,10 @@ const Account: React.FC = () => {
 
                     {me.admin && (
                         <div className="account-card">
-                            <h3>Create User</h3>
+                            <h3 className="account-subtitle">Create User</h3>
                             <form className="admin-form" onSubmit={handleCreate}>
                                 <input
+                                    className="account-input"
                                     name="username"
                                     placeholder="User"
                                     value={newUser.username}
@@ -74,6 +76,7 @@ const Account: React.FC = () => {
                                     required
                                 />
                                 <input
+                                    className="account-input"
                                     name="email"
                                     type="email"
                                     placeholder="Email"
@@ -82,6 +85,7 @@ const Account: React.FC = () => {
                                     required
                                 />
                                 <input
+                                    className="account-input"
                                     name="password"
                                     type="password"
                                     placeholder="Password"
@@ -89,8 +93,12 @@ const Account: React.FC = () => {
                                     onChange={handleChange}
                                     required
                                 />
-                                <button type="submit" disabled={loading}>
-                                    {loading ? 'Add...' : 'Create'}
+                                <button
+                                    type="submit"
+                                    className="account-btn"
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Adding…' : 'Create'}
                                 </button>
                             </form>
                         </div>

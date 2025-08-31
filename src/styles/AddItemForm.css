@@ -1,47 +1,68 @@
+/* src/styles/AddItemForm.css */
+
 .add-item-form {
-  max-width: 400px;
-  margin: 0 auto 20px;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: #f9f9f9;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 24px;
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
 }
 
-.add-item-form h2 {
-  text-align: center;
-  margin-bottom: 20px;
+.add-item-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 8px;
 }
 
-.add-item-form .form-group {
-  margin-bottom: 15px;
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-.add-item-form .form-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #334155;
 }
 
-.add-item-form .form-group input {
-  width: 100%;
-  padding: 8px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.form-group input {
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 0 14px;
+    font-size: 0.95rem;
+    background: #f9fafb;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.add-item-form .submit-btn {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+.form-group input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.25);
+    outline: none;
+    background: #fff;
 }
 
-.add-item-form .submit-btn:hover {
-  background-color: #0056b3;
+.submit-btn {
+    height: 46px;
+    border: none;
+    border-radius: 12px;
+    background: #2563eb;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.submit-btn:hover {
+    background: #1e40af;
+}
+
+.submit-btn:active {
+    transform: scale(0.98);
 }

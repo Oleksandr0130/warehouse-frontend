@@ -1,3 +1,4 @@
+// src/components/ReservedItemsList.tsx
 import React, { useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { toast } from 'react-toastify';
@@ -11,7 +12,7 @@ import QRScanner from './QRScanner';
 interface ReservedItemsListProps {
     reservedItems: ReservedItem[];
     setReservedItems: (items: ReservedItem[]) => void;
-    onScan: (orderNumber: string) => void;                // завершить резервацию по QR
+    onScan: (orderNumber: string) => void;
     onReservationRemoved: (updatedItemId: string, returnedQuantity: number) => void;
 }
 
@@ -27,19 +28,18 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
         const q = String(query ?? '').trim().toLowerCase();
         if (!q) return reservedItems;
 
-        const contains = (v?: string | number | null) => String(v ?? '').toLowerCase().includes(q);
+        const contains = (v?: string | number | null) =>
+            String(v ?? '').toLowerCase().includes(q);
 
-        return reservedItems.filter((item) => {
-            return (
+        return reservedItems.filter(
+            (item) =>
                 contains(item.orderNumber) ||
                 contains(item.name) ||
                 contains(item.week) ||
                 contains(item.quantity)
-            );
-        });
+        );
     }, [reservedItems, query]);
 
-    // ----- удаление резервации
     const handleDelete = async (id: string) => {
         if (!confirm('Do you really want to delete this reservation?')) return;
         try {
@@ -55,10 +55,9 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
     };
 
     return (
-        <div className="reserved-items-list">
-            <h3>Reservations</h3>
+        <div className="reserved-list">
+            <h3 className="reserved-title">Reservations</h3>
 
-            {/* Поле поиска */}
             <div className="reserved-search">
                 <input
                     className="reserved-search-input"
@@ -68,30 +67,32 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                     placeholder="Search by order number, name, week, or amount"
                 />
                 <span className="reserved-search-count">
-                    {filtered.length} / {reservedItems.length}
-                </span>
+          {filtered.length} / {reservedItems.length}
+        </span>
             </div>
 
-            {/* Список резерваций */}
             {filtered.length === 0 ? (
-                <p>No reserved items found.</p>
+                <p className="empty-message">No reserved items found.</p>
             ) : (
-                <ul>
+                <ul className="reserved-ul">
                     {filtered.map((item) => (
                         <li key={item.id} className="reserved-item fade-in">
                             <div className="reserved-item-details">
-                                <strong>{item.name}</strong> — Order number # {item.orderNumber}, Week: {item.week}, Amount: {item.quantity}
+                                <span className="reserved-name">{item.name}</span>
+                                <span className="reserved-info">
+                  Order № <b>{item.orderNumber}</b> | Week: {item.week} | Amount: {item.quantity}
+                </span>
                             </div>
                             <div className="reserved-item-actions">
                                 <button
                                     onClick={() => setShowScanner(true)}
-                                    className="btn btn-scan"
+                                    className="reserved-btn scan"
                                 >
-                                    Complete reservation via QR code
+                                    Complete via QR
                                 </button>
                                 <button
                                     onClick={() => handleDelete(item.id)}
-                                    className="btn btn-delete"
+                                    className="reserved-btn delete"
                                 >
                                     Remove
                                 </button>
@@ -101,7 +102,6 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                 </ul>
             )}
 
-            {/* ==== МОДАЛКА СКАНЕРА ==== */}
             {showScanner &&
                 createPortal(
                     <div

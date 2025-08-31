@@ -1,38 +1,54 @@
-/* ===== Banner (вне embedded) — без изменений ===== */
-.subscription-banner {
-    padding: 12px;
-    background: #fff3cd;
-    border: 1px solid #ffeeba;
+/* src/styles/SubscriptionBanner.css */
+
+/* ====== Общие токены ====== */
+:root {
+    --sb-bg: #0b1220;              /* тёмная карточка (embedded) */
+    --sb-fg: #e2e8f0;              /* текст на тёмной */
+    --sb-muted: #94a3b8;           /* вторичный текст */
+    --sb-border: #1f2937;          /* рамки/делители */
+    --sb-accent: #2563eb;          /* синий акцент */
+    --sb-accent-2: #1e40af;
+    --sb-green: #16a34a;
+    --sb-green-2: #15803d;
+    --sb-red: #ef4444;
+    --sb-yellow: #f59e0b;
+    --sb-surface: #ffffff;         /* белая карточка (баннер) */
+    --sb-surface-border: #e5e7eb;
+
+    --sb-radius: 16px;
+    --sb-radius-sm: 12px;
+    --sb-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+/* ====== Skeleton ====== */
+.sub-skeleton {
+    border-radius: var(--sb-radius);
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    padding: 16px;
+}
+.sub-skel-line {
+    height: 14px;
     border-radius: 8px;
-    margin: 8px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    background: linear-gradient(90deg, #e5e7eb 25%, #f1f5f9 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: sbShimmer 1.2s infinite linear;
+    margin-bottom: 10px;
+}
+.sub-skel-line.short { width: 60%; }
+@keyframes sbShimmer {
+    from { background-position: 200% 0; }
+    to   { background-position:   0% 0; }
 }
 
-.subscription-banner b { color: #856404; }
-
-.subscription-banner button {
-    margin-left: 12px;
-    background: #ffc107;
-    color: #212529;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-.subscription-banner button:hover { background: #e0a800; }
-
-/* ===== Embedded (Вариант 1: тёмная карточка + прогресс) ===== */
+/* ====== EMBEDDED: тёмная карточка ====== */
 .sub-card {
-    background: #0f172a;                 /* глубокий тёмный */
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 14px;
-    padding: 20px;
-    display: grid;
-    gap: 12px;
-    color: #fff;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    background: var(--sb-bg);
+    color: var(--sb-fg);
+    border-radius: var(--sb-radius);
+    box-shadow: var(--sb-shadow);
+    padding: 16px;
+    margin: 12px 0;
+    border: 1px solid var(--sb-border);
 }
 
 .sub-header {
@@ -40,94 +56,165 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    margin-bottom: 8px;
 }
-
 .sub-title {
-    font-weight: 600;
-    font-size: 16px;
-    color: #e5e7eb;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: .2px;
 }
-
-.sub-pill {
-    font-size: 12px;
-    line-height: 1;
-    padding: 6px 12px;
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: #16a34a;                 /* Active — зелёная */
-    color: #fff;
-    font-weight: 600;
-}
-.sub-pill.trial { background: #0ea5e9; }     /* Trial — голубая */
-.sub-pill.expired { background: #ef4444; }   /* Expired — красная */
-.sub-pill.anon, .sub-pill.no_company { background: #334155; }
 
 .sub-dates {
-    font-size: 13px;
-    color: #cbd5e1;
+    color: var(--sb-muted);
+    font-size: .9rem;
+    margin-bottom: 8px;
 }
 
-/* Прогресс-бар (показывает ОСТАТОК дней) */
+/* Плашка-статус */
+.sub-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: .78rem;
+    letter-spacing: .4px;
+    border-radius: 999px;
+    padding: 6px 10px;
+    border: 1px solid rgba(148,163,184,.3);
+    color: var(--sb-fg);
+    background: rgba(148,163,184,.1);
+}
+.sub-pill.trial     { color: #fbbf24; border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.12); }
+.sub-pill.expired   { color: var(--sb-red); border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.12); }
+.sub-pill.anon      { color: #38bdf8; border-color: rgba(56,189,248,.35); background: rgba(56,189,248,.12); }
+.sub-pill.no_company{ color: #a78bfa; border-color: rgba(167,139,250,.35); background: rgba(167,139,250,.12); }
+.sub-pill.ending    { box-shadow: 0 0 0 2px rgba(245,158,11,.25) inset; }
+
+/* Прогресс (оставшиеся дни) */
 .sub-progress {
-    background: #1f2937;
-    border-radius: 8px;
-    height: 8px;
+    height: 10px;
+    background: rgba(148,163,184,.18);
+    border-radius: 999px;
     overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(148,163,184,.25);
 }
 .sub-progress-fill {
-    background: #0d6efd;
     height: 100%;
-    width: 0%;                             /* задаём inline-стилем из TS */
-    border-radius: 8px;
-    transition: width .3s ease;
+    background: linear-gradient(90deg, var(--sb-accent), #22c55e);
+    width: 0%;
+    transition: width .35s ease;
 }
 
-/* Блок действий */
-.sub-actions { display: grid; gap: 8px; }
-
-.sub-btn {
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 0;
-    background: #0d6efd;
-    color: #fff;
-    cursor: pointer;
-    font-weight: 600;
+/* Действия в embedded */
+.sub-actions { margin-top: 12px; }
+.sub-actions-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
 }
-.sub-btn:hover { opacity: .92; }
 
 /* Тоггл валюты */
-.sub-currency-toggle {
+.sub-currency-toggle label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(148,163,184,.35);
+    color: var(--sb-fg);
+    cursor: pointer;
+    font-size: .88rem;
+    user-select: none;
+}
+.sub-currency-toggle input {
+    accent-color: var(--sb-accent);
+}
+
+/* Кнопка «оплатить» */
+.sub-btn {
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background: var(--sb-accent);
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: .3px;
+    cursor: pointer;
+    transition: background .2s ease, transform .1s ease, box-shadow .2s ease;
+    box-shadow: 0 6px 18px rgba(37,99,235,.25);
+}
+.sub-btn:hover   { background: var(--sb-accent-2); }
+.sub-btn:active  { transform: translateY(1px); box-shadow: 0 4px 12px rgba(37,99,235,.22); }
+.sub-btn:disabled{ opacity: .65; cursor: not-allowed; box-shadow: none; }
+
+/* Жёлтая рамка для «скоро закончится» */
+.sub-ending {
+    outline: 2px solid rgba(245,158,11,.35);
+    outline-offset: 2px;
+}
+
+/* ====== Баннер (верхний, светлый) ====== */
+.subscription-banner {
+    background: var(--sb-surface);
+    border: 1px solid var(--sb-surface-border);
+    border-radius: var(--sb-radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.05);
+    margin: 12px 0;
+}
+.subscription-banner .sub-title {
+    color: #0f172a;
+    font-weight: 700;
+}
+.subscription-banner .sub-actions {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: #e5e7eb;
 }
-.sub-currency-toggle input { accent-color: #0d6efd; }
-
-.sub-hint { font-size: 13px; color: #9ca3af; }
-
-/* Skeleton */
-.sub-skeleton { position: relative; overflow: hidden; }
-.sub-skel-line {
-    height: 14px;
-    background: #1f2937;
-    border-radius: 6px;
-    margin-bottom: 8px;
-}
-.sub-skel-line.short { width: 40%; }
-
-/* Когда период вот-вот закончится */
-.sub-ending .sub-title { color: #fde68a; }
-.sub-pill.ending {
-    background: #f59e0b !important;
-    color: #111827 !important;
-}
-
-/* Доп. вариант баннера на всю ширину — оставлен без изменений */
-.sub-banner {
-    padding: 14px 16px;
-    border: 1px dashed #ffe7ba;
+.subscription-banner .button {
+    height: 40px;
+    padding: 0 14px;
     border-radius: 12px;
-    background: #fffdf5;
+    border: 1px solid var(--sb-surface-border);
+    background: #0ea5e9;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: .3px;
+    cursor: pointer;
+    transition: background .2s ease, transform .1s ease, box-shadow .2s ease;
+    box-shadow: 0 6px 16px rgba(14,165,233,.25);
+}
+.subscription-banner .button:hover { background: #0284c7; }
+.subscription-banner .button:disabled { opacity: .65; cursor: not-allowed; }
+
+.subscription-banner .sub-currency-toggle label {
+    border-color: var(--sb-surface-border);
+    color: #0f172a;
+}
+.subscription-banner .sub-hint {
+    color: #64748b;
+    font-size: .95rem;
+}
+
+/* ====== Мелочи ====== */
+.sub-hint {
+    color: var(--sb-muted);
+    font-size: .95rem;
+}
+
+@media (max-width: 560px) {
+    .subscription-banner {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .subscription-banner .sub-actions {
+        justify-content: space-between;
+    }
 }

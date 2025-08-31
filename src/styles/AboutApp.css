@@ -1,41 +1,55 @@
-.about-app-container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    background: #f9f9f9;
-    color: #333;
+/* src/styles/AboutApp.css */
+
+.about-app {
+    padding: 24px;
+    background: #f9fafb;
+    min-height: 100vh;
+    color: #0f172a;
 }
 
-.about-app-container h1 {
-    margin-bottom: 20px;
-    text-align: center;
-    color: #555;
+.about-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 24px;
 }
 
 .about-section {
-    margin-bottom: 20px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
     background: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 20px 24px;
+    margin-bottom: 20px;
 }
 
 .about-section h2 {
-    margin-bottom: 10px;
-    color: #222;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #1e3a8a;
 }
 
 .about-section p {
-    margin-bottom: 10px;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #334155;
 }
 
 .about-section ul {
     list-style: disc;
-    margin-left: 20px;
     padding-left: 20px;
+    color: #334155;
 }
 
-.about-section ul li {
+.about-section li {
     margin-bottom: 8px;
+}
+
+.about-section a {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.about-section a:hover {
+    text-decoration: underline;
 }

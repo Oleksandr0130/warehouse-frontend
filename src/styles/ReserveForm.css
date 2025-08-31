@@ -1,274 +1,99 @@
-/*.reserve-form {*/
-/*    max-width: 500px;*/
-/*    margin: 0 auto;*/
-/*    padding: 20px;*/
-/*    border: 1px solid #ddd;*/
-/*    border-radius: 4px;*/
-/*    background-color: #ffffff;*/
-/*}*/
+/* src/styles/ReserveForm.css */
 
-/*.reserve-form h3 {*/
-/*    text-align: center;*/
-/*    margin-bottom: 20px;*/
-/*}*/
-
-/*.reserve-form .form-group {*/
-/*    margin-bottom: 15px;*/
-/*}*/
-
-/*.reserve-form .form-group label {*/
-/*    display: block;*/
-/*    margin-bottom: 5px;*/
-/*    font-weight: bold;*/
-/*    color: #555;*/
-/*}*/
-
-/*.reserve-form .form-group select,*/
-/*.reserve-form .form-group input {*/
-/*    width: 100%;*/
-/*    padding: 10px;*/
-/*    font-size: 14px;*/
-/*    border: 1px solid #ccc;*/
-/*    border-radius: 4px;*/
-/*    box-sizing: border-box;*/
-/*}*/
-
-/*.reserve-form .form-group input[type="number"] {*/
-/*    -moz-appearance: textfield; !* Убираем стрелки (для Firefox) *!*/
-/*}*/
-
-/*.reserve-form .form-group input::placeholder {*/
-/*    color: #aaa;*/
-/*    font-style: italic;*/
-/*}*/
-
-/*.reserve-form .form-group input:focus,*/
-/*.reserve-form .form-group select:focus {*/
-/*    border-color: #80bdff;*/
-/*    outline: none;*/
-/*    box-shadow: 0 0 4px rgba(128, 189, 255, 0.5);*/
-/*}*/
-
-/*.reserve-form .form-group input.error {*/
-/*    border-color: #dc3545;*/
-/*}*/
-
-/*.reserve-form .btn-submit {*/
-/*    width: 100%;*/
-/*    padding: 12px;*/
-/*    font-size: 16px;*/
-/*    background-color: #28a745;*/
-/*    color: white;*/
-/*    border: none;*/
-/*    border-radius: 4px;*/
-/*    cursor: pointer;*/
-/*    transition: background-color 0.2s ease-in-out;*/
-/*}*/
-
-/*.reserve-form .btn-submit:hover {*/
-/*    background-color: #218838;*/
-/*}*/
-
-/*.reserve-form .btn-submit:disabled {*/
-/*    cursor: not-allowed;*/
-/*    background-color: #94d3a2;*/
-/*}*/
-
-/*!* Список автозаполнения *!*/
-/*.suggestions {*/
-/*    list-style: none;*/
-/*    padding: 0;*/
-/*    margin: 5px 0 0 0;*/
-/*    border: 1px solid #ccc; !* Граница всего списка *!*/
-/*    border-radius: 5px; !* Скруглённые углы *!*/
-/*    max-height: 150px; !* Ограничение высоты для прокрутки *!*/
-/*    overflow-y: auto; !* Прокрутка, если список большой *!*/
-/*}*/
-
-/*.suggestions li {*/
-/*    padding: 10px;*/
-/*    background-color: #fff; !* Белый фон *!*/
-/*    cursor: pointer;*/
-/*    transition: background-color 0.2s ease, color 0.2s ease;*/
-/*}*/
-
-/*.suggestions li:hover {*/
-/*    background-color: #f1f1f1; !* Светло-серый фон при наведении *!*/
-/*    color: #333; !* Изменяем цвет текста *!*/
-/*}*/
-
-/*.suggestions li:active {*/
-/*    background-color: #e1e1e1; !* Ещё более тёмный оттенок при клике *!*/
-/*}*/
-
-/*!* Адаптивность для меньших экранов *!*/
-/*@media (max-width: 600px) {*/
-/*    .reserve-form {*/
-/*        padding: 15px;*/
-/*    }*/
-
-/*    .reserve-form h3 {*/
-/*        font-size: 18px;*/
-/*    }*/
-
-/*    .reserve-form input {*/
-/*        font-size: 13px;*/
-/*    }*/
-
-/*    .reserve-form .btn-submit {*/
-/*        font-size: 13px;*/
-/*        padding: 8px 15px;*/
-/*    }*/
-/*}*/
-
-/* Общие стили формы */
 .reserve-form {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 24px;
     max-width: 500px;
     margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Добавлен легкий эффект тени */
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
 }
 
 .reserve-form h3 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 8px;
 }
 
-/* Общие блоки формы */
-.reserve-form .form-group {
-    margin-bottom: 15px;
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
 }
 
-.reserve-form .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
-    font-size: 14px;
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #334155;
 }
 
-/* Инпуты и элементы формы */
-.reserve-form .form-group select,
-.reserve-form .form-group input {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
+.form-group input {
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 0 14px;
+    font-size: 0.95rem;
+    background: #f9fafb;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.reserve-form .form-group input[type="number"] {
-    -moz-appearance: textfield; /* Убираем стрелки (для Firefox) */
-}
-
-.reserve-form .form-group input::placeholder {
-    color: #aaa;
-    font-style: italic;
-}
-
-.reserve-form .form-group input:focus,
-.reserve-form .form-group select:focus {
-    border-color: #80bdff;
+.form-group input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.25);
     outline: none;
-    box-shadow: 0 0 4px rgba(128, 189, 255, 0.5);
+    background: #fff;
 }
 
-.reserve-form .form-group input.error {
-    border-color: #dc3545;
-}
-
-/* Кнопка отправки */
-.reserve-form .btn-submit {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.reserve-form .btn-submit:hover {
-    background-color: #218838;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Эффект тени при наведении */
-}
-
-.reserve-form .btn-submit:disabled {
-    cursor: not-allowed;
-    background-color: #94d3a2;
-}
-
-/* Список автозаполнения */
+/* Подсказки */
 .suggestions {
     list-style: none;
-    padding: 0;
-    margin: 5px 0 0 0;
-    border: 1px solid #ccc; /* Граница всего списка */
-    border-radius: 5px; /* Скруглённые углы */
-    max-height: 150px; /* Ограничение высоты для прокрутки */
-    overflow-y: auto; /* Прокрутка, если список большой */
-    background-color: #fff; /* Белый фон для блока подсказок */
-    z-index: 10;
-    position: absolute; /* Абсолютное позиционирование для подсказок */
-    width: 100%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Легкая тень */
+    margin: 4px 0 0;
+    padding: 6px 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    max-height: 180px;
+    overflow-y: auto;
 }
 
 .suggestions li {
-    padding: 10px;
-    background-color: #fff; /* Белый фон для элементов списка */
+    padding: 8px 14px;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background 0.15s ease;
 }
 
 .suggestions li:hover {
-    background-color: #f1f1f1; /* Светло-серый фон при наведении */
-    color: #333; /* Темный текст */
+    background: #f1f5f9;
 }
 
-.suggestions li:active {
-    background-color: #e1e1e1; /* Темнее фон при клике */
+/* Кнопка */
+.btn-submit {
+    height: 46px;
+    border: none;
+    border-radius: 12px;
+    background: #2563eb;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
 }
 
-/* Ошибочные и необработанные состояния */
-.suggestions li.no-results {
-    text-align: center;
-    color: #999;
-    font-style: italic;
-    font-size: 14px;
+.btn-submit:hover {
+    background: #1e40af;
 }
 
-/* Адаптивность */
-@media (max-width: 600px) {
-    /* Уменьшаем отступы и размеры для мобильных устройств */
-    .reserve-form {
-        padding: 15px;
-    }
-
-    .reserve-form h3 {
-        font-size: 18px;
-    }
-
-    .reserve-form input, .reserve-form select {
-        font-size: 13px;
-    }
-
-    .reserve-form .btn-submit {
-        font-size: 13px;
-        padding: 8px 15px;
-    }
-
-    .suggestions li {
-        padding: 8px; /* Уменьшаем отступы */
-        font-size: 13px; /* Уменьшаем шрифт */
-    }
+.btn-submit:active {
+    transform: scale(0.98);
 }
