@@ -32,7 +32,7 @@
     color: #334155;
 }
 .form-group input {
-    width: 100%;          /* важное: не выходить за края */
+    /*width: 100%;          !* важное: не выходить за края *!*/
     height: 44px;
     border-radius: 12px;
     border: 1px solid #e5e7eb;
