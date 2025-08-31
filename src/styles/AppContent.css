@@ -138,14 +138,6 @@
     justify-content: center;
     z-index: 2000;
 }
-.scanner-dialog {
-    background: #fff;
-    padding: 20px;
-    border-radius: 16px;
-    width: 90%;
-    max-width: 480px;
-    position: relative;
-}
 .scanner-close {
     position: absolute;
     top: 8px;
