@@ -155,3 +155,26 @@
     font-size: 20px;
     cursor: pointer;
 }
+/* ——— sidebar items with icons ——— */
+.sidebar-menu { padding: 8px 12px; }
+.menu-item{
+    display:flex;align-items:center;gap:12px;
+    padding:10px 12px;border-radius:12px;cursor:pointer;
+    color:#0a2446;
+    transition:background .2s ease, color .2s ease, transform .15s ease;
+}
+.menu-item .mi-icon{
+    width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;
+    border-radius:10px;background:rgba(59,130,246,.12);font-size:16px;
+}
+.menu-item .mi-label{font-weight:600}
+.menu-item:hover{background:#eef4ff}
+.menu-item.active{
+    background:#1d4ed8;color:#fff;
+}
+.menu-item.active .mi-icon{background:rgba(255,255,255,.25)}
+.logout-item{color:#d12c2c}
+.logout-item .mi-icon{background:rgba(209,44,44,.12)}
+
+/* сорт и кнопка в одну линию, как в макете */
+.sort-row{display:flex;align-items:center;gap:12px;margin:0 0 12px 0;flex-wrap:wrap}

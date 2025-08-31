@@ -1,9 +1,9 @@
-// src/components/AppContent.tsx
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import '../styles/AppContent.css';
 import '../styles/CreateReservationPage.css';
+import '../styles/CreateItemPage.css';
 
 import ItemList from './ItemList';
 import ReservedItemsList from './ReservedItemsList';
@@ -13,6 +13,7 @@ import SoldItemsList from './SoldItemsList';
 import QRScanner from './QRScanner';
 import FileViewer from './FileViewer';
 import DownloadExcelButton from './DownloadExelButton';
+import DashboardCards from './DashboardCards';
 
 import { toast } from 'react-toastify';
 import api from '../api';
@@ -22,25 +23,16 @@ import { ReservationData } from '../types/ReservationData';
 import { SoldReservation } from '../types/SoldReservation';
 import logo from '../assets/flowqr-logo.png';
 
-type MenuKey =
-    | 'inventory'
-    | 'createItem'
-    | 'reserve'
-    | 'createReservation'
-    | 'sold'
-    | 'files'
-    | 'route';
+type MenuKey = 'inventory'|'createItem'|'reserve'|'createReservation'|'sold'|'files'|'route';
 
-interface AppContentProps {
-    onLogout: () => void;
-}
+interface AppContentProps { onLogout: () => void; }
 
 const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     const [items, setItems] = useState<Item[]>([]);
     const [reservedItems, setReservedItems] = useState<ReservedItem[]>([]);
     const [soldReservations, setSoldReservations] = useState<SoldReservation[]>([]);
     const [showScanner, setShowScanner] = useState(false);
-    const [scannerAction, setScannerAction] = useState<'add' | 'remove' | null>(null);
+    const [scannerAction, setScannerAction] = useState<'add'|'remove'|null>(null);
     const [loading, setLoading] = useState(false);
     const [activeMenu, setActiveMenu] = useState<MenuKey>('inventory');
     const [sortCriteria, setSortCriteria] = useState('');
@@ -59,16 +51,14 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         }
     }, [location.pathname]);
 
-    useEffect(() => {
-        fetchData();
-    }, [sortCriteria, activeMenu]);
-
-    useEffect(() => {
-        setIsMenuOpen(false);
-    }, [activeMenu, location.pathname]);
+    useEffect(() => { fetchData(); }, [sortCriteria, activeMenu]);
+    useEffect(() => { setIsMenuOpen(false); }, [activeMenu, location.pathname]);
 
     const fetchData = () => {
-        if (activeMenu === 'inventory') fetchItems(sortCriteria);
+        if (activeMenu === 'inventory') { // для карточек подтянем и резервы
+            fetchItems(sortCriteria);
+            fetchReservedItems();
+        }
         if (activeMenu === 'createReservation') fetchItems();
         if (activeMenu === 'reserve') fetchReservedItems();
         if (activeMenu === 'sold') fetchSoldReservations();
@@ -143,14 +133,12 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     const handleScan = async (id: string) => {
         setShowScanner(false);
         if (!scannerAction) return;
-
         const input = prompt(`Enter quantity for ${scannerAction === 'add' ? 'add' : 'remove'}:`);
         const quantity = Number(input);
         if (!input || Number.isNaN(quantity) || quantity <= 0) {
             toast.error('Please enter a valid number.');
             return;
         }
-
         setLoading(true);
         try {
             await api.put(`/items/${id}/${scannerAction}`, null, { params: { quantity } });
@@ -165,19 +153,14 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     };
 
     const handleReservationRemoved = (updatedItemId: string, returnedQuantity: number) => {
-        setItems((prev) =>
-            prev.map((it) => (it.id === updatedItemId ? { ...it, quantity: it.quantity + returnedQuantity } : it))
-        );
+        setItems((prev) => prev.map((it) => (it.id === updatedItemId ? { ...it, quantity: it.quantity + returnedQuantity } : it)));
         fetchReservedItems();
         fetchItems(sortCriteria);
         toast.success('Reservation deleted.');
     };
 
     const handleReservedItemScan = async (orderNumber: string) => {
-        if (!orderNumber) {
-            toast.error('Incorrect QR code.');
-            return;
-        }
+        if (!orderNumber) { toast.error('Incorrect QR code.'); return; }
         setLoading(true);
         try {
             await api.post('/reservations/scan', null, { params: { orderNumber } });
@@ -191,27 +174,17 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         }
     };
 
-    const goInternal = (key: Exclude<MenuKey, 'route'>) => {
-        navigate('/app');
-        setActiveMenu(key);
-    };
+    // навигация
+    const goInternal = (key: Exclude<MenuKey,'route'>) => { navigate('/app'); setActiveMenu(key); };
+    const goRoute = (path: 'about'|'account') => { setIsMenuOpen(false); setActiveMenu('route'); navigate(`/app/${path}`); };
 
-    const goRoute = (path: 'about' | 'account') => {
-        setIsMenuOpen(false);
-        setActiveMenu('route');
-        navigate(`/app/${path}`);
-    };
+    const qrTotalCount = items.length + reservedItems.length;
 
     return (
         <div className="app-container">
             <header className="topbar">
-                <button
-                    className={`hamburger-btn ${isMenuOpen ? 'is-open' : ''}`}
-                    onClick={() => setIsMenuOpen((v) => !v)}
-                >
-                    <span />
-                    <span />
-                    <span />
+                <button className={`hamburger-btn ${isMenuOpen ? 'is-open' : ''}`} onClick={() => setIsMenuOpen((v) => !v)}>
+                    <span/><span/><span/>
                 </button>
                 <h1 className="topbar-title">FLOWQR</h1>
             </header>
@@ -219,15 +192,33 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             <aside className={`sidebar ${isMenuOpen ? 'open' : ''}`}>
                 <img src={logo} alt="FLOWQR" className="sidebar-logo" />
                 <ul className="sidebar-menu">
-                    <li className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`} onClick={() => goInternal('inventory')}>Stock</li>
-                    <li className={`menu-item ${activeMenu === 'createItem' ? 'active' : ''}`} onClick={() => goInternal('createItem')}>Create item</li>
-                    <li className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`} onClick={() => goInternal('reserve')}>Reserved items</li>
-                    <li className={`menu-item ${activeMenu === 'createReservation' ? 'active' : ''}`} onClick={() => goInternal('createReservation')}>Create a reservation</li>
-                    <li className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`} onClick={() => goInternal('sold')}>Sold items</li>
-                    <li className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`} onClick={() => goInternal('files')}>QR-Codes</li>
-                    <li className={`menu-item ${location.pathname.startsWith('/app/about') ? 'active' : ''}`} onClick={() => goRoute('about')}>About App</li>
-                    <li className={`menu-item ${location.pathname.startsWith('/app/account') ? 'active' : ''}`} onClick={() => goRoute('account')}>Personal account</li>
-                    <li className="logout-item" onClick={() => { onLogout(); navigate('/login'); }}>Log out</li>
+                    <li className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`} onClick={() => goInternal('inventory')}>
+                        <span className="mi-icon">📦</span><span className="mi-label">Stock</span>
+                    </li>
+                    <li className={`menu-item ${activeMenu === 'createItem' ? 'active' : ''}`} onClick={() => goInternal('createItem')}>
+                        <span className="mi-icon">➕</span><span className="mi-label">Create item</span>
+                    </li>
+                    <li className={`menu-item ${activeMenu === 'reserve' ? 'active' : ''}`} onClick={() => goInternal('reserve')}>
+                        <span className="mi-icon">🧾</span><span className="mi-label">Reserved items</span>
+                    </li>
+                    <li className={`menu-item ${activeMenu === 'createReservation' ? 'active' : ''}`} onClick={() => goInternal('createReservation')}>
+                        <span className="mi-icon">📝</span><span className="mi-label">Create a reservation</span>
+                    </li>
+                    <li className={`menu-item ${activeMenu === 'sold' ? 'active' : ''}`} onClick={() => goInternal('sold')}>
+                        <span className="mi-icon">🏷️</span><span className="mi-label">Sold items</span>
+                    </li>
+                    <li className={`menu-item ${activeMenu === 'files' ? 'active' : ''}`} onClick={() => goInternal('files')}>
+                        <span className="mi-icon">🔳</span><span className="mi-label">QR-Codes</span>
+                    </li>
+                    <li className={`menu-item ${location.pathname.startsWith('/app/about') ? 'active' : ''}`} onClick={() => goRoute('about')}>
+                        <span className="mi-icon">ℹ️</span><span className="mi-label">About App</span>
+                    </li>
+                    <li className={`menu-item ${location.pathname.startsWith('/app/account') ? 'active' : ''}`} onClick={() => goRoute('account')}>
+                        <span className="mi-icon">👤</span><span className="mi-label">Personal account</span>
+                    </li>
+                    <li className="logout-item" onClick={() => { onLogout(); navigate('/login'); }}>
+                        <span className="mi-icon">🚪</span><span className="mi-label">Log out</span>
+                    </li>
                 </ul>
             </aside>
 
@@ -238,23 +229,31 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                     <>
                         {activeMenu === 'inventory' && (
                             <>
-                                <div className="sort-dropdown">
-                                    <label htmlFor="sort-menu">Sort by:</label>
-                                    <select
-                                        id="sort-menu"
-                                        className="sort-select"
-                                        value={sortCriteria}
-                                        onChange={(e) => setSortCriteria(e.target.value)}
-                                    >
-                                        <option value="">Standard</option>
-                                        <option value="name">Name</option>
-                                        <option value="quantity">Amount</option>
-                                        <option value="sold">Sold</option>
-                                    </select>
-                                </div>
+                                <DashboardCards
+                                    itemsCount={items.length}
+                                    reservedCount={reservedItems.length}
+                                    qrCount={qrTotalCount}
+                                    onGoStock={() => goInternal('inventory')}
+                                    onGoReserved={() => goInternal('reserve')}
+                                    onGoQRCodes={() => goInternal('files')}
+                                />
 
-                                <div className="excel-button-wrapper">
-                                    <DownloadExcelButton />
+                                <div className="sort-row">
+                                    <div className="sort-dropdown">
+                                        <label htmlFor="sort-menu">Sort by:</label>
+                                        <select
+                                            id="sort-menu"
+                                            className="sort-select"
+                                            value={sortCriteria}
+                                            onChange={(e) => setSortCriteria(e.target.value)}
+                                        >
+                                            <option value="">Standard</option>
+                                            <option value="name">Name</option>
+                                            <option value="quantity">Amount</option>
+                                            <option value="sold">Sold</option>
+                                        </select>
+                                    </div>
+                                    <div className="excel-button-wrapper"><DownloadExcelButton /></div>
                                 </div>
 
                                 <ItemList items={items} />
@@ -289,9 +288,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                                         items={items}
                                         onReserveComplete={fetchReservedItems}
                                         onUpdateItems={(id, qty) =>
-                                            setItems((prev) =>
-                                                prev.map((it) => (it.id === id ? { ...it, quantity: it.quantity - qty } : it))
-                                            )
+                                            setItems((prev) => prev.map((it) => (it.id === id ? { ...it, quantity: it.quantity - qty } : it)))
                                         }
                                     />
                                 </div>
@@ -306,27 +303,22 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                 <Outlet />
             </main>
 
-            {isMenuOpen &&
-                createPortal(
-                    <div
-                        className={`backdrop ${supportsBlur ? 'backdrop--blur' : ''}`}
-                        onClick={() => setIsMenuOpen(false)}
-                    />,
-                    document.body
-                )}
+            {isMenuOpen && createPortal(
+                <div className={`backdrop ${supportsBlur ? 'backdrop--blur' : ''}`} onClick={() => setIsMenuOpen(false)}/>,
+                document.body
+            )}
 
-            {showScanner &&
-                createPortal(
-                    <div className="scanner-modal" onClick={() => setShowScanner(false)}>
-                        <div className="scanner-dialog" onClick={(e) => e.stopPropagation()}>
-                            <button className="scanner-close" onClick={() => setShowScanner(false)}>×</button>
-                            <div className="scanner-body">
-                                <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />
-                            </div>
+            {showScanner && createPortal(
+                <div className="scanner-modal" onClick={() => setShowScanner(false)}>
+                    <div className="scanner-dialog" onClick={(e) => e.stopPropagation()}>
+                        <button className="scanner-close" onClick={() => setShowScanner(false)}>×</button>
+                        <div className="scanner-body">
+                            <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />
                         </div>
-                    </div>,
-                    document.body
-                )}
+                    </div>
+                </div>,
+                document.body
+            )}
         </div>
     );
 };
