@@ -2,25 +2,27 @@
 import axios, {
     AxiosError,
     AxiosRequestConfig,
-    AxiosRequestHeaders,
     AxiosResponse,
 } from "axios";
-
 import { ReservationData } from "./types/ReservationData";
 import { Item } from "./types/Item";
 
-/** BASE_URL: env или '/api' */
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "/api";
 
 const api = axios.create({
     baseURL: BASE_URL,
-    timeout: 10_000,
-    withCredentials: true, // пусть остаётся — если куки появятся, будет плюс
+    timeout: 10000,
+    withCredentials: true, // для работы с HttpOnly-куками
 });
 
 /* ===================== Типы ===================== */
 
-export type BillingState = "TRIAL" | "ACTIVE" | "EXPIRED" | "ANON" | "NO_COMPANY";
+export type BillingState =
+    | "TRIAL"
+    | "ACTIVE"
+    | "EXPIRED"
+    | "ANON"
+    | "NO_COMPANY";
 export type Currency = "PLN" | "EUR";
 
 export interface BillingStatusDto {
@@ -29,7 +31,6 @@ export interface BillingStatusDto {
     currentPeriodEnd?: string;
     daysLeft?: number;
     isAdmin?: boolean;
-    /** если бэк отдаёт закреплённую валюту компании */
     billingCurrency?: Currency;
 }
 
@@ -50,39 +51,16 @@ export interface AdminCreateUserRequest {
     password: string;
 }
 
-type UnknownRecord = Record<string, unknown>;
-type Tokens = { accessToken: string; refreshToken: string };
-
 /* ===================== Helpers ===================== */
 
 export const getErrorMessage = (e: unknown): string => {
-    const err = e as AxiosError<UnknownRecord>;
-    const data = err.response?.data as UnknownRecord | undefined;
-    const fromData =
-        (typeof data?.message === "string" && data.message) ||
-        (typeof data?.error === "string" && data.error) ||
-        null;
-
-    return fromData ?? err.message ?? "Unknown error";
-};
-
-const setAuthHeader = (cfg: AxiosRequestConfig, token?: string | null) => {
-    if (!token) return;
-    if (!cfg.headers) {
-        cfg.headers = {} as AxiosRequestHeaders;
-    }
-    (cfg.headers as AxiosRequestHeaders).Authorization = `Bearer ${token}`;
-};
-
-const getAccess = (): string | null => localStorage.getItem("accessToken");
-const getRefresh = (): string | null => localStorage.getItem("refreshToken");
-const saveTokens = (t: Tokens): void => {
-    localStorage.setItem("accessToken", t.accessToken);
-    localStorage.setItem("refreshToken", t.refreshToken);
-};
-const clearTokens = (): void => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    const err = e as AxiosError<{ message?: string; error?: string }>;
+    return (
+        err.response?.data?.message ??
+        err.response?.data?.error ??
+        err.message ??
+        "Unknown error"
+    );
 };
 
 /* ===================== API методы домена ===================== */
@@ -106,7 +84,9 @@ export const createOneOffCheckout = async (
     currency?: Currency
 ): Promise<CheckoutResponse> => {
     const query = currency ? `?currency=${encodeURIComponent(currency)}` : "";
-    const { data } = await api.post<CheckoutResponse>(`/billing/checkout-oneoff${query}`);
+    const { data } = await api.post<CheckoutResponse>(
+        `/billing/checkout-oneoff${query}`
+    );
     return data;
 };
 
@@ -117,19 +97,11 @@ export const registerUser = (data: {
     companyName: string;
 }) => api.post("/auth/register", data);
 
-/**
- * Логин (гибрид): сервер ставит HttpOnly-куки + возвращает JSON с токенами.
- * Мы сохраняем токены локально — это обходит возможные проблемы с прокси/Set-Cookie.
- */
-export const loginUser = async (data: { username: string; password: string }) => {
-    const resp = await api.post<Tokens>("/auth/login", data);
-    if (resp.data?.accessToken && resp.data?.refreshToken) {
-        saveTokens(resp.data);
-    }
-    return resp;
-};
+export const loginUser = (data: { username: string; password: string }) =>
+    api.post("/auth/login", data);
 
-export const confirmEmail = (code: string) => api.get(`/confirmation?code=${code}`);
+export const confirmEmail = (code: string) =>
+    api.get(`/confirmation?code=${code}`);
 
 export const deleteQRCode = async (orderNumber: string): Promise<void> => {
     await api.delete(`/reservations/${orderNumber}/qrcode`);
@@ -149,37 +121,25 @@ export async function fetchMe(): Promise<MeDto> {
     return data;
 }
 
-export async function adminCreateUser(req: AdminCreateUserRequest): Promise<MeDto> {
+export async function adminCreateUser(
+    req: AdminCreateUserRequest
+): Promise<MeDto> {
     const { data } = await api.post<MeDto>("/admin/users", req);
     return data;
 }
 
 /* ===================== Интерцепторы ===================== */
 
-/** Request: добавляем Authorization из accessToken (если есть) */
-api.interceptors.request.use(
-    (config) => {
-        setAuthHeader(config, getAccess());
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
-
-/**
- * Response:
- * - 401 (не для /auth/*) → пробуем обновить токены:
- *   * сначала через JSON-тело (refreshToken из localStorage),
- *   * сервер параллельно может обновить HttpOnly-куки,
- *   * затем повторяем оригинальный запрос.
- */
+// 401 → попробуем один раз обновить куки через /auth/refresh и повторим запрос
 api.interceptors.response.use(
     (response: AxiosResponse) => response,
-    async (error: AxiosError<UnknownRecord>) => {
+    async (error: AxiosError) => {
         const originalRequest = (error.config ?? {}) as AxiosRequestConfig & {
             _retry?: boolean;
         };
         const status = error.response?.status ?? 0;
-        const url = typeof originalRequest.url === "string" ? originalRequest.url : "";
+        const url =
+            typeof originalRequest.url === "string" ? originalRequest.url : "";
 
         // 401 для /auth/* не трогаем
         if (status === 401 && /\/auth\//.test(url)) {
@@ -189,30 +149,14 @@ api.interceptors.response.use(
         if (status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
-                // Пытаемся обновить токены (JSON-вариант + withCredentials на случай куки)
-                const refreshToken = getRefresh();
-                const base = axios.create({
-                    baseURL: BASE_URL,
-                    withCredentials: true,
-                    timeout: 8_000,
-                });
-
-                // Если refreshToken есть — отправляем в теле, иначе — null (сервер возьмёт из куки)
-                const { data } = await base.post<Tokens>(
+                // refresh по куке RefreshToken (тело пустое JSON, + заголовок)
+                await api.post(
                     "/auth/refresh",
-                    refreshToken ? { refreshToken } : null
+                    {},
+                    { headers: { "Content-Type": "application/json" } }
                 );
-
-                if (!data?.accessToken || !data?.refreshToken) {
-                    throw new Error("Refresh returned no tokens");
-                }
-
-                saveTokens(data);
-                setAuthHeader(originalRequest, data.accessToken);
-
                 return api(originalRequest);
             } catch (refreshError) {
-                clearTokens();
                 if (window.location.pathname !== "/login") {
                     window.dispatchEvent(new Event("auth:logout"));
                 }
@@ -224,29 +168,33 @@ api.interceptors.response.use(
     }
 );
 
-/** 402 → мягкий редирект на /app/account (не для /billing/*) */
+// 402 → мягкий редирект на /app/account (не для /billing/*)
 let subscriptionRedirectScheduled = false;
 api.interceptors.response.use(
     (res: AxiosResponse) => res,
-    (err: AxiosError<UnknownRecord>) => {
+    (err: AxiosError) => {
         const status = err.response?.status;
-        const headers = err.response?.headers ?? {};
-        const data = (err.response?.data ?? {}) as UnknownRecord;
-        const url = typeof err.config?.url === "string" ? err.config.url : "";
+        const headersObj: Record<string, unknown> =
+            (err.response?.headers as Record<string, unknown>) ?? {};
+        const dataObj: Record<string, unknown> =
+            (err.response?.data as Record<string, unknown>) ?? {};
+        const url = typeof err.config?.url === "string" ? err.config!.url! : "";
 
-        const headerExpired =
-            (headers as Record<string, string | undefined>)["x-subscription-expired"] === "true" ||
-            (headers as Record<string, string | undefined>)["X-Subscription-Expired"] === "true";
-
-        const payloadExpired = data["error"] === "payment_required";
-
-        const expired = headerExpired || payloadExpired;
+        const expired =
+            headersObj["x-subscription-expired"] === "true" ||
+            headersObj["X-Subscription-Expired"] === "true" ||
+            dataObj["error"] === "payment_required";
 
         const onAccountPage = window.location.pathname.startsWith("/app/account");
-        const isBillingCall = url.startsWith("/billing/") || url.startsWith("/api/billing/");
+        const isBillingCall =
+            url.startsWith("/billing/") || url.startsWith("/api/billing/");
 
         if (status === 402 && expired) {
-            if (!onAccountPage && !isBillingCall && !subscriptionRedirectScheduled) {
+            if (
+                !onAccountPage &&
+                !isBillingCall &&
+                !subscriptionRedirectScheduled
+            ) {
                 subscriptionRedirectScheduled = true;
                 setTimeout(() => {
                     try {
@@ -256,6 +204,7 @@ api.interceptors.response.use(
                     }
                 }, 100);
             }
+            return Promise.reject(err);
         }
         return Promise.reject(err);
     }

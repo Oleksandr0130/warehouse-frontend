@@ -31,23 +31,25 @@ function RequireAuth({
                          isAuthenticated,
                      }: {
     children: JSX.Element;
-    isAuthenticated: boolean;
+    isAuthenticated: boolean | undefined;
 }) {
-    if (!isAuthenticated) return <Navigate to="/login" replace />;
+    if (isAuthenticated !== true) return <Navigate to="/login" replace />;
     return children;
 }
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    // undefined — пока не знаем статус, true/false — после инициализации
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(
+        undefined
+    );
     const [authReady, setAuthReady] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
-    // глобальный выход
+    // глобальный выход (используется интерцептором при 401, когда refresh не удался)
     useEffect(() => {
         const onLogout = () => {
             setIsAuthenticated(false);
-            sessionStorage.removeItem("isAuthed");
             if (location.pathname !== "/login") {
                 toast.info("Сессия завершена. Войдите снова.");
                 navigate("/login", { replace: true });
@@ -57,7 +59,7 @@ function App() {
         return () => window.removeEventListener("auth:logout", onLogout);
     }, [navigate, location.pathname]);
 
-    // инициализация: попытаться освежить сессию и проверить её
+    // инициализация: мягко освежаем сессию и проверяем её
     useEffect(() => {
         const init = async () => {
             try {
@@ -67,11 +69,6 @@ function App() {
             }
             const valid = await validateSession(); // GET /users/me
             setIsAuthenticated(valid);
-            if (valid) {
-                sessionStorage.setItem("isAuthed", "1");
-            } else {
-                sessionStorage.removeItem("isAuthed");
-            }
             setAuthReady(true);
         };
         void init();
@@ -87,14 +84,12 @@ function App() {
         const valid = await validateSession();
         setIsAuthenticated(valid);
         if (valid) {
-            sessionStorage.setItem("isAuthed", "1");
             toast.success("Successful Login!", { toastId: "auth-login" });
             navigate("/app", { replace: true });
             setTimeout(() => {
                 void warnOnLogin();
             }, 0);
         } else {
-            sessionStorage.removeItem("isAuthed");
             toast.error("Login failed: no session detected.");
         }
     };
@@ -141,13 +136,24 @@ function App() {
             /* ignore */
         }
         setIsAuthenticated(false);
-        sessionStorage.removeItem("isAuthed");
         toast.info("Successful Logout!", { toastId: "auth-logout" });
         navigate("/login", { replace: true });
     };
 
-    // Пока не знаем статус — можно показать сплэш/лоадер
-    if (!authReady) return null;
+    // простой лоадер, пока не знаем статус авторизации
+    if (!authReady) {
+        return (
+            <>
+                <ToastContainer
+                    position="top-right"
+                    autoClose={4000}
+                    newestOnTop
+                    limit={3}
+                />
+                <div style={{ padding: 24 }}>Loading...</div>
+            </>
+        );
+    }
 
     return (
         <>

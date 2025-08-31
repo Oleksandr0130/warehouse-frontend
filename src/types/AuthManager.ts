@@ -11,7 +11,6 @@ interface Tokens {
 
 /**
  * Быстрая проверка: есть ли рабочая сессия (по кукам/токенам).
- * Возвращает true, если сервер отдал 200 на /users/me.
  */
 const validateSession = async (): Promise<boolean> => {
     try {
@@ -24,15 +23,16 @@ const validateSession = async (): Promise<boolean> => {
 
 /**
  * Мягко продлить сессию (обновить AccessToken по RefreshToken).
- * ⚠️ Если сервер работает только через HttpOnly-куки — тело можно не передавать.
- * ⚠️ Если он ещё и возвращает JSON с токенами — можно сохранить их в localStorage.
  */
 const touchSession = async (): Promise<void> => {
     try {
         const resp: AxiosResponse<Tokens | unknown> = await axios.post(
             `${BASE_URL}/auth/refresh`,
-            null,
-            { withCredentials: true }
+            {}, // пустое JSON-тело
+            {
+                withCredentials: true,
+                headers: { "Content-Type": "application/json" },
+            }
         );
 
         // если бэк вернул JSON с токенами — сохраним их
@@ -45,7 +45,7 @@ const touchSession = async (): Promise<void> => {
             localStorage.setItem("refreshToken", tokens.refreshToken);
         }
     } catch {
-        // игнорируем — при неудаче фронт сам поймёт по 401, что нужна перелогинизация
+        // при неудаче фронт сам поймёт по 401, что нужна перелогинизация
     }
 };
 
@@ -54,7 +54,14 @@ const touchSession = async (): Promise<void> => {
  */
 const logout = async (): Promise<void> => {
     try {
-        await axios.post(`${BASE_URL}/auth/logout`, null, { withCredentials: true });
+        await axios.post(
+            `${BASE_URL}/auth/logout`,
+            {},
+            {
+                withCredentials: true,
+                headers: { "Content-Type": "application/json" },
+            }
+        );
     } catch {
         /* ignore */
     } finally {
