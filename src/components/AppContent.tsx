@@ -55,14 +55,22 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
     useEffect(() => { setIsMenuOpen(false); }, [activeMenu, location.pathname]);
 
     const fetchData = () => {
-        if (activeMenu === 'inventory') { // для карточек подтянем и резервы
+        if (activeMenu === 'inventory') {
             fetchItems(sortCriteria);
+            fetchReservedItems();              // нужно для счётчика
+        }
+        if (activeMenu === 'reserve') {
             fetchReservedItems();
+            fetchItems();                      // нужно для QR-count
+        }
+        if (activeMenu === 'files') {
+            fetchItems();
+            fetchReservedItems();              // оба для QR-count
         }
         if (activeMenu === 'createReservation') fetchItems();
-        if (activeMenu === 'reserve') fetchReservedItems();
         if (activeMenu === 'sold') fetchSoldReservations();
     };
+
 
     const fetchItems = async (sortBy?: string) => {
         setLoading(true);
@@ -230,6 +238,7 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                         {activeMenu === 'inventory' && (
                             <>
                                 <DashboardCards
+                                    active="stock"
                                     itemsCount={items.length}
                                     reservedCount={reservedItems.length}
                                     qrCount={qrTotalCount}
@@ -273,12 +282,23 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                         )}
 
                         {activeMenu === 'reserve' && (
-                            <ReservedItemsList
-                                reservedItems={reservedItems}
-                                setReservedItems={setReservedItems}
-                                onScan={handleReservedItemScan}
-                                onReservationRemoved={handleReservationRemoved}
-                            />
+                            <>
+                                <DashboardCards
+                                    active="reserved"
+                                    itemsCount={items.length}
+                                    reservedCount={reservedItems.length}
+                                    qrCount={qrTotalCount}
+                                    onGoStock={() => goInternal('inventory')}
+                                    onGoReserved={() => goInternal('reserve')}
+                                    onGoQRCodes={() => goInternal('files')}
+                                />
+                                <ReservedItemsList
+                                    reservedItems={reservedItems}
+                                    setReservedItems={setReservedItems}
+                                    onScan={handleReservedItemScan}
+                                    onReservationRemoved={handleReservationRemoved}
+                                />
+                            </>
                         )}
 
                         {activeMenu === 'createReservation' && (
@@ -296,7 +316,20 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                         )}
 
                         {activeMenu === 'sold' && <SoldItemsList reservations={soldReservations} />}
-                        {activeMenu === 'files' && <FileViewer />}
+                        {activeMenu === 'files' && (
+                            <>
+                                <DashboardCards
+                                    active="qr"
+                                    itemsCount={items.length}
+                                    reservedCount={reservedItems.length}
+                                    qrCount={qrTotalCount}
+                                    onGoStock={() => goInternal('inventory')}
+                                    onGoReserved={() => goInternal('reserve')}
+                                    onGoQRCodes={() => goInternal('files')}
+                                />
+                                <FileViewer />
+                            </>
+                        )}
                     </>
                 )}
 
