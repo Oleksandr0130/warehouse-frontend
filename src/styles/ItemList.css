@@ -1,14 +1,18 @@
 /* контейнер */
 .item-list {
+    display: block;
     width: 100%;
     max-width: 100%;
+    /* На всякий случай ограничим физической шириной экрана */
+    max-width: 100vw;
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     padding: 20px 24px;
     margin-bottom: 24px;
     box-sizing: border-box;
-    overflow-x: hidden; /* защита от горизонтального скролла */
+    overflow-x: hidden;   /* стоп горизонтального скролла */
+    contain: layout paint;/* изолируем влияние внутренних переполнений */
 }
 .item-list *, .item-list *::before, .item-list *::after { box-sizing: border-box; }
 
@@ -24,11 +28,12 @@
     align-items: center;
     gap: 12px;
     margin-bottom: 16px;
-    min-width: 0; /* разрешаем сжатие */
+    min-width: 0;            /* разрешаем сжатие */
+    max-width: 100%;
 }
 .item-search-input {
-    flex: 1 1 320px;  /* может уменьшаться и переноситься */
-    min-width: 0;
+    flex: 1 1 320px;
+    min-width: 0;            /* важно для flex-элементов */
     height: 40px;
     padding: 0 14px;
     border-radius: 12px;
@@ -53,6 +58,8 @@
     list-style: none;
     margin: 0;
     padding: 0;
+    max-width: 100%;
+    overflow-x: hidden;   /* перестраховка */
 }
 .item-list-item {
     padding: 14px 16px;
@@ -60,7 +67,9 @@
     border-radius: 12px;
     margin-bottom: 12px;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
-    min-width: 0; /* карточка не тянет контейнер */
+    min-width: 0;         /* карточка не тянет контейнер */
+    max-width: 100%;
+    overflow: hidden;     /* отсечём любые выпирания внутри */
 }
 .item-list-item:hover {
     transform: translateY(-2px);
@@ -71,7 +80,11 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    min-width: 0; /* чтобы переносились длинные строки */
+    min-width: 0;
+    max-width: 100%;
+    /* ломаем длинные слова/ID и не даём выталкивать контейнер */
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 .item-name {
     font-weight: 600;
@@ -80,6 +93,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    max-width: 100%;
 }
 .item-quantity {
     font-size: 0.9rem;
@@ -104,7 +118,7 @@
 .fade-in { animation: fadeIn 0.3s ease; }
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(4px); }
-    to { opacity: 1; transform: translateY(0); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 .empty-message {
@@ -119,14 +133,15 @@
     .item-list { padding: 16px; }
 
     .item-search {
-        flex-wrap: wrap;       /* переносим элементы */
+        flex-wrap: wrap;
         gap: 10px;
     }
     .item-search-input { flex: 1 1 100%; width: 100%; }
     .item-search-count { width: 100%; text-align: right; }
+
+    /* на мобилке разрешаем перенос имени в 2+ строки */
     .item-name {
-        white-space: normal;         /* разрешаем перенос строки */
-        overflow-wrap: anywhere;     /* ломаем очень длинные слова/ID */
+        white-space: normal;
         text-overflow: unset;
     }
 }
