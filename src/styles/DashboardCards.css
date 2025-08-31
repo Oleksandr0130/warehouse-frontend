@@ -13,12 +13,16 @@
 .dash-card__title{font-weight:700;color:#0a2446}
 .dash-card__subtitle{font-size:13px;color:#6b7a90}
 
-.dash-card--primary{
-    background:linear-gradient(180deg,#3b82f6 0%, #1e40af 100%);
-    border:none;color:#fff;
+.dash-card--primary,
+.dash-card--active{
+    background: linear-gradient(180deg,#3b82f6 0%, #1e40af 100%);
+    border: none;
+    color: #fff;
 }
-.dash-card--primary .dash-card__title{color:#fff}
-.dash-card--primary .dash-card__subtitle{color:rgba(255,255,255,.85)}
+.dash-card--primary .dash-card__title,
+.dash-card--active .dash-card__title { color:#fff; }
+.dash-card--primary .dash-card__subtitle,
+.dash-card--active .dash-card__subtitle { color:rgba(255,255,255,.85); }
 
 @media (max-width: 900px){ .dash-cards{grid-template-columns:1fr 1fr} }
 @media (max-width: 560px){ .dash-cards{grid-template-columns:1fr} }

@@ -1,10 +1,13 @@
 import React from 'react';
 import '../styles/DashboardCards.css';
 
+type Active = 'stock' | 'reserved' | 'qr';
+
 type Props = {
     itemsCount: number;
     reservedCount: number;
     qrCount: number;
+    active: Active;                    // <— кто подсвечен
     onGoStock: () => void;
     onGoReserved: () => void;
     onGoQRCodes: () => void;
@@ -12,23 +15,33 @@ type Props = {
 
 const DashboardCards: React.FC<Props> = ({
                                              itemsCount, reservedCount, qrCount,
+                                             active,
                                              onGoStock, onGoReserved, onGoQRCodes
                                          }) => {
     return (
         <div className="dash-cards">
-            <button className="dash-card dash-card--primary" onClick={onGoStock}>
+            <button
+                className={`dash-card ${active === 'stock' ? 'dash-card--active' : ''}`}
+                onClick={onGoStock}
+            >
                 <div className="dash-card__icon">📦</div>
                 <div className="dash-card__title">Stock</div>
                 <div className="dash-card__subtitle">{itemsCount} Items</div>
             </button>
 
-            <button className="dash-card" onClick={onGoReserved}>
+            <button
+                className={`dash-card ${active === 'reserved' ? 'dash-card--active' : ''}`}
+                onClick={onGoReserved}
+            >
                 <div className="dash-card__icon">🧾</div>
                 <div className="dash-card__title">Reserved Items</div>
                 <div className="dash-card__subtitle">{reservedCount} active</div>
             </button>
 
-            <button className="dash-card" onClick={onGoQRCodes}>
+            <button
+                className={`dash-card ${active === 'qr' ? 'dash-card--active' : ''}`}
+                onClick={onGoQRCodes}
+            >
                 <div className="dash-card__icon">🔳</div>
                 <div className="dash-card__title">QR Codes</div>
                 <div className="dash-card__subtitle">{qrCount} generated</div>
