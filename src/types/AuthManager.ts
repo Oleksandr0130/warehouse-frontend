@@ -1,73 +1,57 @@
-// src/types/AuthManager.ts
-import axios, { AxiosResponse } from "axios";
+// AuthManager.ts
+import axios from 'axios';
 
-const BASE_URL = "/api";
+const BASE_URL = '/api'; // Базовый URL для обработки токенов
 
-/** Ответ от /auth/refresh (если сервер возвращает JSON с токенами) */
-interface Tokens {
-    accessToken: string;
-    refreshToken: string;
-}
+const getAccessToken = () => localStorage.getItem('accessToken');
+const getRefreshToken = () => localStorage.getItem('refreshToken');
 
-/**
- * Быстрая проверка: есть ли рабочая сессия (по кукам/токенам).
- */
-const validateSession = async (): Promise<boolean> => {
-    try {
-        await axios.get(`${BASE_URL}/users/me`, { withCredentials: true });
-        return true;
-    } catch {
-        return false;
-    }
+const setTokens = (accessToken: string, refreshToken: string) => {
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
 };
 
-/**
- * Мягко продлить сессию (обновить AccessToken по RefreshToken).
- */
-const touchSession = async (): Promise<void> => {
-    try {
-        const resp: AxiosResponse<Tokens | unknown> = await axios.post(
-            `${BASE_URL}/auth/refresh`,
-            {}, // пустое JSON-тело
-            {
-                withCredentials: true,
-                headers: { "Content-Type": "application/json" },
-            }
-        );
+const clearTokens = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+};
 
-        // если бэк вернул JSON с токенами — сохраним их
-        if (
-            typeof (resp.data as Tokens)?.accessToken === "string" &&
-            typeof (resp.data as Tokens)?.refreshToken === "string"
-        ) {
-            const tokens = resp.data as Tokens;
-            localStorage.setItem("accessToken", tokens.accessToken);
-            localStorage.setItem("refreshToken", tokens.refreshToken);
+// Проверка токенов
+const validateTokens = async (): Promise<boolean> => {
+    const accessToken = getAccessToken();
+    const refreshToken = getRefreshToken();
+
+    if (!refreshToken) {
+        return false; // Refresh Token отсутствует
+    }
+
+    if (!accessToken) {
+        // Если Access Token истёк, пытаемся обновить
+        try {
+            const response = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
+            setTokens(response.data.accessToken, response.data.refreshToken);
+            return true;
+        } catch (error) {
+            console.error('Ошибка обновления токенов:', error);
+            clearTokens();
+            return false;
         }
-    } catch {
-        // при неудаче фронт сам поймёт по 401, что нужна перелогинизация
+    }
+
+    return true; // Токены валидны
+};
+
+// Автоматическое обновление токена
+const refreshTokensIfNeeded = async () => {
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+        await validateTokens();
     }
 };
 
-/**
- * Выход: попросим сервер стереть куки и локально очистим токены.
- */
-const logout = async (): Promise<void> => {
-    try {
-        await axios.post(
-            `${BASE_URL}/auth/logout`,
-            {},
-            {
-                withCredentials: true,
-                headers: { "Content-Type": "application/json" },
-            }
-        );
-    } catch {
-        /* ignore */
-    } finally {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-    }
+// Выход
+const logout = () => {
+    clearTokens();
 };
 
-export { validateSession, touchSession, logout };
+export { validateTokens, refreshTokensIfNeeded, logout };
