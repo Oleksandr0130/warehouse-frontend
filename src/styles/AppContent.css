@@ -58,7 +58,7 @@
     top: 56px;
     left: 0;
     height: calc(100svh - 56px);
-    width: 240px;
+    width: clamp(240px, 80vw, 360px);
     background: #fff;
     border-right: 1px solid #e5e7eb;
     padding: 20px 12px;
