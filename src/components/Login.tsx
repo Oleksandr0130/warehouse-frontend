@@ -80,8 +80,6 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
             <div className="login-card">
                 <img src={logo} alt="FlowQR" className="login-logo" />
 
-                <h1 className="login-title">Welcome back</h1>
-
                 {formError && (
                     <div className="form-error" role="alert" aria-live="assertive">
                         {formError}
