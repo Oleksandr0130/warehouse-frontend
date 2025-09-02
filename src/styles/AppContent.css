@@ -2,8 +2,9 @@
 
 .app-container {
     display: flex;
-    min-height: 100vh;
+    min-height: 100%;
     background: #f9fafb;
+    padding-top: 56px;
 }
 
 .topbar {
@@ -53,10 +54,8 @@
 }
 
 .sidebar {
-    position: fixed;
+    position: sticky;
     top: 56px;
-    left: 0;
-    bottom: 0;
     width: 240px;
     background: #fff;
     border-right: 1px solid #e5e7eb;
