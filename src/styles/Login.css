@@ -1,30 +1,22 @@
 /* src/styles/Login.css */
 html, body {
-    margin: 0;              /* убираем любые внешние поля */
+    /*margin: 0;*/
     padding: 0;
     height: 100%;
 }
-
 .login-page {
-    /* тянем фон ровно на высоту экрана устройства */
-    min-height: 100dvh;     /* Android/iOS WebView, современные браузеры */
-    min-height: 100svh;     /* small viewport height — доп. фоллбек */
-    min-height: 100vh;      /* общий фоллбек */
-
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    /* фон */
+    /*background: linear-gradient(135deg, #eff6ff, #e0f2fe);*/
     background-image: url("../assets/background.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-
     padding: 20px;
 }
 
-/* дальше без изменений */
 .login-card {
     width: 100%;
     max-width: 420px;
@@ -35,15 +27,31 @@ html, body {
     text-align: center;
 }
 
-.login-logo { height: 150px; margin-bottom: 20px; }
+.login-logo {
+    height: 150px;
+    margin-bottom: 20px;
+}
 
-.login-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; }
+.login-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
 
-.login-form { display: flex; flex-direction: column; gap: 16px; }
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
 
 .login-form input {
-    height: 48px; padding: 0 16px; border-radius: 12px;
-    border: 1px solid #e5e7eb; background: #f9fafb; font-size: 15px; transition: 0.2s ease;
+    height: 48px;
+    padding: 0 16px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    font-size: 15px;
+    transition: 0.2s ease;
 }
 
 .login-form input:focus {
@@ -53,25 +61,58 @@ html, body {
 }
 
 .login-button {
-    height: 48px; border-radius: 12px; background: #2563eb; color: #fff;
-    font-weight: 600; font-size: 15px; cursor: pointer; border: none; transition: 0.2s ease;
+    height: 48px;
+    border-radius: 12px;
+    background: #2563eb;
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    border: none;
+    transition: 0.2s ease;
 }
 
-.login-button:hover { background: #1e40af; }
+.login-button:hover {
+    background: #1e40af;
+}
 
 .form-error {
-    background: #fde7e9; color: #b00020; border: 1px solid #f5c2c7;
-    padding: 10px 12px; border-radius: 12px; margin-bottom: 12px; font-size: 0.95rem;
+    background: #fde7e9;
+    color: #b00020;
+    border: 1px solid #f5c2c7;
+    padding: 10px 12px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
 }
 
-.error-text { color: #d93025; font-size: 0.85rem; margin-top: 4px; text-align: left; }
+.error-text {
+    color: #d93025;
+    font-size: 0.85rem;
+    margin-top: 4px;
+    text-align: left;
+}
 
-.input-error { border: 2px solid #d93025 !important; }
+.input-error {
+    border: 2px solid #d93025 !important;
+}
 
-.login-alt { margin-top: 20px; font-size: 0.9rem; color: #48515e; }
+.login-alt {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #48515e;
+}
 
 .login-alt button {
-    background: none; border: none; color: #2563eb; cursor: pointer; font-weight: 600;
+    background: none;
+    border: none;
+    color: #2563eb;
+    cursor: pointer;
+    font-weight: 600;
 }
 
-.login-footer { margin-top: 20px; font-size: 12px; color: #0b0c0d; }
+.login-footer {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #0b0c0d;
+}
