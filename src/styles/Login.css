@@ -6,7 +6,6 @@ html, body {
 }
 .login-page {
     min-height: 100vh;
-    min-width: 100vw;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -21,9 +20,9 @@ html, body {
 .login-card {
     width: 100%;
     max-width: 420px;
-    background: #fff;
+    background: #ffffff1f;
     border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 20px #00000014;
     padding: 32px 24px;
     text-align: center;
 }
@@ -101,7 +100,7 @@ html, body {
 .login-alt {
     margin-top: 20px;
     font-size: 0.9rem;
-    color: #64748b;
+    color: #48515e;
 }
 
 .login-alt button {
@@ -115,5 +114,5 @@ html, body {
 .login-footer {
     margin-top: 20px;
     font-size: 12px;
-    color: #94a3b8;
+    color: #0b0c0d;
 }
