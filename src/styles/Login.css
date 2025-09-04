@@ -137,8 +137,9 @@ html, body {
 
     .login-card,
     .register-card {
-        width: 100%;
+        /*width: 100%;*/
         max-width: 380px;
+        max-height: 100%;
         padding: 24px 18px;
         border-radius: 16px;
     }
