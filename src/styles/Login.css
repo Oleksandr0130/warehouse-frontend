@@ -1,7 +1,12 @@
 /* src/styles/Login.css */
-
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
 .login-page {
     min-height: 100vh;
+    min-width: 100vw;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -9,7 +14,7 @@
     background-image: url("../assets/background.png");
     background-size: cover;
     background-position: center;
-    background: no-repeat;
+    background-repeat: no-repeat;
     padding: 20px;
 }
 
