@@ -7,6 +7,9 @@
     justify-content: center;
     /*background: linear-gradient(135deg, #eff6ff, #e0f2fe);*/
     background-image: url("../assets/background.png");
+    background-size: cover;
+    background-position: center;
+    background: no-repeat;
     padding: 20px;
 }
 
