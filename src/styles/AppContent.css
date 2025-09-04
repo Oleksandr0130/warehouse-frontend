@@ -1,7 +1,9 @@
 /* src/styles/AppContent.css */
 
 .app-container {
+    position: relative;
     display: flex;
+    min-height: 100dvh;
     min-height: 100vh;
     background: #f9fafb;
 }
@@ -53,11 +55,12 @@
 }
 
 .sidebar {
-    position: fixed;
+    position: absolute;
     top: 56px;
     left: 0;
     bottom: 0;
-    min-height: 100vh;
+    /*min-height: 100vh;*/
+    height: auto;
     width: 240px;
     background: #fff;
     border-right: 1px solid #e5e7eb;
@@ -66,6 +69,7 @@
     transition: transform 0.25s ease;
     z-index: 999;
 }
+.sidebar { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
 .sidebar.open {
     transform: translateX(0);
 }
