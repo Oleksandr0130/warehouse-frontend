@@ -1,5 +1,9 @@
 /* src/styles/Register.css */
-
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
 .register-page {
     min-height: 100vh;
     display: flex;
@@ -7,15 +11,18 @@
     justify-content: center;
     /*background: linear-gradient(135deg, #eff6ff, #e0f2fe);*/
     background-image: url("../assets/background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     padding: 20px;
 }
 
 .register-card {
     width: 100%;
     max-width: 440px;
-    background: #fff;
+    background: #ffffff1f;
     border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 20px #00000014;
     padding: 32px 24px;
     text-align: center;
 }
@@ -72,7 +79,7 @@
 .register-alt {
     margin-top: 20px;
     font-size: 0.9rem;
-    color: #64748b;
+    color: #48515e;
 }
 
 .register-alt button {
@@ -86,5 +93,5 @@
 .register-footer {
     margin-top: 20px;
     font-size: 12px;
-    color: #94a3b8;
+    color: #0b0c0d;
 }
