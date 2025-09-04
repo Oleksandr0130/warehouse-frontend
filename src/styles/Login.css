@@ -178,8 +178,8 @@ html, body {
 @media (min-width: 481px) and (max-width: 1024px) {
     .login-page,
     .register-page {
-        min-height: 100dvh;
-        min-height: 100svh;
+        /*min-height: 100dvh;*/
+        /*min-height: 100svh;*/
         display: flex;
         align-items: center;
         justify-content: center;
@@ -192,6 +192,9 @@ html, body {
 
     .login-card,
     .register-card {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         max-width: 480px;
         padding: 32px 24px;
     }
