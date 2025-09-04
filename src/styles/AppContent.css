@@ -58,7 +58,7 @@
     position: absolute;
     top: 56px;
     left: 0;
-    bottom: 0;
+    /*bottom: 0;*/
     /*min-height: 100vh;*/
     height: auto;
     width: 240px;
