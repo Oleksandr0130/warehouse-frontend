@@ -116,3 +116,99 @@ html, body {
     font-size: 12px;
     color: #0b0c0d;
 }
+
+/* === PHONE (узкие экраны) ===================================== */
+@media (max-width: 480px) {
+    /* гарантируем, что фон тянется на всю высоту экрана Android */
+    .login-page,
+    .register-page {
+        min-height: 100dvh;      /* корректно в мобильных браузерах */
+        min-height: 100svh;      /* фоллбек для новых движков */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        /* учитываем жестовую панель/вырезы */
+        padding-top: max(16px, env(safe-area-inset-top));
+        padding-right: max(16px, env(safe-area-inset-right));
+        padding-bottom: max(16px, env(safe-area-inset-bottom));
+        padding-left: max(16px, env(safe-area-inset-left));
+    }
+
+    .login-card,
+    .register-card {
+        width: 100%;
+        max-width: 380px;
+        padding: 24px 18px;
+        border-radius: 16px;
+    }
+
+    .login-logo,
+    .register-logo {
+        height: 120px;
+        margin-bottom: 16px;
+    }
+
+    .login-title,
+    .register-title {
+        font-size: 1.25rem;
+        margin-bottom: .75rem;
+    }
+
+    .login-form input,
+    .register-input {
+        height: 46px;
+        font-size: 15px;
+    }
+
+    .login-button,
+    .register-button {
+        height: 46px;
+        width: 100%;
+        font-size: 15px;
+    }
+
+    .login-footer,
+    .register-footer {
+        font-size: 11px;
+    }
+}
+
+/* === TABLET (портрет/ландшафт) ================================ */
+@media (min-width: 481px) and (max-width: 1024px) {
+    .login-page,
+    .register-page {
+        min-height: 100dvh;
+        min-height: 100svh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding-top: max(24px, env(safe-area-inset-top));
+        padding-right: max(24px, env(safe-area-inset-right));
+        padding-bottom: max(24px, env(safe-area-inset-bottom));
+        padding-left: max(24px, env(safe-area-inset-left));
+    }
+
+    .login-card,
+    .register-card {
+        max-width: 480px;
+        padding: 32px 24px;
+    }
+
+    .login-logo,
+    .register-logo {
+        height: 140px;
+    }
+}
+
+/* === небольшая страховка от «белой полосы» снаружи карточки === */
+@media (max-width: 1024px) {
+    html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #0ea5e9; /* близкий к фону, чтобы не было резкого контраста */
+        overscroll-behavior: none; /* без эффекта «подтягивания» */
+    }
+}
+
