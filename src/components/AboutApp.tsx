@@ -51,7 +51,7 @@ const AboutApp: React.FC = () => {
                 <h2>Contact</h2>
                 <p>
                     For questions or support, please contact:{" "}
-                    <a href="mailto:olek92112@gmail.com">olek92112@gmail.com</a>
+                    <a href="mailto:flowqr.office@gmail.com">flowqr.office@gmail.com</a>
                 </p>
             </section>
         </div>
