@@ -19,18 +19,12 @@
 
 html, body, #root {
     margin: 0;
-    padding: 0;
-    min-height: 100svh;       /* стабильная высота */
-    /* резерв на случай необходимости динамической высоты */
-    min-height: 100dvh;
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    min-height: 100%;
+    height: auto;
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
 }
-
-a { color: inherit; text-decoration: none; }
-button { font-family: inherit; cursor: pointer; }
-ul { margin: 0; padding: 0; list-style: none; }
 
 /* Card */
 .ui-card {
@@ -53,10 +47,21 @@ ul { margin: 0; padding: 0; list-style: none; }
     cursor: pointer;
     transition: var(--transition);
 }
-.ui-btn--primary { background: var(--brand); color: #fff; }
-.ui-btn--primary:hover { background: var(--brand-dark); }
-.ui-btn--outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-.ui-btn--outline:hover { background: var(--surface-alt); }
+.ui-btn--primary {
+    background: var(--brand);
+    color: #fff;
+}
+.ui-btn--primary:hover {
+    background: var(--brand-dark);
+}
+.ui-btn--outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+.ui-btn--outline:hover {
+    background: var(--surface-alt);
+}
 
 /* Input */
 .ui-field { display: grid; gap: .4rem; }
@@ -77,18 +82,24 @@ ul { margin: 0; padding: 0; list-style: none; }
 
 /* Auth layout */
 .auth {
-    min-height: 100svh;
-    min-height: 100dvh;
+    min-height: 100vh;
     display: grid;
     place-items: center;
     padding: 2rem;
     background: linear-gradient(135deg, #eff6ff, #e0f2fe);
 }
-.auth-card { width: min(420px, 95%); }
+.auth-card {
+    width: min(420px, 95%);
+}
 .auth-title {
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
     text-align: center;
 }
-.auth-actions { margin-top: 1.2rem; display: grid; gap: 0.8rem; }
+.auth-actions {
+    margin-top: 1.2rem;
+    display: grid;
+    gap: 0.8rem;
+}
+
