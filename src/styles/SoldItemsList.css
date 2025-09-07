@@ -2,6 +2,7 @@
 
 .sold-items-list {
     /*background: #fff;*/
+    height: 100svh;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     padding: 20px 24px;
@@ -101,6 +102,7 @@
     font-size: 0.95rem;
     text-align: center;
     padding: 20px 0;
+    height: 100svh;
 }
 
 /* Анимация появления */
