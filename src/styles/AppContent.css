@@ -3,9 +3,14 @@
 .app-container {
     position: relative;
     display: flex;
-    /*min-height: 100dvh;*/
-    min-height: 100vh;
-    background: #f9fafb;
+    /* было: min-height: 100vh; */
+    min-height: 100svh;
+    height: auto;
+    background: transparent; /* не перекрываем фоновую картинку у .app-main */
+}
+
+@supports not (height: 100svh) {
+    .app-container { min-height: 100vh; }
 }
 
 .topbar {
@@ -44,23 +49,15 @@
     background: #0f172a;
     display: block;
 }
-.hamburger-btn.is-open span:nth-child(2) {
-    opacity: 0;
-}
-.hamburger-btn.is-open span:nth-child(1) {
-    transform: translateY(6px) rotate(45deg);
-}
-.hamburger-btn.is-open span:nth-child(3) {
-    transform: translateY(-6px) rotate(-45deg);
-}
+.hamburger-btn.is-open span:nth-child(2) { opacity: 0; }
+.hamburger-btn.is-open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger-btn.is-open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 .sidebar {
     position: absolute;
     top: 56px;
     left: 0;
-    /*bottom: 0;*/
-    /*min-height: 100vh;*/
-    height: auto;
+    bottom: 0;               /* чтобы тянулась до низа контейнера */
     width: 240px;
     background: #fff;
     border-right: 1px solid #e5e7eb;
@@ -70,9 +67,7 @@
     z-index: 999;
 }
 .sidebar { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
-.sidebar.open {
-    transform: translateX(0);
-}
+.sidebar.open { transform: translateX(0); }
 .sidebar-logo {
     height: 150px;
     margin-bottom: 20px;
@@ -93,28 +88,29 @@
     transition: background 0.2s ease, color 0.2s ease;
 }
 .menu-item:hover,
-.logout-item:hover {
-    background: #f1f5f9;
-}
+.logout-item:hover { background: #f1f5f9; }
 .menu-item.active {
     background: #2563eb;
     color: #fff;
 }
+.logout-item { color: #dc2626; font-weight: 600; }
 
-.logout-item {
-    color: #dc2626;
-    font-weight: 600;
-}
-
+/* Основной контент с фоновым изображением */
 .app-main {
     flex: 1;
-    min-height: 100vh;
+    /* было: min-height: 100vh; */
+    min-height: calc(100svh - 56px); /* полный экран минус топбар */
     margin-top: 56px;
     padding: 24px;
+
     background-image: url("../assets/background.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+@supports not (height: 100svh) {
+    .app-main { min-height: calc(100vh - 56px); }
 }
 
 .loading-overlay {
@@ -136,9 +132,7 @@
     background: rgba(0,0,0,0.4);
     z-index: 998;
 }
-.backdrop--blur {
-    backdrop-filter: blur(2px);
-}
+.backdrop--blur { backdrop-filter: blur(2px); }
 
 .scanner-modal {
     position: fixed;
@@ -158,6 +152,7 @@
     font-size: 20px;
     cursor: pointer;
 }
+
 /* ——— sidebar items with icons ——— */
 .sidebar-menu { padding: 8px 12px; }
 .menu-item{
@@ -213,7 +208,6 @@
     font-size: 14px;
     color: #0f172a;                    /* slate-900 */
 
-    /* убираем системные стрелки и рисуем свою */
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -225,19 +219,13 @@
     transition: border-color .2s ease, box-shadow .2s ease, transform .06s ease;
 }
 
-.sort-select:hover{
-    border-color: #cbd5e1;             /* slate-300 */
-}
-
+.sort-select:hover{ border-color: #cbd5e1; }
 .sort-select:focus{
     outline: none;
     border-color: #3b82f6;             /* blue-500 */
     box-shadow: 0 0 0 4px rgba(59,130,246,.15);
 }
-
-.sort-select:active{
-    transform: translateY(1px);
-}
+.sort-select:active{ transform: translateY(1px); }
 
 /* Кнопка Excel пусть не прилипает */
 .excel-button-wrapper{
@@ -257,7 +245,5 @@
     }
     .sort-select{
         flex: 0 0 auto;
-        /*width: 100%;*/
-        /*min-width: 0;*/
     }
 }
