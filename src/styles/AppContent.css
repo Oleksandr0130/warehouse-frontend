@@ -5,7 +5,10 @@
     display: flex;
     min-height: 100dvh;
     min-height: 100vh;
-    background: #f9fafb;
+    background-image: url("../assets/background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .topbar {
@@ -110,10 +113,6 @@
     flex: 1;
     margin-top: 56px;
     padding: 24px;
-    background-image: url("../assets/background.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
 }
 
 .loading-overlay {
