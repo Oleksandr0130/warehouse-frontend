@@ -93,7 +93,7 @@
 }
 
 .reserved-item-actions {
-    display: flex;
+    /*display: flex;*/
     gap: 8px;
 }
 
