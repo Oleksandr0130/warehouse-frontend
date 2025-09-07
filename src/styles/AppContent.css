@@ -3,8 +3,8 @@
 .app-container {
     position: relative;
     display: flex;
-    /*min-height: 100dvh;*/
-    min-height: 100vh;
+    min-height: 100vh;   /* фолбэк */
+    min-height: 100dvh;  /* Android WebView */
     background: #f9fafb;
 }
 
@@ -106,11 +106,14 @@
     font-weight: 600;
 }
 
-.app-main {
+.app-main{
     flex: 1;
-    min-height: 100vh;
-    margin-top: 56px;
+
+    /* высота экрана минус фиксированный топбар */
+    min-height: calc(100dvh - 56px);
     padding: 24px;
+    padding-top: 56px; /* чтобы контент не залезал под топбар */
+
     background-image: url("../assets/background.png");
     background-size: cover;
     background-position: center;
