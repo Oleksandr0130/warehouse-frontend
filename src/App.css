@@ -82,12 +82,16 @@ html, body, #root {
 
 /* Auth layout */
 .auth {
-    min-height: 100vh;
+    min-height: 100vh;   /* fallback */
+    min-height: 100dvh;  /* Android */
+    min-height: 100svh;  /* iOS Safari */
+
     display: grid;
     place-items: center;
     padding: 2rem;
     background: linear-gradient(135deg, #eff6ff, #e0f2fe);
 }
+
 .auth-card {
     width: min(420px, 95%);
 }
