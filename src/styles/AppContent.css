@@ -252,7 +252,5 @@
     }
     .sort-select{
         flex: 0 0 auto;
-        width: 100%;
-        min-width: 0;
     }
 }
