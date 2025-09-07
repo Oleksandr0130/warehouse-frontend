@@ -1,14 +1,14 @@
 /* CreateItemPage.css */
 /* Страница прозрачная — фон глобальный через body::before */
 .item-page{
-    position: relative;
-    width: 100%;
+    /*position: relative;*/
+    /*width: 100%;*/
     min-height: 100svh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
-    box-sizing: border-box;
+    /*box-sizing: border-box;*/
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     color: #333;
     overflow-x: hidden;
