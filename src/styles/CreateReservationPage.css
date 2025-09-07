@@ -8,6 +8,8 @@
     align-items: center;
     justify-content: center;
     /*padding: 20px;*/
+    padding-top: 50px;
+    padding-bottom: 200px;
     /*box-sizing: border-box;*/
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     color: #333;
