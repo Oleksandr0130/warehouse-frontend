@@ -108,15 +108,9 @@
 
 .app-main {
     flex: 1;
-
-    /* чтобы фон всегда тянулся */
-    min-height: 100vh;   /* fallback */
-    min-height: 100dvh;  /* Android */
-    min-height: 100svh;  /* iOS Safari */
-    padding-top: 56px;
-
+    min-height: 100vh;
+    margin-top: 56px;
     padding: 24px;
-
     background-image: url("../assets/background.png");
     background-size: cover;
     background-position: center;

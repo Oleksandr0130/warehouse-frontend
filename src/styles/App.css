@@ -1,9 +1,7 @@
 /* Общие стили для приложения */
 .app-container {
   display: flex;
-    min-height: 100vh;   /* fallback */
-    min-height: 100dvh;  /* Android */
-    min-height: 100svh;  /* iOS Safari */
+  height: 100vh;
   background-color: #f5f5f5;
 }
 
