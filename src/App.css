@@ -1,7 +1,7 @@
 :root {
     --brand: #2563eb;
     --brand-dark: #1e3a8a;
-    /* --bg удалён */
+    --bg: #f5f7fb;
     --surface: #ffffff;
     --surface-alt: #f9fafb;
     --text: #0f172a;
@@ -22,7 +22,7 @@ html, body, #root {
     min-height: 100%;
     height: auto;
     font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    /* background: var(--bg);  — удалено */
+    background: var(--bg);
     color: var(--text);
 }
 
@@ -82,19 +82,12 @@ html, body, #root {
 
 /* Auth layout */
 .auth {
-    /* раньше: min-height: 100vh; */
-    min-height: 100svh; /* корректно тянется на весь экран в мобильных */
+    min-height: 100vh;
     display: grid;
     place-items: center;
     padding: 2rem;
     background: linear-gradient(135deg, #eff6ff, #e0f2fe);
 }
-
-/* Фолбэк на движки без svh */
-@supports not (height: 100svh) {
-    .auth { min-height: 100vh; }
-}
-
 .auth-card {
     width: min(420px, 95%);
 }
@@ -109,3 +102,4 @@ html, body, #root {
     display: grid;
     gap: 0.8rem;
 }
+

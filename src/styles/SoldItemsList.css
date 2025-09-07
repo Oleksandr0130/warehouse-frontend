@@ -1,9 +1,7 @@
 /* src/styles/SoldItemsList.css */
 
 .sold-items-list {
-    background: rgba(255,255,255,0.85);     /* было #fff */
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    background: #fff;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     padding: 20px 24px;
@@ -29,7 +27,7 @@
     padding: 0 14px;
     border-radius: 12px;
     border: 1px solid #e5e7eb;
-    background: rgba(249,250,251,0.85);     /* было #f9fafb */
+    background: #f9fafb;
     font-size: 0.95rem;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -57,7 +55,7 @@
     border: 1px solid #dcfce7;
     border-radius: 12px;
     margin-bottom: 12px;
-    background: rgba(240,253,244,0.9);      /* было #f0fdf4 */
+    background: #f0fdf4;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -70,8 +68,6 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 6px;
-    gap: 8px; /* чтобы длинные названия не налезали */
-    flex-wrap: wrap;
 }
 
 .sold-order {
@@ -103,11 +99,11 @@
     padding: 20px 0;
 }
 
-/* Анимация появления (бережно к motion) */
-@media (prefers-reduced-motion: no-preference) {
-    .fade-in { animation: fadeIn 0.3s ease; }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(4px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
+/* Анимация появления */
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
 }

@@ -1,8 +1,8 @@
-/* Страница прозрачная — глобальный фон через body::before */
+/* CreateItemPage.css */
+/* Страница прозрачная — фон глобальный через body::before */
 .item-page{
     position: relative;
     width: 100%;
-    /* было: min-height: 100svh; — оставляем и добавляем фолбэк */
     min-height: 100svh;
     display: flex;
     align-items: center;
@@ -15,17 +15,14 @@
     background: transparent;
 }
 
-/* фолбэк для движков без svh */
-@supports not (height: 100svh) {
-    .item-page { min-height: 100vh; }
-}
+/* НЕТ собственных градиентов/::before — используем глобальный фон */
 
-/* Карточка — делаю полупрозрачной, чтобы был виден глобальный фон */
+/* Карточка */
 .item-card{
     width: 100%;
     max-width: 560px;
     padding: 24px 20px 16px;
-    background: rgba(255,255,255,0.75);          /* было #aaaaaa */
+    background: #aaaaaa;
     border: 1px solid rgba(0,0,0,0.06);
     border-radius: 16px;
     backdrop-filter: blur(6px);
