@@ -109,6 +109,7 @@
 .app-main {
     flex: 1;
     margin-top: 56px;
+    padding: 24px;
     background-image: url("../assets/background.png");
     background-size: cover;
     background-position: center;

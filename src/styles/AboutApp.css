@@ -2,10 +2,7 @@
 
 .about-app {
     padding: 24px;
-    background-image: url("../assets/background.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    /*background: #f9fafb;*/
     min-height: 100vh;
     color: #0f172a;
 }
