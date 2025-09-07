@@ -12,8 +12,10 @@
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     color: #333;
     overflow-x: hidden;
-    background: transparent;
-}
+    background-image: url("../assets/background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;}
 
 /* НЕТ собственных градиентов/::before — используем глобальный фон */
 
