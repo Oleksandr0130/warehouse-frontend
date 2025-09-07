@@ -113,8 +113,8 @@
     min-height: 100vh;   /* fallback */
     min-height: 100dvh;  /* Android */
     min-height: 100svh;  /* iOS Safari */
+    padding-top: 56px;
 
-    margin-top: 56px;
     padding: 24px;
 
     background-image: url("../assets/background.png");
