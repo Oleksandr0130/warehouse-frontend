@@ -1,11 +1,14 @@
 /* src/styles/AppContent.css */
 
 .app-container {
-    position: relative;
+    /*position: relative;*/
     display: flex;
     min-height: 100dvh;
     min-height: 100vh;
-    background: #f9fafb;
+    background-image: url("../assets/background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .topbar {
