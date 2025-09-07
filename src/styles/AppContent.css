@@ -108,16 +108,17 @@
 
 .app-main{
     flex: 1;
+    box-sizing: border-box;
 
-    /* высота экрана минус фиксированный топбар */
-    min-height: calc(100dvh - 56px);
+    /* ВЕСЬ экран (без вычитания) */
+    min-height: 100vh;
+    min-height: 100dvh;
+
     padding: 24px;
-    padding-top: 56px; /* чтобы контент не залезал под топбар */
+    padding-top: 56px; /* под фиксированный топбар */
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
 
-    background-image: url("../assets/background.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: url("../assets/background.png") center/cover no-repeat;
 }
 
 .loading-overlay {

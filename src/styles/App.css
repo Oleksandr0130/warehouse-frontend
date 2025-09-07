@@ -56,8 +56,8 @@
 
 /* Стили для основного контента */
 .app-main {
-  flex: 1;
-  padding: 20px;
+  /*flex: 1;*/
+  /*padding: 20px;*/
   overflow-y: auto;
 }
 
