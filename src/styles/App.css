@@ -1,142 +1,117 @@
 /* Общие стили для приложения */
 .app-container {
-  display: flex;
-  height: 100vh;
-  background-color: #f5f5f5;
+    position: relative;        /* нужен контекст для ::before */
+    z-index: 0;
+
+    display: flex;
+
+    /* вместо height — min-height + dvh */
+    min-height: 100vh;         /* fallback */
+    min-height: 100dvh;        /* Android WebView */
+
+    /* цвет не критичен, фон перекроет ::before */
+    background-color: #f5f5f5;
+}
+
+/* ФИКСИРОВАННЫЙ ФОН НА ВЕСЬ ЭКРАН — работает на всех страницах */
+.app-container::before {
+    content: "";
+    position: fixed;           /* приклеен к вьюпорту, а не к контенту */
+    inset: 0;
+    background: url("../assets/background.png") center/cover no-repeat;
+    z-index: -1;               /* под контентом, но выше body */
+    pointer-events: none;
 }
 
 /* Стили для фиксированного бокового меню */
 .fixed-sidebar {
-  width: 250px;
-  background-color: #12232E; /* Тёмно-синий фон */
-  color: #ffffff; /* Белый текст */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 0;
-  box-shadow: inset -1px 0 5px rgba(0, 0, 0, 0.2);
+    width: 250px;
+    background-color: #12232E;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    box-shadow: inset -1px 0 5px rgba(0, 0, 0, 0.2);
 }
 
 .sidebar-title {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #ffffff;
-  padding-bottom: 10px;
-  text-align: center;
-  width: 80%;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ffffff;
+    padding-bottom: 10px;
+    text-align: center;
+    width: 80%;
 }
 
 .sidebar-menu {
-  list-style: none;
-  width: 100%;
-  padding: 0;
-  margin: 0;
+    list-style: none;
+    width: 100%;
+    padding: 0;
+    margin: 0;
 }
 
 .menu-item {
-  font-size: 1rem;
-  padding: 15px;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 0.3s;
+    font-size: 1rem;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
+.menu-item:hover { background-color: #007CC7; }
+.menu-item.active { background-color: #4DA8DA; }
 
-.menu-item:hover {
-  background-color: #007CC7; /* Слегка светлее при наведении */
-}
-
-.menu-item.active {
-  background-color: #4DA8DA; /* Цвет активного пункта меню */
-}
-.logout-item {
-  /* если нужно, можно добавить особый стиль, например, красный цвет */
-  color: red;
-}
+.logout-item { color: red; }
 
 /* Стили для основного контента */
 .app-main {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
+    flex: 1;
+    box-sizing: border-box;
+
+    /* гарантируем высоту, даже если контента мало */
+    min-height: 100vh;         /* fallback */
+    min-height: 100dvh;        /* Android WebView */
+
+    /* если есть фиксированный топбар ~56px — открой место под него */
+    padding-top: var(--topbar-h, 56px);
+
+    padding: 20px;
+    overflow-y: auto;          /* скролл по контенту при необходимости */
 }
 
-.scanner-buttons {
-  margin: 20px 0;
-}
+.scanner-buttons { margin: 20px 0; }
 
 /* Стили кнопок */
 .btn {
-  padding: 10px 15px;
-  font-size: 14px;
-  border-radius: 4px;
-  margin-right: 10px;
-  border: none;
-  color: white;
-  cursor: pointer;
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 4px;
+    margin-right: 10px;
+    border: none;
+    color: white;
+    cursor: pointer;
 }
-
-.btn.btn-add {
-  background-color: #28a745;
-}
-
-.btn.btn-remove {
-  background-color: #dc3545;
-}
-
-.btn:disabled {
-  background-color: grey;
-  cursor: not-allowed;
-}
+.btn.btn-add { background-color: #28a745; }
+.btn.btn-remove { background-color: #dc3545; }
+.btn:disabled { background-color: grey; cursor: not-allowed; }
 
 .loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 24px;
-  color: #555;
+    position: fixed; inset: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex; justify-content: center; align-items: center;
+    font-size: 24px; color: #555;
 }
 
 .sort-dropdown {
-  margin-bottom: 20px; /* Отступ от соседних элементов */
-  display: flex;
-  align-items: center;
-  gap: 10px; /* Расстояние между текстом "Sort Items By:" и выпадающим списком */
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
 }
-
-.sort-dropdown label {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #555;
-}
+.sort-dropdown label { font-size: 1rem; font-weight: 600; color: #555; }
 
 .sort-select {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-  background-color: #fff;
-  cursor: pointer;
-  appearance: none; /* Убирает стандартный стиль браузера на выпадающем меню */
-  transition: border-color 0.2s ease;
+    padding: 8px 12px;
+    border: 1px solid #ccc; border-radius: 4px;
+    font-size: 1rem; background-color: #fff; cursor: pointer;
+    appearance: none; transition: border-color 0.2s ease;
 }
-
-.sort-select:focus {
-  outline: none;
-  border-color: #007bff; /* Подсвечиваем границу при фокусе */
-}
-
-
-
-
-
-
-
-
-
-
+.sort-select:focus { outline: none; border-color: #007bff; }
