@@ -3,8 +3,8 @@
 .app-container {
     position: relative;
     display: flex;
-    min-height: 100vh;   /* фолбэк */
-    min-height: 100dvh;  /* Android WebView */
+    /*min-height: 100dvh;*/
+    min-height: 100vh;
     background: #f9fafb;
 }
 
@@ -106,19 +106,15 @@
     font-weight: 600;
 }
 
-.app-main{
+.app-main {
     flex: 1;
-    box-sizing: border-box;
-
-    /* ВЕСЬ экран (без вычитания) */
     min-height: 100vh;
-    min-height: 100dvh;
-
+    margin-top: 56px;
     padding: 24px;
-    padding-top: 56px; /* под фиксированный топбар */
-    padding-bottom: max(24px, env(safe-area-inset-bottom));
-
-    background: url("../assets/background.png") center/cover no-repeat;
+    background-image: url("../assets/background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .loading-overlay {
