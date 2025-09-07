@@ -108,6 +108,7 @@
 
 .app-main {
     flex: 1;
+    min-height: 100dvh;
     margin-top: 56px;
     padding: 24px;
     background-image: url("../assets/background.png");
