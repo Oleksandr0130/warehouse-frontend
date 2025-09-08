@@ -8,7 +8,7 @@ const Confirmation: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [message, setMessage] = useState<string>('Проверяем статус подтверждения…');
+    const [message, setMessage] = useState<string>('Checking the confirmation status…');
     const [status, setStatus] = useState<'success' | 'error'>('error');
 
     useEffect(() => {
@@ -16,11 +16,11 @@ const Confirmation: React.FC = () => {
         const statusParam = params.get('status');
 
         if (statusParam === 'success') {
-            setMessage('Почта успешно подтверждена!');
+            setMessage('Email successfully confirmed!');
             setStatus('success');
             setTimeout(() => navigate('/login', { replace: true }), 5000);
         } else {
-            setMessage('Не удалось подтвердить почту. Попробуйте ещё раз.');
+            setMessage('Failed to confirm email. Try again.');
             setStatus('error');
         }
     }, [location.search, navigate]);
@@ -33,27 +33,27 @@ const Confirmation: React.FC = () => {
                     {status === 'error' && <AiOutlineCloseCircle size={64} />}
                 </div>
 
-                <h2 className="confirmation-title">Подтверждение почты</h2>
+                <h2 className="confirmation-title">Email confirmation</h2>
                 <p className="confirmation-text">{message}</p>
 
                 <div className="confirmation-actions">
-                    <button
-                        className="confirmation-btn primary"
-                        onClick={() => navigate('/app/account')}
-                    >
-                        Перейти в аккаунт
-                    </button>
+                    {/*<button*/}
+                    {/*    className="confirmation-btn primary"*/}
+                    {/*    onClick={() => navigate('/app/account')}*/}
+                    {/*>*/}
+                    {/*    Перейти в аккаунт*/}
+                    {/*</button>*/}
                     <button
                         className="confirmation-btn outline"
                         onClick={() => navigate('/login')}
                     >
-                        Войти
+                        Login
                     </button>
                 </div>
 
                 {status === 'success' && (
                     <p className="confirmation-hint">
-                        Сейчас автоматически перейдём на страницу входа…
+                        Now you will be automatically redirected to the login page...
                     </p>
                 )}
             </div>
