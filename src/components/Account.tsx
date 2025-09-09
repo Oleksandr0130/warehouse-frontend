@@ -4,6 +4,8 @@ import { fetchMe, adminCreateUser, AdminCreateUserRequest, MeDto } from '../api'
 import { toast } from 'react-toastify';
 import '../styles/Account.css';
 import SubscriptionBanner from "./SubscriptionBanner.tsx";
+import { deleteAccount } from '../api';
+import { useNavigate } from 'react-router-dom';
 
 const Account: React.FC = () => {
     const [me, setMe] = useState<MeDto | null>(null);
@@ -26,6 +28,21 @@ const Account: React.FC = () => {
             }
         })();
     }, []);
+
+    const navigate = useNavigate();
+
+    const handleDeleteAccount = async () => {
+        if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+            return;
+        }
+        try {
+            await deleteAccount();
+            toast.success("Your account has been deleted.");
+            navigate("/login", { replace: true });
+        } catch {
+            toast.error("Failed to delete account");
+        }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -61,6 +78,9 @@ const Account: React.FC = () => {
                         <div className="row"><span>Email:</span><b>{me.email}</b></div>
                         <div className="row"><span>Company:</span><b>{me.companyName ?? '—'}</b></div>
                         <div className="row"><span>Role:</span><b>{me.admin ? 'Admin' : 'User'}</b></div>
+                        <button className="delete-btn" onClick={handleDeleteAccount}>
+                            Delete my account
+                        </button>
                     </div>
 
                     {me.admin && (

@@ -134,6 +134,26 @@ export async function adminCreateUser(
     return data;
 }
 
+export async function deleteAccount(): Promise<void> {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error("Not authenticated");
+
+    const res = await fetch(`/users/me`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to delete account");
+    }
+
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+}
+
+
 /* ===================== Интерцепторы ===================== */
 
 // request: проставляем Authorization, если токен есть

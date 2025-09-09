@@ -84,3 +84,22 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+.delete-btn {
+    height: 44px;
+    border-radius: 12px;
+    background: #dc2626;
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    border: none;
+    transition: 0.2s ease;
+    width: 100%;
+    margin-top: 12px;
+}
+
+.delete-btn:hover {
+    background: #b91c1c;
+}
+
