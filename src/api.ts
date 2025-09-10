@@ -3,6 +3,7 @@ import axios, {
     AxiosRequestConfig,
     InternalAxiosRequestConfig,
     AxiosRequestHeaders,
+    AxiosResponse,
 } from 'axios';
 import { ReservationData } from './types/ReservationData.ts';
 import { Item } from './types/Item.ts';
@@ -51,6 +52,18 @@ export interface AdminCreateUserRequest {
 interface RefreshResponse {
     accessToken: string;
     refreshToken: string;
+}
+
+/** ===== Google Play Billing: verify ===== */
+export interface VerifyPlayPurchaseRequest {
+    productId: string;
+    purchaseToken: string;
+    packageName: string;
+}
+export interface VerifyPlayPurchaseResponse {
+    active: boolean;
+    /** epoch millis (окончание текущего периода) */
+    expiryTime: number;
 }
 
 /* ===================== Helpers ===================== */
@@ -118,7 +131,19 @@ export const fetchBillingStatus = async (): Promise<BillingStatusDto> => {
     return data;
 };
 
-// подписочные методы удалены
+/** ✅ Google Play Billing: верификация покупки из APK
+ *  Вызывать после успешного `onPurchasesUpdated` в приложении:
+ *    verifyPlayPurchase(purchaseToken, 'flowqr_standard', 'com.example.warehouseqrapp')
+ */
+export const verifyPlayPurchase = async (
+    purchaseToken: string,
+    productId = 'flowqr_standard',
+    packageName = 'com.example.warehouseqrapp'
+): Promise<VerifyPlayPurchaseResponse> => {
+    const payload: VerifyPlayPurchaseRequest = { productId, purchaseToken, packageName };
+    const { data } = await api.post<VerifyPlayPurchaseResponse>('/billing/play/verify', payload);
+    return data;
+};
 
 /* ===================== Профиль / Админ ===================== */
 
@@ -133,26 +158,6 @@ export async function adminCreateUser(
     const { data } = await api.post<MeDto>('/admin/users', req);
     return data;
 }
-
-export async function deleteAccount(): Promise<void> {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error("Not authenticated");
-
-    const res = await fetch(`/users/me`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        },
-    });
-
-    if (!res.ok) {
-        throw new Error("Failed to delete account");
-    }
-
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-}
-
 
 /* ===================== Интерцепторы ===================== */
 
@@ -174,14 +179,10 @@ api.interceptors.request.use(
 );
 
 // response: обновление accessToken по 401 + мягкий редирект по 402
-import type { AxiosResponse } from 'axios'; // чтобы не было any в коллбеках
-
 api.interceptors.response.use(
     (response: AxiosResponse) => response,
     async (error: AxiosError) => {
-        const originalRequest = (error.config ?? {}) as AxiosRequestConfig & {
-            _retry?: boolean;
-        };
+        const originalRequest = (error.config ?? {}) as AxiosRequestConfig & { _retry?: boolean };
         const url: string = typeof originalRequest.url === 'string' ? originalRequest.url : '';
 
         // не трогаем 401 для /auth/*
@@ -199,16 +200,13 @@ api.interceptors.response.use(
                 const refreshToken = localStorage.getItem('refreshToken');
                 if (!refreshToken) throw new Error('No refresh token');
 
-                const { data } = await api.post<RefreshResponse>('/auth/refresh', {
-                    refreshToken,
-                });
+                const { data } = await api.post<RefreshResponse>('/auth/refresh', { refreshToken });
 
                 localStorage.setItem('accessToken', data.accessToken);
                 localStorage.setItem('refreshToken', data.refreshToken);
 
                 // проставим заголовок и повторим запрос
-                originalRequest.headers = (originalRequest.headers ??
-                    {}) as AxiosRequestHeaders;
+                originalRequest.headers = (originalRequest.headers ?? {}) as AxiosRequestHeaders;
                 (originalRequest.headers as AxiosRequestHeaders)['Authorization'] =
                     `Bearer ${data.accessToken}`;
 

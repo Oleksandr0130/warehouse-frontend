@@ -9,6 +9,12 @@ import {
 } from '../api';
 import { toast } from 'react-toastify';
 
+declare global {
+    interface Window {
+        billing?: { buy: (productId: string) => void };
+    }
+}
+
 interface Props {
     embedded?: boolean;
 }
@@ -22,15 +28,21 @@ export default function SubscriptionBanner({ embedded }: Props) {
     const [status, setStatus] = useState<BillingStatusDto | null>(null);
     const [currency, setCurrency] = useState<Currency>('EUR');
 
+    // Детектируем APK (WebView с JS-мостом)
+    const isAndroidApp = typeof window !== 'undefined' && !!window.billing;
+
     const load = async () => {
         try {
             const s = await fetchBillingStatus();
             setStatus(s);
 
-            if (isCurrency(s.billingCurrency)) {
-                setCurrency(s.billingCurrency);
-            } else if (navigator.language?.toLowerCase().startsWith('pl')) {
-                setCurrency('PLN');
+            if (!isAndroidApp) {
+                // Валюты касаются только веб-Stripe
+                if (isCurrency(s.billingCurrency)) {
+                    setCurrency(s.billingCurrency);
+                } else if (navigator.language?.toLowerCase().startsWith('pl')) {
+                    setCurrency('PLN');
+                }
             }
         } catch (e: unknown) {
             toast.error(getErrorMessage(e));
@@ -75,21 +87,25 @@ export default function SubscriptionBanner({ embedded }: Props) {
         return isEnding ? `${base} ending` : base;
     }, [status, isEnding]);
 
-    // === Расчёт прогресса (для тёмной карточки)
-    // Показываем ДОЛЮ оставшихся дней. Базовый период — 30 дн. (fallback).
+    // Прогресс (для тёмной карточки)
     const progressPct = useMemo(() => {
         if (!status || (status.status !== 'TRIAL' && status.status !== 'ACTIVE')) return 0;
         const daysLeft = typeof status.daysLeft === 'number' ? status.daysLeft : 0;
-        const base = 30; // если API не даёт длительность периода, берём 30
+        const base = 30; // fallback
         const pct = Math.max(0, Math.min(100, (daysLeft / base) * 100));
         return pct;
     }, [status]);
 
-    const onPayCurrency = async (cur: Currency) => {
+    // Покупка: APK → Google Play; Web → Stripe
+    const onPay = async () => {
         try {
             setLoading(true);
-            const { checkoutUrl } = await createOneOffCheckout(cur);
-            window.location.href = checkoutUrl;
+            if (isAndroidApp) {
+                window.billing?.buy('flowqr_standard');
+            } else {
+                const { checkoutUrl } = await createOneOffCheckout(currency);
+                window.location.href = checkoutUrl;
+            }
         } catch (e: unknown) {
             toast.error(getErrorMessage(e));
         } finally {
@@ -114,12 +130,12 @@ export default function SubscriptionBanner({ embedded }: Props) {
                 <div className="sub-header">
                     <div className="sub-title">{title}</div>
                     <span className={pillClass}>
-            {status.status === 'TRIAL' && 'Trial'}
+                        {status.status === 'TRIAL' && 'Trial'}
                         {status.status === 'ACTIVE' && 'Active'}
                         {status.status === 'EXPIRED' && 'Expired'}
                         {status.status === 'ANON' && 'Anon'}
                         {status.status === 'NO_COMPANY' && 'No company'}
-          </span>
+                    </span>
                 </div>
 
                 {(status.status === 'TRIAL' || status.status === 'ACTIVE') && (
@@ -137,7 +153,61 @@ export default function SubscriptionBanner({ embedded }: Props) {
                 <div className="sub-actions">
                     {status.isAdmin ? (
                         <div className="sub-actions-row">
-                            <div className="sub-currency-toggle">
+                            {!isAndroidApp && (
+                                <div className="sub-currency-toggle">
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="currency"
+                                            value="EUR"
+                                            checked={currency === 'EUR'}
+                                            onChange={() => setCurrency('EUR')}
+                                        />
+                                        EUR
+                                    </label>
+                                    <label style={{ marginLeft: 12 }}>
+                                        <input
+                                            type="radio"
+                                            name="currency"
+                                            value="PLN"
+                                            checked={currency === 'PLN'}
+                                            onChange={() => setCurrency('PLN')}
+                                        />
+                                        PLN
+                                    </label>
+                                </div>
+                            )}
+
+                            <div style={{ marginTop: 8 }}>
+                                <button className="sub-btn" onClick={onPay} disabled={loading}>
+                                    {isAndroidApp
+                                        ? 'Buy 1 month (Google Play)'
+                                        : currency === 'EUR'
+                                            ? 'Buy 1 month (EUR · card)'
+                                            : 'Zapłać 1 miesiąc (PLN · karta/BLIK)'}
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="sub-hint">Extension is available to the company administrator</div>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
+    // Banner (верхний)
+    return (
+        <div className={`subscription-banner ${isEnding ? 'sub-ending' : ''}`}>
+            <div>
+                <div className="sub-title">{title}</div>
+            </div>
+
+            <div className="sub-actions">
+                {status.isAdmin ? (
+                    <>
+                        {!isAndroidApp && (
+                            <div className="sub-currency-toggle" style={{ marginRight: 12 }}>
                                 <label>
                                     <input
                                         type="radio"
@@ -159,56 +229,14 @@ export default function SubscriptionBanner({ embedded }: Props) {
                                     PLN
                                 </label>
                             </div>
+                        )}
 
-                            <div style={{ marginTop: 8 }}>
-                                <button className="sub-btn" onClick={() => onPayCurrency(currency)} disabled={loading}>
-                                    {currency === 'EUR' ? 'Buy 1 month (EUR · card)' : 'Zapłać 1 miesiąc (PLN · karta/BLIK)'}
-                                </button>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="sub-hint">Extension is available to the company administrator</div>
-                    )}
-                </div>
-            </div>
-        );
-    }
-
-    // Banner (оставил как было)
-    return (
-        <div className={`subscription-banner ${isEnding ? 'sub-ending' : ''}`}>
-            <div>
-                <div className="sub-title">{title}</div>
-            </div>
-
-            <div className="sub-actions">
-                {status.isAdmin ? (
-                    <>
-                        <div className="sub-currency-toggle" style={{ marginRight: 12 }}>
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="currency"
-                                    value="EUR"
-                                    checked={currency === 'EUR'}
-                                    onChange={() => setCurrency('EUR')}
-                                />
-                                EUR
-                            </label>
-                            <label style={{ marginLeft: 12 }}>
-                                <input
-                                    type="radio"
-                                    name="currency"
-                                    value="PLN"
-                                    checked={currency === 'PLN'}
-                                    onChange={() => setCurrency('PLN')}
-                                />
-                                PLN
-                            </label>
-                        </div>
-
-                        <button className="subscription-banner button" onClick={() => onPayCurrency(currency)} disabled={loading}>
-                            {currency === 'EUR' ? 'Buy 1 month (EUR · card)' : 'Zapłać 1 miesiąc (PLN · karta/BLIK)'}
+                        <button className="subscription-banner button" onClick={onPay} disabled={loading}>
+                            {isAndroidApp
+                                ? 'Buy 1 month (Google Play)'
+                                : currency === 'EUR'
+                                    ? 'Buy 1 month (EUR · card)'
+                                    : 'Zapłać 1 miesiąc (PLN · karta/BLIK)'}
                         </button>
                     </>
                 ) : (
