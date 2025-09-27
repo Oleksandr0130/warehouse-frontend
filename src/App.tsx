@@ -30,13 +30,16 @@ function getStorage(): Storage {
     }
 }
 
+/** Чтение токена (с b/c по ключу "token") */
 function getAccessToken() {
-    return getStorage().getItem('accessToken');
+    const s = getStorage();
+    return s.getItem('accessToken') ?? s.getItem('token') ?? null;
 }
 
-function RequireAuth({ children }: { children: JSX.Element }) {
+/** Теперь RequireAuth учитывает и наличие токена, и флаг isAuthenticated */
+function RequireAuth({ children, isAuthenticated }: { children: JSX.Element; isAuthenticated: boolean }) {
     const token = getAccessToken();
-    if (!token) return <Navigate to="/login" replace />;
+    if (!token && !isAuthenticated) return <Navigate to="/login" replace />;
     return children;
 }
 
@@ -122,7 +125,7 @@ function App() {
                 <Route
                     path="/app"
                     element={
-                        <RequireAuth>
+                        <RequireAuth isAuthenticated={isAuthenticated}>
                             <AppContent onLogout={handleLogout} />
                         </RequireAuth>
                     }
@@ -133,8 +136,8 @@ function App() {
                 </Route>
 
                 {/* редиректы */}
-                <Route path="/" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
-                <Route path="*" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
+                <Route path="/" element={<Navigate to={isAuthenticated || getAccessToken() ? '/app' : '/login'} replace />} />
+                <Route path="*" element={<Navigate to={isAuthenticated || getAccessToken() ? '/app' : '/login'} replace />} />
             </Routes>
         </>
     );
