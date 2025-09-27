@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { loginUser } from '../api';
-import '../styles/Login.css';
+import '../styles/Login.css';   // 👈 отдельный файл только для логина
 import logo from '../assets/flowqr-logo.png';
 
 interface LoginProps {
@@ -14,27 +14,6 @@ type FieldErrors = {
     username?: string;
     password?: string;
 };
-
-/** детектор Android WebView вашего приложения */
-const isAndroidApp = (() => {
-    try {
-        return typeof navigator !== 'undefined' && navigator.userAgent.includes('FlowQRApp/Android');
-    } catch {
-        return false;
-    }
-})();
-
-/** единая точка доступа к стору: sessionStorage на Android, иначе localStorage */
-function getStorage(): Storage {
-    try {
-        return isAndroidApp ? sessionStorage : localStorage;
-    } catch {
-        return localStorage;
-    }
-}
-
-const ACCESS_KEY = 'accessToken';
-const REFRESH_KEY = 'refreshToken';
 
 const Login: React.FC<LoginProps> = ({ onSuccess }) => {
     const navigate = useNavigate();
@@ -63,22 +42,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 username: credentials.username,
                 password: credentials.password,
             });
-
-            // ожидаемые варианты ответа сервера:
-            // 1) { accessToken, refreshToken }
-            // 2) { token } — старый вариант
-            const data: any = res?.data ?? {};
-            const accessToken: string | undefined = data.accessToken ?? data.token;
-            const refreshToken: string | undefined = data.refreshToken;
-
-            if (!accessToken) {
-                throw new Error('Missing access token in response');
-            }
-
-            const storage = getStorage();
-            storage.setItem(ACCESS_KEY, accessToken);
-            if (refreshToken) storage.setItem(REFRESH_KEY, refreshToken);
-
+            localStorage.setItem('token', res.data.token);
             onSuccess?.();
             navigate('/app', { replace: true });
         } catch (err) {
