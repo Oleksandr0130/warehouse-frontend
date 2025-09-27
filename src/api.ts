@@ -1,3 +1,4 @@
+// src/api.ts
 import axios, {
     AxiosError,
     AxiosRequestConfig,
@@ -8,6 +9,8 @@ import axios, {
 import { ReservationData } from './types/ReservationData.ts';
 import { Item } from './types/Item.ts';
 
+/* ===================== База ===================== */
+
 // BASE_URL: env или '/api'
 const BASE_URL = import.meta.env.VITE_API_BASE ?? '/api';
 
@@ -16,6 +19,27 @@ const api = axios.create({
     timeout: 10000,
     withCredentials: true,
 });
+
+/* ===================== Детектор платформы и стор ===================== */
+
+const isAndroidApp = (() => {
+    try {
+        return typeof navigator !== 'undefined' && navigator.userAgent.includes('FlowQRApp/Android');
+    } catch {
+        return false;
+    }
+})();
+
+function getStorage(): Storage {
+    try {
+        return isAndroidApp ? sessionStorage : localStorage;
+    } catch {
+        return localStorage;
+    }
+}
+
+const ACCESS_KEY = 'accessToken';
+const REFRESH_KEY = 'refreshToken';
 
 /* ===================== Типы ===================== */
 
@@ -82,6 +106,27 @@ const setAuthHeader = (headers: AxiosRequestHeaders, token: string) => {
     headers['Authorization'] = `Bearer ${token}`;
 };
 
+// нормализуем URL до пути без baseURL
+function stripBase(url: string): string {
+    if (!url) return '';
+    try {
+        // относительный путь
+        if (url.startsWith('/')) return url;
+        // абсолютный — пробуем удалить baseURL
+        const base = (api.defaults.baseURL ?? '').replace(/\/+$/, '');
+        return url.startsWith(base) ? url.slice(base.length) || '/' : url;
+    } catch {
+        return url;
+    }
+}
+
+const AUTH_WHITELIST = [/^\/auth\/login\b/i, /^\/auth\/register\b/i, /^\/auth\/refresh\b/i, /^\/confirmation\b/i];
+
+function shouldSkipAuth(config: AxiosRequestConfig): boolean {
+    const path = stripBase(String(config.url ?? ''));
+    return AUTH_WHITELIST.some((re) => re.test(path));
+}
+
 /* ===================== API методы домена ===================== */
 
 export const fetchItems = async (): Promise<Item[]> => {
@@ -131,10 +176,7 @@ export const fetchBillingStatus = async (): Promise<BillingStatusDto> => {
     return data;
 };
 
-/** ✅ Google Play Billing: верификация покупки из APK
- *  Вызывать после успешного `onPurchasesUpdated` в приложении:
- *    verifyPlayPurchase(purchaseToken, 'flowqr_standard', 'com.example.warehouseqrapp')
- */
+/** ✅ Google Play Billing: верификация покупки из APK */
 export const verifyPlayPurchase = async (
     purchaseToken: string,
     productId = 'flowqr_standard',
@@ -160,37 +202,30 @@ export async function adminCreateUser(
 }
 
 export async function deleteAccount(): Promise<void> {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error("Not authenticated");
-
-    const res = await fetch(`/users/me`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        },
-    });
-
-    if (!res.ok) {
-        throw new Error("Failed to delete account");
-    }
-
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
+    await api.delete('/users/me');
+    const storage = getStorage();
+    storage.removeItem(ACCESS_KEY);
+    storage.removeItem(REFRESH_KEY);
 }
 
 /* ===================== Интерцепторы ===================== */
 
-// request: проставляем Authorization, если токен есть
+// request: проставляем Authorization, если токен есть (кроме /auth/*)
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const raw =
-            localStorage.getItem('accessToken') ?? localStorage.getItem('token');
-        if (raw) {
-            const token = raw.startsWith('Bearer ') ? raw.slice(7) : raw;
-            if (!config.headers) {
-                config.headers = {} as AxiosRequestHeaders;
+        if (!shouldSkipAuth(config)) {
+            const storage = getStorage();
+            const raw = storage.getItem(ACCESS_KEY) ?? storage.getItem('token'); // b/c
+            if (raw) {
+                const token = raw.startsWith('Bearer ') ? raw.slice(7) : raw;
+                if (!config.headers) {
+                    config.headers = {} as AxiosRequestHeaders;
+                }
+                setAuthHeader(config.headers as AxiosRequestHeaders, token);
             }
-            setAuthHeader(config.headers as AxiosRequestHeaders, token);
+        } else if (config.headers && 'Authorization' in config.headers) {
+            // гарантированно убираем заголовок для /auth/*
+            delete (config.headers as any).Authorization;
         }
         return config;
     },
@@ -202,13 +237,10 @@ api.interceptors.response.use(
     (response: AxiosResponse) => response,
     async (error: AxiosError) => {
         const originalRequest = (error.config ?? {}) as AxiosRequestConfig & { _retry?: boolean };
-        const url: string = typeof originalRequest.url === 'string' ? originalRequest.url : '';
+        const url = stripBase(String(originalRequest.url ?? ''));
 
         // не трогаем 401 для /auth/*
-        if (
-            error.response?.status === 401 &&
-            /\/auth\/login|\/auth\/register|\/auth\/refresh|\/confirmation/.test(url)
-        ) {
+        if (error.response?.status === 401 && AUTH_WHITELIST.some((re) => re.test(url))) {
             return Promise.reject(error);
         }
 
@@ -216,13 +248,15 @@ api.interceptors.response.use(
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
-                const refreshToken = localStorage.getItem('refreshToken');
+                const storage = getStorage();
+                const refreshToken = storage.getItem(REFRESH_KEY);
                 if (!refreshToken) throw new Error('No refresh token');
 
+                // важно: не добавлять Authorization сюда
                 const { data } = await api.post<RefreshResponse>('/auth/refresh', { refreshToken });
 
-                localStorage.setItem('accessToken', data.accessToken);
-                localStorage.setItem('refreshToken', data.refreshToken);
+                storage.setItem(ACCESS_KEY, data.accessToken);
+                storage.setItem(REFRESH_KEY, data.refreshToken);
 
                 // проставим заголовок и повторим запрос
                 originalRequest.headers = (originalRequest.headers ?? {}) as AxiosRequestHeaders;
@@ -231,8 +265,9 @@ api.interceptors.response.use(
 
                 return api(originalRequest);
             } catch (refreshError) {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
+                const storage = getStorage();
+                storage.removeItem(ACCESS_KEY);
+                storage.removeItem(REFRESH_KEY);
                 if (window.location.pathname !== '/login') {
                     window.dispatchEvent(new Event('auth:logout'));
                 }
@@ -254,7 +289,7 @@ api.interceptors.response.use(
             (err.response?.headers as Record<string, unknown>) ?? {};
         const dataObj: Record<string, unknown> =
             (err.response?.data as Record<string, unknown>) ?? {};
-        const url = typeof err.config?.url === 'string' ? err.config!.url! : '';
+        const url = stripBase(String(err.config?.url ?? ''));
 
         const expired =
             headersObj['x-subscription-expired'] === 'true' ||
