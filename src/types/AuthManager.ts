@@ -1,9 +1,9 @@
-// AuthManager.ts
+// types/AuthManager.ts
 import axios from 'axios';
 
-const BASE_URL = '/api'; // Базовый URL для обработки токенов
+const BASE_URL = '/api';
 
-// Определяем, запущено ли в Android WebView вашего приложения
+// Определяем Android WebView вашего приложения
 const isAndroidApp = (() => {
     try {
         return typeof navigator !== 'undefined' && navigator.userAgent.includes('FlowQRApp/Android');
@@ -12,45 +12,53 @@ const isAndroidApp = (() => {
     }
 })();
 
-// Безопасно получаем хранилище (sessionStorage для Android-приложения, иначе localStorage)
-function getStorage(): Storage {
+// accessToken (Android) -> sessionStorage, refreshToken -> localStorage
+const accessStore = (() => {
     try {
         return isAndroidApp ? sessionStorage : localStorage;
     } catch {
-        // Фолбэк на localStorage, если что-то пошло не так
         return localStorage;
     }
-}
+})();
+const refreshStore = localStorage;
 
 const ACCESS_KEY = 'accessToken';
 const REFRESH_KEY = 'refreshToken';
 
-const getAccessToken = () => getStorage().getItem(ACCESS_KEY);
-const getRefreshToken = () => getStorage().getItem(REFRESH_KEY);
+const getAccessToken = () =>
+    accessStore.getItem(ACCESS_KEY) ?? accessStore.getItem('token'); // b/c по старому ключу
 
-const setTokens = (accessToken: string, refreshToken: string) => {
-    const storage = getStorage();
-    storage.setItem(ACCESS_KEY, accessToken);
-    storage.setItem(REFRESH_KEY, refreshToken);
+const getRefreshToken = () => refreshStore.getItem(REFRESH_KEY);
+
+const setTokens = (accessToken: string, refreshToken?: string) => {
+    accessStore.setItem(ACCESS_KEY, accessToken);
+    if (refreshToken) refreshStore.setItem(REFRESH_KEY, refreshToken);
 };
 
 const clearTokens = () => {
-    const storage = getStorage();
-    storage.removeItem(ACCESS_KEY);
-    storage.removeItem(REFRESH_KEY);
+    accessStore.removeItem(ACCESS_KEY);
+    refreshStore.removeItem(REFRESH_KEY);
+    // на всякий случай уберём старые ключи
+    accessStore.removeItem('token');
 };
 
-// Проверка токенов
+// Проверка/обновление токенов (используется при старте/ротации)
 const validateTokens = async (): Promise<boolean> => {
     const accessToken = getAccessToken();
     const refreshToken = getRefreshToken();
 
+    // Нет refresh — попробовать cookie-сессию (для веба), иначе неавторизован
     if (!refreshToken) {
-        return false; // Refresh Token отсутствует
+        try {
+            await axios.get(`${BASE_URL}/users/me`, { withCredentials: true });
+            return true;
+        } catch {
+            return false;
+        }
     }
 
+    // Если access потеряли (например, после ротации на Android) — обновим по refresh
     if (!accessToken) {
-        // Если Access Token отсутствует/истёк, пытаемся обновить
         try {
             const response = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
             setTokens(response.data.accessToken, response.data.refreshToken);
@@ -62,10 +70,10 @@ const validateTokens = async (): Promise<boolean> => {
         }
     }
 
-    return true; // Токены валидны
+    return true;
 };
 
-// Автоматическое обновление токена
+// Автоматическое обновление access при необходимости
 const refreshTokensIfNeeded = async () => {
     const accessToken = getAccessToken();
     if (!accessToken) {

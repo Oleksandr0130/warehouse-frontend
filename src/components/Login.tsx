@@ -22,12 +22,16 @@ const isAndroidApp = (() => {
     }
 })();
 
-function getStorage(): Storage {
+// access → sessionStorage на Android, иначе localStorage; refresh → всегда localStorage
+function getAccessStore(): Storage {
     try {
         return isAndroidApp ? sessionStorage : localStorage;
     } catch {
         return localStorage;
     }
+}
+function getRefreshStore(): Storage {
+    return localStorage;
 }
 
 const ACCESS_KEY = 'accessToken';
@@ -68,9 +72,11 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
             const refreshToken: string | undefined = data.refreshToken ?? data.refresh_token;
 
             if (accessToken) {
-                const storage = getStorage();
-                storage.setItem(ACCESS_KEY, accessToken);
-                if (refreshToken) storage.setItem(REFRESH_KEY, refreshToken);
+                const aStore = getAccessStore();
+                const rStore = getRefreshStore();
+                aStore.setItem(ACCESS_KEY, accessToken);
+                if (refreshToken) rStore.setItem(REFRESH_KEY, refreshToken);
+
                 onSuccess?.();
                 navigate('/app', { replace: true });
                 return;
@@ -79,12 +85,10 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
             // Токена в теле нет? Пробуем cookie-сессию: защищённый вызов должен пройти
             try {
                 await fetchMe();
-                // ок — авторизованы через cookie, пускаем без записи токена
                 onSuccess?.();
                 navigate('/app', { replace: true });
                 return;
             } catch {
-                // cookie-сессии нет — считаем, что логин неуспешен
                 setFormError('Incorrect username or password');
                 setFieldErrors({ password: 'Incorrect username or password' });
             }
