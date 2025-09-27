@@ -12,8 +12,30 @@ import { validateTokens, logout } from './types/AuthManager';
 import { toast, ToastContainer } from 'react-toastify';
 import { fetchBillingStatus } from './api';
 
+/** Определяем Android WebView вашего приложения по user-agent */
+const isAndroidApp = (() => {
+    try {
+        return typeof navigator !== 'undefined' && navigator.userAgent.includes('FlowQRApp/Android');
+    } catch {
+        return false;
+    }
+})();
+
+/** Унифицированный доступ к стору: sessionStorage для Android-приложения, иначе localStorage */
+function getStorage(): Storage {
+    try {
+        return isAndroidApp ? sessionStorage : localStorage;
+    } catch {
+        return localStorage;
+    }
+}
+
+function getAccessToken() {
+    return getStorage().getItem('accessToken');
+}
+
 function RequireAuth({ children }: { children: JSX.Element }) {
-    const token = localStorage.getItem('token');
+    const token = getAccessToken();
     if (!token) return <Navigate to="/login" replace />;
     return children;
 }
@@ -76,7 +98,7 @@ function App() {
     const handleAuthSuccess = () => {
         setIsAuthenticated(true);
         toast.success('Successful Login!', { toastId: 'auth-login' });
-        // на всякий случай в следующий тик — чтобы токен точно попал в localStorage
+        // запускаем предупреждение о биллинге в следующий тик
         setTimeout(() => warnOnLogin(), 0);
     };
 

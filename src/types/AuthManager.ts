@@ -3,17 +3,41 @@ import axios from 'axios';
 
 const BASE_URL = '/api'; // Базовый URL для обработки токенов
 
-const getAccessToken = () => localStorage.getItem('accessToken');
-const getRefreshToken = () => localStorage.getItem('refreshToken');
+// Определяем, запущено ли в Android WebView вашего приложения
+const isAndroidApp = (() => {
+    try {
+        return typeof navigator !== 'undefined' && navigator.userAgent.includes('FlowQRApp/Android');
+    } catch {
+        return false;
+    }
+})();
+
+// Безопасно получаем хранилище (sessionStorage для Android-приложения, иначе localStorage)
+function getStorage(): Storage {
+    try {
+        return isAndroidApp ? sessionStorage : localStorage;
+    } catch {
+        // Фолбэк на localStorage, если что-то пошло не так
+        return localStorage;
+    }
+}
+
+const ACCESS_KEY = 'accessToken';
+const REFRESH_KEY = 'refreshToken';
+
+const getAccessToken = () => getStorage().getItem(ACCESS_KEY);
+const getRefreshToken = () => getStorage().getItem(REFRESH_KEY);
 
 const setTokens = (accessToken: string, refreshToken: string) => {
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
+    const storage = getStorage();
+    storage.setItem(ACCESS_KEY, accessToken);
+    storage.setItem(REFRESH_KEY, refreshToken);
 };
 
 const clearTokens = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    const storage = getStorage();
+    storage.removeItem(ACCESS_KEY);
+    storage.removeItem(REFRESH_KEY);
 };
 
 // Проверка токенов
@@ -26,7 +50,7 @@ const validateTokens = async (): Promise<boolean> => {
     }
 
     if (!accessToken) {
-        // Если Access Token истёк, пытаемся обновить
+        // Если Access Token отсутствует/истёк, пытаемся обновить
         try {
             const response = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
             setTokens(response.data.accessToken, response.data.refreshToken);
