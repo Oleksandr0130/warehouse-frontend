@@ -21,8 +21,8 @@ const isAndroidApp = (() => {
     }
 })();
 
-/** Где храним токены: access → sessionStorage на Android, иначе localStorage */
-function getAccessStore(): Storage {
+/** Унифицированный доступ к стору: sessionStorage для Android-приложения, иначе localStorage */
+function getStorage(): Storage {
     try {
         return isAndroidApp ? sessionStorage : localStorage;
     } catch {
@@ -30,23 +30,14 @@ function getAccessStore(): Storage {
     }
 }
 
-/** Чтение access токена (с b/c по ключу "token") */
+/** Чтение токена (с b/c по ключу "token") */
 function getAccessToken() {
-    const s = getAccessStore();
+    const s = getStorage();
     return s.getItem('accessToken') ?? s.getItem('token') ?? null;
 }
 
-/** Guard ждёт завершения проверки (authReady), затем пускает по токену ИЛИ по флагу isAuthenticated */
-function RequireAuth({
-                         children,
-                         isAuthenticated,
-                         authReady,
-                     }: {
-    children: JSX.Element;
-    isAuthenticated: boolean;
-    authReady: boolean;
-}) {
-    if (!authReady) return null; // при желании добавь спиннер
+/** Теперь RequireAuth учитывает и наличие токена, и флаг isAuthenticated */
+function RequireAuth({ children, isAuthenticated }: { children: JSX.Element; isAuthenticated: boolean }) {
     const token = getAccessToken();
     if (!token && !isAuthenticated) return <Navigate to="/login" replace />;
     return children;
@@ -54,7 +45,6 @@ function RequireAuth({
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [authReady, setAuthReady] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -74,9 +64,8 @@ function App() {
 
     useEffect(() => {
         const init = async () => {
-            const valid = await validateTokens(); // при потере access на Android обновим его по refresh из localStorage
+            const valid = await validateTokens();
             setIsAuthenticated(valid);
-            setAuthReady(true);
         };
         init();
     }, []);
@@ -112,6 +101,7 @@ function App() {
     const handleAuthSuccess = () => {
         setIsAuthenticated(true);
         toast.success('Successful Login!', { toastId: 'auth-login' });
+        // запускаем предупреждение о биллинге в следующий тик
         setTimeout(() => warnOnLogin(), 0);
     };
 
@@ -135,7 +125,7 @@ function App() {
                 <Route
                     path="/app"
                     element={
-                        <RequireAuth isAuthenticated={isAuthenticated} authReady={authReady}>
+                        <RequireAuth isAuthenticated={isAuthenticated}>
                             <AppContent onLogout={handleLogout} />
                         </RequireAuth>
                     }
@@ -146,22 +136,8 @@ function App() {
                 </Route>
 
                 {/* редиректы */}
-                <Route
-                    path="/"
-                    element={
-                        authReady
-                            ? <Navigate to={(isAuthenticated || getAccessToken()) ? '/app' : '/login'} replace />
-                            : null
-                    }
-                />
-                <Route
-                    path="*"
-                    element={
-                        authReady
-                            ? <Navigate to={(isAuthenticated || getAccessToken()) ? '/app' : '/login'} replace />
-                            : null
-                    }
-                />
+                <Route path="/" element={<Navigate to={isAuthenticated || getAccessToken() ? '/app' : '/login'} replace />} />
+                <Route path="*" element={<Navigate to={isAuthenticated || getAccessToken() ? '/app' : '/login'} replace />} />
             </Routes>
         </>
     );
