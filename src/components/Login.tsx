@@ -14,10 +14,22 @@ type FieldErrors = {
     password?: string;
 };
 
-// ВСЕГДА localStorage
+const isAndroidApp = (() => {
+    try {
+        return typeof navigator !== 'undefined' && navigator.userAgent.includes('FlowQRApp/Android');
+    } catch {
+        return false;
+    }
+})();
+
 function getStorage(): Storage {
-    try { return localStorage; } catch { return sessionStorage; }
+    try {
+        return isAndroidApp ? sessionStorage : localStorage;
+    } catch {
+        return localStorage;
+    }
 }
+
 const ACCESS_KEY = 'accessToken';
 const REFRESH_KEY = 'refreshToken';
 
@@ -30,9 +42,9 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setCredentials((prev) => ({ ...prev, [name]: value }));           // фикс опечаток ...prev
+        setCredentials((prev) => ({ ...prev, [name]: value }));
         if (fieldErrors[name as keyof FieldErrors]) {
-            setFieldErrors((prev) => ({ ...prev, [name]: undefined }));     // фикс опечаток ...prev
+            setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
         }
         if (formError) setFormError(null);
     };
@@ -50,23 +62,32 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
             });
 
             const data: any = res?.data ?? {};
+            // РјР°РєСЃРёРјР°Р»СЊРЅРѕ В«РіРёР±РєРёР№В» РїР°СЂСЃРёРЅРі РІРѕР·РјРѕР¶РЅС‹С… РєР»СЋС‡РµР№
             const accessToken: string | undefined =
                 data.accessToken ?? data.token ?? data.jwt ?? data.jwtToken ?? data.id_token ?? data.access_token;
             const refreshToken: string | undefined = data.refreshToken ?? data.refresh_token;
 
             if (accessToken) {
-                const s = getStorage();
-                s.setItem(ACCESS_KEY, accessToken);
-                if (refreshToken) s.setItem(REFRESH_KEY, refreshToken);
+                const storage = getStorage();
+                storage.setItem(ACCESS_KEY, accessToken);
+                if (refreshToken) storage.setItem(REFRESH_KEY, refreshToken);
                 onSuccess?.();
                 navigate('/app', { replace: true });
                 return;
             }
 
-            // Если бэк не отдал токены, но есть cookie-сессия
-            await fetchMe();
-            onSuccess?.();
-            navigate('/app', { replace: true });
+            // РўРѕРєРµРЅР° РІ С‚РµР»Рµ РЅРµС‚? РџСЂРѕР±СѓРµРј cookie-СЃРµСЃСЃРёСЋ: Р·Р°С‰РёС‰С‘РЅРЅС‹Р№ РІС‹Р·РѕРІ РґРѕР»Р¶РµРЅ РїСЂРѕР№С‚Рё
+            try {
+                await fetchMe();
+                // РѕРє вЂ” Р°РІС‚РѕСЂРёР·РѕРІР°РЅС‹ С‡РµСЂРµР· cookie, РїСѓСЃРєР°РµРј Р±РµР· Р·Р°РїРёСЃРё С‚РѕРєРµРЅР°
+                onSuccess?.();
+                navigate('/app', { replace: true });
+                return;
+            } catch {
+                // cookie-СЃРµСЃСЃРёРё РЅРµС‚ вЂ” СЃС‡РёС‚Р°РµРј, С‡С‚Рѕ Р»РѕРіРёРЅ РЅРµСѓСЃРїРµС€РµРЅ
+                setFormError('Incorrect username or password');
+                setFieldErrors({ password: 'Incorrect username or password' });
+            }
         } catch (err) {
             if (err instanceof AxiosError) {
                 const status = err.response?.status;
@@ -149,24 +170,23 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
 
                     <button
                         type="button"
-                        onClick={doLogin}
-                        disabled={isSubmitting}
                         className="login-button"
-                        aria-busy={isSubmitting}
+                        disabled={isSubmitting}
+                        onClick={doLogin}
                     >
-                        {isSubmitting ? 'Logging in...' : 'Login'}
+                        {isSubmitting ? 'Logging inвЂ¦' : 'Login'}
                     </button>
                 </div>
 
                 <div className="login-alt">
-                    Don’t have an account?{' '}
+                    DonвЂ™t have an account?{' '}
                     <button type="button" onClick={() => navigate('/register')}>
                         Sign up
                     </button>
                 </div>
 
                 <footer className="login-footer">
-                    © 2025 Aleksander Starikov. <span>All rights reserved.</span>
+                    В© 2025 Aleksander Starikov. <span>All rights reserved.</span>
                 </footer>
             </div>
         </div>

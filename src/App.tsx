@@ -12,23 +12,32 @@ import { validateTokens, logout } from './types/AuthManager';
 import { toast, ToastContainer } from 'react-toastify';
 import { fetchBillingStatus } from './api';
 
-/** storage: ВСЕГДА localStorage */
+/** РћРїСЂРµРґРµР»СЏРµРј Android WebView РІР°С€РµРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ РїРѕ user-agent */
+const isAndroidApp = (() => {
+    try {
+        return typeof navigator !== 'undefined' && navigator.userAgent.includes('FlowQRApp/Android');
+    } catch {
+        return false;
+    }
+})();
+
+/** РЈРЅРёС„РёС†РёСЂРѕРІР°РЅРЅС‹Р№ РґРѕСЃС‚СѓРї Рє СЃС‚РѕСЂСѓ: sessionStorage РґР»СЏ Android-РїСЂРёР»РѕР¶РµРЅРёСЏ, РёРЅР°С‡Рµ localStorage */
 function getStorage(): Storage {
-    try { return localStorage; } catch { return sessionStorage; }
+    try {
+        return isAndroidApp ? sessionStorage : localStorage;
+    } catch {
+        return localStorage;
+    }
 }
 
-/** Чтение токена (с b/c по ключу "token") */
+/** Р§С‚РµРЅРёРµ С‚РѕРєРµРЅР° (СЃ b/c РїРѕ РєР»СЋС‡Сѓ "token") */
 function getAccessToken() {
     const s = getStorage();
     return s.getItem('accessToken') ?? s.getItem('token') ?? null;
 }
 
-function RequireAuth({
-                         children,
-                         isAuthenticated,
-                         bootstrapping,
-                     }: { children: JSX.Element; isAuthenticated: boolean; bootstrapping: boolean }) {
-    if (bootstrapping) return null; // можно показать глобальный лоадер
+/** РўРµРїРµСЂСЊ RequireAuth СѓС‡РёС‚С‹РІР°РµС‚ Рё РЅР°Р»РёС‡РёРµ С‚РѕРєРµРЅР°, Рё С„Р»Р°Рі isAuthenticated */
+function RequireAuth({ children, isAuthenticated }: { children: JSX.Element; isAuthenticated: boolean }) {
     const token = getAccessToken();
     if (!token && !isAuthenticated) return <Navigate to="/login" replace />;
     return children;
@@ -36,35 +45,32 @@ function RequireAuth({
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [bootstrapping, setBootstrapping] = useState(true);
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Глобальный обработчик логаута (по событию из AuthManager / api)
     useEffect(() => {
         const onLogout = () => {
             const alreadyOnLogin = location.pathname === '/login';
             logout();
             setIsAuthenticated(false);
             if (!alreadyOnLogin) {
-                toast.info('Session ended. Please sign in again.');
+                toast.info('РЎРµСЃСЃРёСЏ Р·Р°РІРµСЂС€РµРЅР°. Р’РѕР№РґРёС‚Рµ СЃРЅРѕРІР°.');
                 navigate('/login', { replace: true });
             }
         };
-        window.addEventListener('auth:logout', onLogout as EventListener);
-        return () => window.removeEventListener('auth:logout', onLogout as EventListener);
+        window.addEventListener('auth:logout', onLogout);
+        return () => window.removeEventListener('auth:logout', onLogout);
     }, [navigate, location.pathname]);
 
-    // Бутстрап авторизации (ждём до рендера приватных роутов)
     useEffect(() => {
-        (async () => {
-            const ok = await validateTokens();
-            setIsAuthenticated(ok);
-            setBootstrapping(false);
-        })();
+        const init = async () => {
+            const valid = await validateTokens();
+            setIsAuthenticated(valid);
+        };
+        init();
     }, []);
 
-    // Тост-напоминание про окончание периода, если осталось ≤ 2 дней
+    // С‚РѕСЃС‚ РїСЂРё РІС…РѕРґРµ, РµСЃР»Рё РѕСЃС‚Р°Р»РѕСЃСЊ в‰¤ 2 РґРЅРµР№ (TRIAL/ACTIVE)
     const warnOnLogin = async () => {
         try {
             const res = await fetchBillingStatus();
@@ -73,17 +79,20 @@ function App() {
                     res.status === 'ACTIVE' ? res.currentPeriodEnd : undefined;
             if (!endRaw) return;
 
-            const msLeft = new Date(endRaw).getTime() - Date.now();
-            const daysLeft = Math.max(0, Math.ceil(msLeft / 86_400_000));
+            const daysLeft =
+                typeof res.daysLeft === 'number'
+                    ? Math.max(0, res.daysLeft)
+                    : Math.max(0, Math.ceil((new Date(endRaw).getTime() - Date.now()) / 86_400_000));
 
-            if ((res.status === 'TRIAL' || res.status === 'ACTIVE') && daysLeft <= 2) {
-                toast.warn(
-                    res.status === 'TRIAL'
-                        ? `Your trial ends in ${daysLeft} day(s).`
-                        : `Your access period ends in ${daysLeft} day(s).`,
-                    { toastId: 'billing-warn' }
-                );
-            }
+            const shouldWarn = (res.status === 'TRIAL' || res.status === 'ACTIVE') && daysLeft <= 2;
+            if (!shouldWarn) return;
+
+            toast.warn(
+                res.status === 'TRIAL'
+                    ? `Your trial ends in ${daysLeft} day(s).`
+                    : `Your access period ends in ${daysLeft} day(s).`,
+                { toastId: 'billing-warn' }
+            );
         } catch {
             /* ignore */
         }
@@ -92,6 +101,7 @@ function App() {
     const handleAuthSuccess = () => {
         setIsAuthenticated(true);
         toast.success('Successful Login!', { toastId: 'auth-login' });
+        // Р·Р°РїСѓСЃРєР°РµРј РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ Рѕ Р±РёР»Р»РёРЅРіРµ РІ СЃР»РµРґСѓСЋС‰РёР№ С‚РёРє
         setTimeout(() => warnOnLogin(), 0);
     };
 
@@ -106,16 +116,16 @@ function App() {
         <>
             <ToastContainer position="top-right" autoClose={4000} newestOnTop limit={3} />
             <Routes>
-                {/* публичные */}
+                {/* РїСѓР±Р»РёС‡РЅС‹Рµ */}
                 <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
                 <Route path="/register" element={<Register onSuccess={() => {}} />} />
                 <Route path="/confirmed" element={<Confirmation />} />
 
-                {/* приватные под /app */}
+                {/* РїСЂРёРІР°С‚РЅС‹Рµ РїРѕРґ /app */}
                 <Route
                     path="/app"
                     element={
-                        <RequireAuth isAuthenticated={isAuthenticated} bootstrapping={bootstrapping}>
+                        <RequireAuth isAuthenticated={isAuthenticated}>
                             <AppContent onLogout={handleLogout} />
                         </RequireAuth>
                     }
@@ -125,33 +135,9 @@ function App() {
                     <Route path="account" element={<Account />} />
                 </Route>
 
-                {/* редиректы — не дёргаем, пока идёт бутстрап */}
-                <Route
-                    path="/"
-                    element={
-                        <Navigate
-                            to={
-                                bootstrapping
-                                    ? '/app'
-                                    : (isAuthenticated || getAccessToken() ? '/app' : '/login')
-                            }
-                            replace
-                        />
-                    }
-                />
-                <Route
-                    path="*"
-                    element={
-                        <Navigate
-                            to={
-                                bootstrapping
-                                    ? '/app'
-                                    : (isAuthenticated || getAccessToken() ? '/app' : '/login')
-                            }
-                            replace
-                        />
-                    }
-                />
+                {/* СЂРµРґРёСЂРµРєС‚С‹ */}
+                <Route path="/" element={<Navigate to={isAuthenticated || getAccessToken() ? '/app' : '/login'} replace />} />
+                <Route path="*" element={<Navigate to={isAuthenticated || getAccessToken() ? '/app' : '/login'} replace />} />
             </Routes>
         </>
     );
