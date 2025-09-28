@@ -1,54 +1,45 @@
 // types/AuthManager.ts
 import axios from 'axios';
 
-const BASE_URL = '/api';
+const BASE_URL = import.meta.env.VITE_API_BASE ?? '/api';
 
-// Определяем Android WebView вашего приложения
-const isAndroidApp = (() => {
-    try {
-        return typeof navigator !== 'undefined' && navigator.userAgent.includes('FlowQRApp/Android');
-    } catch {
-        return false;
-    }
-})();
-
-// accessToken (Android) -> sessionStorage, refreshToken -> localStorage
-const accessStore = (() => {
-    try {
-        return isAndroidApp ? sessionStorage : localStorage;
-    } catch {
-        return localStorage;
-    }
-})();
-const refreshStore = localStorage;
+// ВСЕГДА localStorage (переживает ротацию/рестарт WebView)
+function storage(): Storage {
+    try { return localStorage; } catch { return sessionStorage; }
+}
 
 const ACCESS_KEY = 'accessToken';
 const REFRESH_KEY = 'refreshToken';
 
-const getAccessToken = () =>
-    accessStore.getItem(ACCESS_KEY) ?? accessStore.getItem('token'); // b/c по старому ключу
+export function getAccessToken(): string | null {
+    const s = storage();
+    return s.getItem(ACCESS_KEY) ?? s.getItem('token') ?? null; // b/c "token"
+}
 
-const getRefreshToken = () => refreshStore.getItem(REFRESH_KEY);
+export function getRefreshToken(): string | null {
+    return storage().getItem(REFRESH_KEY);
+}
 
-const setTokens = (accessToken: string, refreshToken?: string) => {
-    accessStore.setItem(ACCESS_KEY, accessToken);
-    if (refreshToken) refreshStore.setItem(REFRESH_KEY, refreshToken);
-};
+export function setTokens(access?: string | null, refresh?: string | null) {
+    const s = storage();
+    if (access) s.setItem(ACCESS_KEY, access);
+    if (refresh) s.setItem(REFRESH_KEY, refresh);
+}
 
-const clearTokens = () => {
-    accessStore.removeItem(ACCESS_KEY);
-    refreshStore.removeItem(REFRESH_KEY);
-    // на всякий случай уберём старые ключи
-    accessStore.removeItem('token');
-};
+export function clearTokens() {
+    const s = storage();
+    s.removeItem(ACCESS_KEY);
+    s.removeItem(REFRESH_KEY);
+    s.removeItem('token'); // b/c
+}
 
-// Проверка/обновление токенов (используется при старте/ротации)
-const validateTokens = async (): Promise<boolean> => {
-    const accessToken = getAccessToken();
-    const refreshToken = getRefreshToken();
+/** Проверка/обновление токенов при старте/перезагрузке */
+export async function validateTokens(): Promise<boolean> {
+    const access = getAccessToken();
+    const refresh = getRefreshToken();
 
-    // Нет refresh — попробовать cookie-сессию (для веба), иначе неавторизован
-    if (!refreshToken) {
+    // Нет refresh → пробуем cookie-сессию
+    if (!refresh) {
         try {
             await axios.get(`${BASE_URL}/users/me`, { withCredentials: true });
             return true;
@@ -57,33 +48,35 @@ const validateTokens = async (): Promise<boolean> => {
         }
     }
 
-    // Если access потеряли (например, после ротации на Android) — обновим по refresh
-    if (!accessToken) {
+    // Потеряли access (например, после ротации) → обновляем
+    if (!access) {
         try {
-            const response = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
-            setTokens(response.data.accessToken, response.data.refreshToken);
+            const { data } = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken: refresh }, { withCredentials: true });
+            const newAccess =
+                data?.accessToken ?? data?.token ?? data?.jwt ?? data?.id_token ?? data?.access_token;
+            const newRefresh = data?.refreshToken ?? data?.refresh_token ?? refresh;
+            if (!newAccess) throw new Error('No access token in refresh response');
+            setTokens(newAccess, newRefresh);
             return true;
-        } catch (error) {
-            console.error('Ошибка обновления токенов:', error);
+        } catch {
             clearTokens();
             return false;
         }
     }
 
     return true;
-};
+}
 
-// Автоматическое обновление access при необходимости
-const refreshTokensIfNeeded = async () => {
-    const accessToken = getAccessToken();
-    if (!accessToken) {
+/** На всякий случай — подтянуть access, если пропал */
+export async function refreshTokensIfNeeded() {
+    if (!getAccessToken()) {
         await validateTokens();
     }
-};
+}
 
-// Выход
-const logout = () => {
+/** Выход */
+export function logout() {
     clearTokens();
-};
-
-export { validateTokens, refreshTokensIfNeeded, logout };
+    // пусть App.tsx обработает событие и сделает навигацию/тосты
+    window.dispatchEvent(new CustomEvent('auth:logout'));
+}

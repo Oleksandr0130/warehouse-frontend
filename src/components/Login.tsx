@@ -14,22 +14,10 @@ type FieldErrors = {
     password?: string;
 };
 
-const isAndroidApp = (() => {
-    try {
-        return typeof navigator !== 'undefined' && navigator.userAgent.includes('FlowQRApp/Android');
-    } catch {
-        return false;
-    }
-})();
-
+// ВСЕГДА localStorage
 function getStorage(): Storage {
-    try {
-        return isAndroidApp ? sessionStorage : localStorage;
-    } catch {
-        return localStorage;
-    }
+    try { return localStorage; } catch { return sessionStorage; }
 }
-
 const ACCESS_KEY = 'accessToken';
 const REFRESH_KEY = 'refreshToken';
 
@@ -42,9 +30,9 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setCredentials((prev) => ({ ...prev, [name]: value }));
+        setCredentials((prev) => ({ ...prev, [name]: value }));           // фикс опечаток ...prev
         if (fieldErrors[name as keyof FieldErrors]) {
-            setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
+            setFieldErrors((prev) => ({ ...prev, [name]: undefined }));     // фикс опечаток ...prev
         }
         if (formError) setFormError(null);
     };
@@ -62,32 +50,23 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
             });
 
             const data: any = res?.data ?? {};
-            // максимально «гибкий» парсинг возможных ключей
             const accessToken: string | undefined =
                 data.accessToken ?? data.token ?? data.jwt ?? data.jwtToken ?? data.id_token ?? data.access_token;
             const refreshToken: string | undefined = data.refreshToken ?? data.refresh_token;
 
             if (accessToken) {
-                const storage = getStorage();
-                storage.setItem(ACCESS_KEY, accessToken);
-                if (refreshToken) storage.setItem(REFRESH_KEY, refreshToken);
+                const s = getStorage();
+                s.setItem(ACCESS_KEY, accessToken);
+                if (refreshToken) s.setItem(REFRESH_KEY, refreshToken);
                 onSuccess?.();
                 navigate('/app', { replace: true });
                 return;
             }
 
-            // Токена в теле нет? Пробуем cookie-сессию: защищённый вызов должен пройти
-            try {
-                await fetchMe();
-                // ок — авторизованы через cookie, пускаем без записи токена
-                onSuccess?.();
-                navigate('/app', { replace: true });
-                return;
-            } catch {
-                // cookie-сессии нет — считаем, что логин неуспешен
-                setFormError('Incorrect username or password');
-                setFieldErrors({ password: 'Incorrect username or password' });
-            }
+            // Если бэк не отдал токены, но есть cookie-сессия
+            await fetchMe();
+            onSuccess?.();
+            navigate('/app', { replace: true });
         } catch (err) {
             if (err instanceof AxiosError) {
                 const status = err.response?.status;
@@ -170,11 +149,12 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
 
                     <button
                         type="button"
-                        className="login-button"
-                        disabled={isSubmitting}
                         onClick={doLogin}
+                        disabled={isSubmitting}
+                        className="login-button"
+                        aria-busy={isSubmitting}
                     >
-                        {isSubmitting ? 'Logging in…' : 'Login'}
+                        {isSubmitting ? 'Logging in...' : 'Login'}
                     </button>
                 </div>
 
