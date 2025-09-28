@@ -1,4 +1,3 @@
-// src/api.ts
 import axios, {
     AxiosError,
     AxiosRequestConfig,
@@ -9,9 +8,7 @@ import axios, {
 import { ReservationData } from './types/ReservationData.ts';
 import { Item } from './types/Item.ts';
 
-/* ===================== Р‘Р°Р·Р° ===================== */
-
-// BASE_URL: env РёР»Рё '/api'
+// BASE_URL: env или '/api'
 const BASE_URL = import.meta.env.VITE_API_BASE ?? '/api';
 
 const api = axios.create({
@@ -20,28 +17,7 @@ const api = axios.create({
     withCredentials: true,
 });
 
-/* ===================== Р”РµС‚РµРєС‚РѕСЂ РїР»Р°С‚С„РѕСЂРјС‹ Рё СЃС‚РѕСЂ ===================== */
-
-const isAndroidApp = (() => {
-    try {
-        return typeof navigator !== 'undefined' && navigator.userAgent.includes('FlowQRApp/Android');
-    } catch {
-        return false;
-    }
-})();
-
-function getStorage(): Storage {
-    try {
-        return isAndroidApp ? sessionStorage : localStorage;
-    } catch {
-        return localStorage;
-    }
-}
-
-const ACCESS_KEY = 'accessToken';
-const REFRESH_KEY = 'refreshToken';
-
-/* ===================== РўРёРїС‹ ===================== */
+/* ===================== Типы ===================== */
 
 export type BillingState = 'TRIAL' | 'ACTIVE' | 'EXPIRED' | 'ANON' | 'NO_COMPANY';
 export type Currency = 'PLN' | 'EUR';
@@ -52,7 +28,7 @@ export interface BillingStatusDto {
     currentPeriodEnd?: string;
     daysLeft?: number;
     isAdmin?: boolean;
-    /** РµСЃР»Рё Р±СЌРє РѕС‚РґР°С‘С‚ Р·Р°РєСЂРµРїР»С‘РЅРЅСѓСЋ РІР°Р»СЋС‚Сѓ РєРѕРјРїР°РЅРёРё */
+    /** если бэк отдаёт закреплённую валюту компании */
     billingCurrency?: Currency;
 }
 
@@ -86,7 +62,7 @@ export interface VerifyPlayPurchaseRequest {
 }
 export interface VerifyPlayPurchaseResponse {
     active: boolean;
-    /** epoch millis (РѕРєРѕРЅС‡Р°РЅРёРµ С‚РµРєСѓС‰РµРіРѕ РїРµСЂРёРѕРґР°) */
+    /** epoch millis (окончание текущего периода) */
     expiryTime: number;
 }
 
@@ -106,28 +82,7 @@ const setAuthHeader = (headers: AxiosRequestHeaders, token: string) => {
     headers['Authorization'] = `Bearer ${token}`;
 };
 
-// РЅРѕСЂРјР°Р»РёР·СѓРµРј URL РґРѕ РїСѓС‚Рё Р±РµР· baseURL
-function stripBase(url: string): string {
-    if (!url) return '';
-    try {
-        // РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹Р№ РїСѓС‚СЊ
-        if (url.startsWith('/')) return url;
-        // Р°Р±СЃРѕР»СЋС‚РЅС‹Р№ вЂ” РїСЂРѕР±СѓРµРј СѓРґР°Р»РёС‚СЊ baseURL
-        const base = (api.defaults.baseURL ?? '').replace(/\/+$/, '');
-        return url.startsWith(base) ? url.slice(base.length) || '/' : url;
-    } catch {
-        return url;
-    }
-}
-
-const AUTH_WHITELIST = [/^\/auth\/login\b/i, /^\/auth\/register\b/i, /^\/auth\/refresh\b/i, /^\/confirmation\b/i];
-
-function shouldSkipAuth(config: AxiosRequestConfig): boolean {
-    const path = stripBase(String(config.url ?? ''));
-    return AUTH_WHITELIST.some((re) => re.test(path));
-}
-
-/* ===================== API РјРµС‚РѕРґС‹ РґРѕРјРµРЅР° ===================== */
+/* ===================== API методы домена ===================== */
 
 export const fetchItems = async (): Promise<Item[]> => {
     const resp = await api.get<Item[]>('/items');
@@ -176,7 +131,10 @@ export const fetchBillingStatus = async (): Promise<BillingStatusDto> => {
     return data;
 };
 
-/** вњ… Google Play Billing: РІРµСЂРёС„РёРєР°С†РёСЏ РїРѕРєСѓРїРєРё РёР· APK */
+/** ✅ Google Play Billing: верификация покупки из APK
+ *  Вызывать после успешного `onPurchasesUpdated` в приложении:
+ *    verifyPlayPurchase(purchaseToken, 'flowqr_standard', 'com.example.warehouseqrapp')
+ */
 export const verifyPlayPurchase = async (
     purchaseToken: string,
     productId = 'flowqr_standard',
@@ -187,7 +145,7 @@ export const verifyPlayPurchase = async (
     return data;
 };
 
-/* ===================== РџСЂРѕС„РёР»СЊ / РђРґРјРёРЅ ===================== */
+/* ===================== Профиль / Админ ===================== */
 
 export async function fetchMe(): Promise<MeDto> {
     const { data } = await api.get<MeDto>('/users/me');
@@ -202,72 +160,79 @@ export async function adminCreateUser(
 }
 
 export async function deleteAccount(): Promise<void> {
-    await api.delete('/users/me');
-    const storage = getStorage();
-    storage.removeItem(ACCESS_KEY);
-    storage.removeItem(REFRESH_KEY);
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error("Not authenticated");
+
+    const res = await fetch(`/users/me`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to delete account");
+    }
+
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
 }
 
-/* ===================== РРЅС‚РµСЂС†РµРїС‚РѕСЂС‹ ===================== */
+/* ===================== Интерцепторы ===================== */
 
-// request: РїСЂРѕСЃС‚Р°РІР»СЏРµРј Authorization, РµСЃР»Рё С‚РѕРєРµРЅ РµСЃС‚СЊ (РєСЂРѕРјРµ /auth/*)
+// request: проставляем Authorization, если токен есть
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        if (!shouldSkipAuth(config)) {
-            const storage = getStorage();
-            const raw = storage.getItem(ACCESS_KEY) ?? storage.getItem('token'); // b/c
-            if (raw) {
-                const token = raw.startsWith('Bearer ') ? raw.slice(7) : raw;
-                if (!config.headers) {
-                    config.headers = {} as AxiosRequestHeaders;
-                }
-                setAuthHeader(config.headers as AxiosRequestHeaders, token);
+        const raw =
+            localStorage.getItem('accessToken') ?? localStorage.getItem('token');
+        if (raw) {
+            const token = raw.startsWith('Bearer ') ? raw.slice(7) : raw;
+            if (!config.headers) {
+                config.headers = {} as AxiosRequestHeaders;
             }
-        } else if (config.headers && 'Authorization' in config.headers) {
-            // РіР°СЂР°РЅС‚РёСЂРѕРІР°РЅРЅРѕ СѓР±РёСЂР°РµРј Р·Р°РіРѕР»РѕРІРѕРє РґР»СЏ /auth/*
-            delete (config.headers as any).Authorization;
+            setAuthHeader(config.headers as AxiosRequestHeaders, token);
         }
         return config;
     },
     (error) => Promise.reject(error)
 );
 
-// response: РѕР±РЅРѕРІР»РµРЅРёРµ accessToken РїРѕ 401 + РјСЏРіРєРёР№ СЂРµРґРёСЂРµРєС‚ РїРѕ 402
+// response: обновление accessToken по 401 + мягкий редирект по 402
 api.interceptors.response.use(
     (response: AxiosResponse) => response,
     async (error: AxiosError) => {
         const originalRequest = (error.config ?? {}) as AxiosRequestConfig & { _retry?: boolean };
-        const url = stripBase(String(originalRequest.url ?? ''));
+        const url: string = typeof originalRequest.url === 'string' ? originalRequest.url : '';
 
-        // РЅРµ С‚СЂРѕРіР°РµРј 401 РґР»СЏ /auth/*
-        if (error.response?.status === 401 && AUTH_WHITELIST.some((re) => re.test(url))) {
+        // не трогаем 401 для /auth/*
+        if (
+            error.response?.status === 401 &&
+            /\/auth\/login|\/auth\/register|\/auth\/refresh|\/confirmation/.test(url)
+        ) {
             return Promise.reject(error);
         }
 
-        // РѕРґРёРЅ СЂРµС„СЂРµС€
+        // один рефреш
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
-                const storage = getStorage();
-                const refreshToken = storage.getItem(REFRESH_KEY);
+                const refreshToken = localStorage.getItem('refreshToken');
                 if (!refreshToken) throw new Error('No refresh token');
 
-                // РІР°Р¶РЅРѕ: РЅРµ РґРѕР±Р°РІР»СЏС‚СЊ Authorization СЃСЋРґР°
                 const { data } = await api.post<RefreshResponse>('/auth/refresh', { refreshToken });
 
-                storage.setItem(ACCESS_KEY, data.accessToken);
-                storage.setItem(REFRESH_KEY, data.refreshToken);
+                localStorage.setItem('accessToken', data.accessToken);
+                localStorage.setItem('refreshToken', data.refreshToken);
 
-                // РїСЂРѕСЃС‚Р°РІРёРј Р·Р°РіРѕР»РѕРІРѕРє Рё РїРѕРІС‚РѕСЂРёРј Р·Р°РїСЂРѕСЃ
+                // проставим заголовок и повторим запрос
                 originalRequest.headers = (originalRequest.headers ?? {}) as AxiosRequestHeaders;
                 (originalRequest.headers as AxiosRequestHeaders)['Authorization'] =
                     `Bearer ${data.accessToken}`;
 
                 return api(originalRequest);
             } catch (refreshError) {
-                const storage = getStorage();
-                storage.removeItem(ACCESS_KEY);
-                storage.removeItem(REFRESH_KEY);
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
                 if (window.location.pathname !== '/login') {
                     window.dispatchEvent(new Event('auth:logout'));
                 }
@@ -279,7 +244,7 @@ api.interceptors.response.use(
     }
 );
 
-// 402 в†’ РјСЏРіРєРёР№ СЂРµРґРёСЂРµРєС‚ РЅР° /app/account (РЅРµ РґР»СЏ /api/billing/*)
+// 402 → мягкий редирект на /app/account (не для /api/billing/*)
 let subscriptionRedirectScheduled = false;
 api.interceptors.response.use(
     (res: AxiosResponse) => res,
@@ -289,7 +254,7 @@ api.interceptors.response.use(
             (err.response?.headers as Record<string, unknown>) ?? {};
         const dataObj: Record<string, unknown> =
             (err.response?.data as Record<string, unknown>) ?? {};
-        const url = stripBase(String(err.config?.url ?? ''));
+        const url = typeof err.config?.url === 'string' ? err.config!.url! : '';
 
         const expired =
             headersObj['x-subscription-expired'] === 'true' ||

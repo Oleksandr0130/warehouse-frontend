@@ -12,34 +12,9 @@ import { validateTokens, logout } from './types/AuthManager';
 import { toast, ToastContainer } from 'react-toastify';
 import { fetchBillingStatus } from './api';
 
-/** РћРїСЂРµРґРµР»СЏРµРј Android WebView РІР°С€РµРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ РїРѕ user-agent */
-const isAndroidApp = (() => {
-    try {
-        return typeof navigator !== 'undefined' && navigator.userAgent.includes('FlowQRApp/Android');
-    } catch {
-        return false;
-    }
-})();
-
-/** РЈРЅРёС„РёС†РёСЂРѕРІР°РЅРЅС‹Р№ РґРѕСЃС‚СѓРї Рє СЃС‚РѕСЂСѓ: sessionStorage РґР»СЏ Android-РїСЂРёР»РѕР¶РµРЅРёСЏ, РёРЅР°С‡Рµ localStorage */
-function getStorage(): Storage {
-    try {
-        return isAndroidApp ? sessionStorage : localStorage;
-    } catch {
-        return localStorage;
-    }
-}
-
-/** Р§С‚РµРЅРёРµ С‚РѕРєРµРЅР° (СЃ b/c РїРѕ РєР»СЋС‡Сѓ "token") */
-function getAccessToken() {
-    const s = getStorage();
-    return s.getItem('accessToken') ?? s.getItem('token') ?? null;
-}
-
-/** РўРµРїРµСЂСЊ RequireAuth СѓС‡РёС‚С‹РІР°РµС‚ Рё РЅР°Р»РёС‡РёРµ С‚РѕРєРµРЅР°, Рё С„Р»Р°Рі isAuthenticated */
-function RequireAuth({ children, isAuthenticated }: { children: JSX.Element; isAuthenticated: boolean }) {
-    const token = getAccessToken();
-    if (!token && !isAuthenticated) return <Navigate to="/login" replace />;
+function RequireAuth({ children }: { children: JSX.Element }) {
+    const token = localStorage.getItem('token');
+    if (!token) return <Navigate to="/login" replace />;
     return children;
 }
 
@@ -54,7 +29,7 @@ function App() {
             logout();
             setIsAuthenticated(false);
             if (!alreadyOnLogin) {
-                toast.info('РЎРµСЃСЃРёСЏ Р·Р°РІРµСЂС€РµРЅР°. Р’РѕР№РґРёС‚Рµ СЃРЅРѕРІР°.');
+                toast.info('Сессия завершена. Войдите снова.');
                 navigate('/login', { replace: true });
             }
         };
@@ -70,7 +45,7 @@ function App() {
         init();
     }, []);
 
-    // С‚РѕСЃС‚ РїСЂРё РІС…РѕРґРµ, РµСЃР»Рё РѕСЃС‚Р°Р»РѕСЃСЊ в‰¤ 2 РґРЅРµР№ (TRIAL/ACTIVE)
+    // тост при входе, если осталось ≤ 2 дней (TRIAL/ACTIVE)
     const warnOnLogin = async () => {
         try {
             const res = await fetchBillingStatus();
@@ -101,7 +76,7 @@ function App() {
     const handleAuthSuccess = () => {
         setIsAuthenticated(true);
         toast.success('Successful Login!', { toastId: 'auth-login' });
-        // Р·Р°РїСѓСЃРєР°РµРј РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ Рѕ Р±РёР»Р»РёРЅРіРµ РІ СЃР»РµРґСѓСЋС‰РёР№ С‚РёРє
+        // на всякий случай в следующий тик — чтобы токен точно попал в localStorage
         setTimeout(() => warnOnLogin(), 0);
     };
 
@@ -116,16 +91,16 @@ function App() {
         <>
             <ToastContainer position="top-right" autoClose={4000} newestOnTop limit={3} />
             <Routes>
-                {/* РїСѓР±Р»РёС‡РЅС‹Рµ */}
+                {/* публичные */}
                 <Route path="/login" element={<Login onSuccess={handleAuthSuccess} />} />
                 <Route path="/register" element={<Register onSuccess={() => {}} />} />
                 <Route path="/confirmed" element={<Confirmation />} />
 
-                {/* РїСЂРёРІР°С‚РЅС‹Рµ РїРѕРґ /app */}
+                {/* приватные под /app */}
                 <Route
                     path="/app"
                     element={
-                        <RequireAuth isAuthenticated={isAuthenticated}>
+                        <RequireAuth>
                             <AppContent onLogout={handleLogout} />
                         </RequireAuth>
                     }
@@ -135,9 +110,9 @@ function App() {
                     <Route path="account" element={<Account />} />
                 </Route>
 
-                {/* СЂРµРґРёСЂРµРєС‚С‹ */}
-                <Route path="/" element={<Navigate to={isAuthenticated || getAccessToken() ? '/app' : '/login'} replace />} />
-                <Route path="*" element={<Navigate to={isAuthenticated || getAccessToken() ? '/app' : '/login'} replace />} />
+                {/* редиректы */}
+                <Route path="/" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
+                <Route path="*" element={<Navigate to={isAuthenticated ? '/app' : '/login'} replace />} />
             </Routes>
         </>
     );
