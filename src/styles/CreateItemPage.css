@@ -24,7 +24,7 @@
     width: 100%;
     max-width: 560px;
     padding: 24px 20px 16px;
-    background: rgba(170, 170, 170, 0);
+    background: rgba(170, 170, 170, 0.1);
     border: 1px solid rgba(0,0,0,0.06);
     border-radius: 16px;
     /*backdrop-filter: blur(6px);*/
