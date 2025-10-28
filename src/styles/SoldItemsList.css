@@ -1,26 +1,17 @@
 /* src/styles/SoldItemsList.css */
 
-/* src/styles/SoldItemsList.css */
-
 .sold-items-list {
-    /* Делаем блок размером с окно */
-    position: fixed;   /* ключевой трюк */
-    inset: 0;          /* top:0; right:0; bottom:0; left:0 */
-    overflow: auto;    /* чтобы список скроллился, если элементов много */
-
-    /* Фон — на самом блоке, он теперь всегда на весь экран */
+    /*background: #fff;*/
+    min-height: 100vh;
+    min-height: 100svh;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 20px 24px;
+    margin-bottom: 24px;
     background-image: url("../assets/background.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-
-    /* Убираем вещи, которые создавали «белые поля» */
-    margin: 0;
-    border-radius: 0;
-    box-shadow: none;
-
-    /* Внутренние отступы оставим как было (можно подправить) */
-    padding: 20px 24px;
 }
 
 .sold-title {
