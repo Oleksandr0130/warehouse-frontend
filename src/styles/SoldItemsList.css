@@ -1,35 +1,27 @@
 /* src/styles/SoldItemsList.css */
 
+/* src/styles/SoldItemsList.css */
+
 .sold-items-list {
-    position: relative; /* создаём контекст для псевдоэлемента */
-    padding: 20px 24px;
-    margin-bottom: 24px;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    /* Делаем блок размером с окно */
+    position: fixed;   /* ключевой трюк */
+    inset: 0;          /* top:0; right:0; bottom:0; left:0 */
+    overflow: auto;    /* чтобы список скроллился, если элементов много */
 
-    /* можно оставить/убрать этот бэкграунд — он уже не обязателен */
-    background: transparent;
-    min-height: 100vh;
-}
-
-@supports (height: 100dvh) {
-    .sold-items-list {
-        min-height: 100dvh;
-    }
-}
-
-/* Фон, прибитый к экрану */
-.sold-items-list::before {
-    content: "";
-    position: fixed;   /* ключ: фон теперь размером с окно, а не с контент */
-    inset: 0;
+    /* Фон — на самом блоке, он теперь всегда на весь экран */
     background-image: url("../assets/background.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    z-index: -1;       /* уводим под содержимое */
-}
 
+    /* Убираем вещи, которые создавали «белые поля» */
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+
+    /* Внутренние отступы оставим как было (можно подправить) */
+    padding: 20px 24px;
+}
 
 .sold-title {
     font-size: 1.2rem;
