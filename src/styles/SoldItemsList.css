@@ -1,25 +1,35 @@
 /* src/styles/SoldItemsList.css */
 
 .sold-items-list {
-    /* Было: min-height: 100vh; min-height: 100svh; */
-    min-height: 100vh;        /* фолбэк для старых */
+    position: relative; /* создаём контекст для псевдоэлемента */
     padding: 20px 24px;
     margin-bottom: 24px;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 
-    background-image: url("../assets/background.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    /* можно оставить/убрать этот бэкграунд — он уже не обязателен */
+    background: transparent;
+    min-height: 100vh;
 }
 
-/* Если браузер/вебвью понимает dvh — используем его (работает стабильнее на мобильных) */
 @supports (height: 100dvh) {
     .sold-items-list {
         min-height: 100dvh;
     }
 }
+
+/* Фон, прибитый к экрану */
+.sold-items-list::before {
+    content: "";
+    position: fixed;   /* ключ: фон теперь размером с окно, а не с контент */
+    inset: 0;
+    background-image: url("../assets/background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;       /* уводим под содержимое */
+}
+
 
 .sold-title {
     font-size: 1.2rem;
