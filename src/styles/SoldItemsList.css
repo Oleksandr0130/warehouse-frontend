@@ -1,7 +1,6 @@
 /* src/styles/SoldItemsList.css */
 
 .sold-items-list {
-    position: relative;
     /*background: #fff;*/
     min-height: 100vh;
     min-height: 100svh;
@@ -100,7 +99,7 @@
 }
 
 .empty-message {
-    color: #94a3b8;
+    color: rgba(0, 0, 0, 0.51);
     font-size: 0.95rem;
     text-align: center;
     padding: 20px 0;
