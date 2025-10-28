@@ -2,7 +2,7 @@
 
 .app-container {
     /*position: relative;*/
-    /*display: flex;*/
+    display: flex;
     min-height: 100dvh;
     min-height: 100vh;
     background-image: url("../assets/background.png");
@@ -111,10 +111,9 @@
 
 .app-main {
     flex: 1;
-    min-height:100vh;
     margin-top: 56px;
-    /*padding: 24px;*/
-    /*position: relative;*/
+    padding: 24px;
+    position: relative;
 }
 
 .loading-overlay {
