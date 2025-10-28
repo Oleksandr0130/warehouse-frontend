@@ -1,17 +1,24 @@
 /* src/styles/SoldItemsList.css */
 
 .sold-items-list {
-    /*background: #fff;*/
-    min-height: 100vh;
-    min-height: 100svh;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    /* Было: min-height: 100vh; min-height: 100svh; */
+    min-height: 100vh;        /* фолбэк для старых */
     padding: 20px 24px;
     margin-bottom: 24px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+
     background-image: url("../assets/background.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+/* Если браузер/вебвью понимает dvh — используем его (работает стабильнее на мобильных) */
+@supports (height: 100dvh) {
+    .sold-items-list {
+        min-height: 100dvh;
+    }
 }
 
 .sold-title {
