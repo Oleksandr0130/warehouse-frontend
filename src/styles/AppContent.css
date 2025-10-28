@@ -11,9 +11,9 @@
     background-repeat: no-repeat;
 }
 
-@supports (height: 100dvh) {
-    .app-container {min-height: 100dvh;}
-}
+/*@supports (height: 100dvh) {*/
+/*    .app-container {min-height: 100dvh;}*/
+/*}*/
 
 .topbar {
     position: fixed;
