@@ -2,7 +2,7 @@
 
 .app-container {
     /*position: relative;*/
-    display: flex;
+    /*display: flex;*/
     /*min-height: 100dvh;*/
     min-height: 100vh;
     background-image: url("../assets/background.png");
