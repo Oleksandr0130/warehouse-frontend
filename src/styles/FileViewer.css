@@ -185,9 +185,9 @@
     border-radius:16px;
     padding:16px;
     box-shadow:0 12px 30px rgba(0,0,0,.15);
-    width:min(560px,92vw);
-    max-height:80vh;
-    display:grid; gap:12px;
+    /*width:min(560px,92vw);*/
+    /*max-height:80vh;*/
+    /*display:grid; gap:12px;*/
     justify-items:center;
     overflow:hidden;
 }
