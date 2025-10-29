@@ -82,66 +82,32 @@ const FileViewer: React.FC = () => {
 
         setCanvasReady(false);
 
-        // --- безопасная ширина/высота для WebView ---
-        const getViewportSize = () => {
-            const vv = (window as any).visualViewport;
-            const vw = Math.max(
-                vv?.width || 0,
-                window.innerWidth || 0,
-                document.documentElement?.clientWidth || 0,
-                screen.width || 0
-            );
-            const vh = Math.max(
-                vv?.height || 0,
-                window.innerHeight || 0,
-                document.documentElement?.clientHeight || 0,
-                // в особо глючных WebView берём доступную высоту
-                (window.screen && (window.screen as any).availHeight) || 0,
-                screen.height || 0
-            );
-            return { vw, vh };
-        };
-
-        const DPR = Math.max(1, Math.floor(window.devicePixelRatio || 1));
-
         const img = new Image();
         img.onload = () => {
-            const { vw, vh } = getViewportSize();
-
-            // размеры области превью: 92% ширины и 70% высоты экрана
-            const maxW = Math.min(vw * 0.92, 520);
-            const maxH = Math.min(vh * 0.70, 520);
-
-            let drawW = img.naturalWidth;
-            let drawH = img.naturalHeight;
+            const maxW = Math.min(window.innerWidth * 0.92, 520);
+            const maxH = Math.min(window.innerHeight * 0.6, 520);
+            let drawW = img.width;
+            let drawH = img.height;
 
             const ratio = Math.min(maxW / drawW, maxH / drawH, 1);
-            drawW = Math.max(1, Math.floor(drawW * ratio));
-            drawH = Math.max(1, Math.floor(drawH * ratio));
+            drawW = Math.floor(drawW * ratio);
+            drawH = Math.floor(drawH * ratio);
 
-            // физические пиксели для чёткости
-            canvas.width  = drawW * DPR;
-            canvas.height = drawH * DPR;
-
-            // CSS-размеры (на экране)
-            canvas.style.width  = `${drawW}px`;
-            canvas.style.height = `${drawH}px`;
+            canvas.width = drawW;
+            canvas.height = drawH;
 
             const ctx = canvas.getContext('2d');
             if (ctx) {
-                ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
                 ctx.clearRect(0, 0, drawW, drawH);
                 ctx.drawImage(img, 0, 0, drawW, drawH);
                 setCanvasReady(true);
             }
         };
         img.onerror = () => setCanvasReady(false);
-
         img.src = activeQrCode.startsWith('data:')
             ? activeQrCode
             : `data:image/png;base64,${activeQrCode}`;
     }, [showModal, activeQrCode]);
-
 
     const handleDownloadQRCode = async (id: string, type: 'item' | 'reservation') => {
         try {
