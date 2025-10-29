@@ -185,14 +185,26 @@
     border-radius:16px;
     padding:16px;
     box-shadow:0 12px 30px rgba(0,0,0,.15);
+
+    /* ширина как и была */
     width:min(560px,92vw);
-    max-height:80vh;
-    display:grid; gap:12px;
+
+    /* высота надёжнее в WebView: dvh + запасные варианты */
+    max-height:80dvh;
+    max-height:80svh; /* fallback для движков без dvh */
+    max-height:80vh;  /* самый общий fallback */
+
+    display:grid;
+    gap:12px;
     justify-items:center;
-    overflow:hidden;
+
+    /* нам нужна прокрутка, если контент выше окна */
+    overflow:auto;
 }
 .modal-canvas{
-    width:100%; height:auto;
+    display:block;
+    width:100%;
+    height:auto;
     border-radius:12px;
     background:#000;
 }
