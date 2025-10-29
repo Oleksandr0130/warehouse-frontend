@@ -344,20 +344,10 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                 document.body
             )}
 
-            {/*{showScanner && createPortal(*/}
-            {/*    <div className="scanner-modal" onClick={() => setShowScanner(false)}>*/}
-            {/*        <div className="scanner-dialog" onClick={(e) => e.stopPropagation()}>*/}
-            {/*            <button className="scanner-close" onClick={() => setShowScanner(false)}>×</button>*/}
-            {/*            <div className="scanner-body">*/}
-            {/*                <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />*/}
-            {/*            </div>*/}
-            {/*        </div>*/}
-            {/*    </div>,*/}
-            {/*    document.body*/}
             {showScanner && (
-                // QRScanner сам рисует модалку/оверлей и заголовок
                 <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />
             )}
+
         </div>
     );
 };
