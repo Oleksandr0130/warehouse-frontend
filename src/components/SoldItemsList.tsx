@@ -1,5 +1,6 @@
 // src/components/SoldItemsList.tsx
-import { useMemo, useState } from 'react';
+// import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { SoldReservation } from '../types/SoldReservation';
 import '../styles/SoldItemsList.css';
 
@@ -35,6 +36,12 @@ function SoldItemsList({ reservations }: SoldItemsListProps) {
             );
         });
     }, [reservations, query]);
+
+        useEffect(() => {
+                // Патч: принудительно растягиваем фон на весь экран для старых WebView
+            const appContainer = document.querySelector('.app-container') as HTMLElement;
+            if (appContainer) {appContainer.style.minHeight = `${window.innerHeight}px`;
+            }}, []);
 
     if (reservations.length === 0) {
         return <p className="empty-message">There are no reservations yet.</p>;

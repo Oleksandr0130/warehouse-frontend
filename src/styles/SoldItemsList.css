@@ -8,10 +8,10 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     padding: 20px 24px;
     margin-bottom: 0;
-    background-image: url("../assets/background.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    /*background-image: url("../assets/background.png");*/
+    /*background-size: cover;*/
+    /*background-position: center;*/
+    /*background-repeat: no-repeat;*/
 }
 
 .sold-title {
