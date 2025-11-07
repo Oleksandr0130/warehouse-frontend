@@ -5,9 +5,10 @@ import '../styles/ItemList.css';
 
 interface ItemListProps {
     items: Item[];
+    onDelete: (id: string) => void;
 }
 
-const ItemList: React.FC<ItemListProps> = ({ items }) => {
+const ItemList: React.FC<ItemListProps> = ({ items, onDelete }) => {
     const [query, setQuery] = useState('');
     const [openId, setOpenId] = useState<string | null>(null); // раскрытие/скрытие
 
@@ -91,6 +92,18 @@ const ItemList: React.FC<ItemListProps> = ({ items }) => {
                                                     ))}
                                                 </div>
                                             )}
+
+                                            {onDelete && (
+                                                <div className="actions-row">
+                                                    <button
+                                                        type="button"
+                                                        className="btn-delete"
+                                                        onClick={() => onDelete(item.id)}
+                                                    >
+                                                        Delete item
+                                                    </button>
+                                                </div>
+                                                )}
                                         </div>
                                     ) : (
                                         <div className="collapse-inner empty">No extra info.</div>

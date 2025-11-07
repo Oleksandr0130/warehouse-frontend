@@ -138,6 +138,21 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         }
     };
 
+    const handleDeleteItem = async (id: string) => {
+        setLoading(true);
+        try {
+            await api.delete(`/items/${encodeURIComponent(id)}`);
+            setItems(prev => prev.filter(i => i.id !== id));
+            toast.success('Product deleted.');
+        } catch (e) {
+            console.error(e);
+            toast.error('Error deleting product.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
     const handleScan = async (id: string) => {
         setShowScanner(false);
         if (!scannerAction) return;
@@ -268,7 +283,8 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                                     </div>
                                 </div>
 
-                                <ItemList items={items} />
+                                <ItemList items={items} onDelete={handleDeleteItem} />
+
                             </>
                         )}
 
