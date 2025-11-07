@@ -231,3 +231,20 @@
     .row { grid-template-columns: 56px 1fr 16px; gap: 10px; }
     .avatar, .avatar-placeholder { width: 56px; height: 56px; }
 }
+
+.actions-row {
+    margin-top: 12px;
+    display: flex;
+    justify-content: flex-end;
+}
+.btn-delete {
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+}
+.btn-delete:hover {
+    filter: brightness(0.95);
+}

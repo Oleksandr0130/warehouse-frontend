@@ -77,9 +77,8 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete }) => {
                                     <div className={`chevron ${isOpen ? 'up' : ''}`} aria-hidden />
                                 </button>
 
-                                {/* COLLAPSE — плавно раскрывается вниз */}
                                 <div className={`collapse ${isOpen ? 'open' : ''}`}>
-                                    {(item.description || (item.images && item.images.length > 1)) ? (
+                                    {(item.description || (item.images && item.images.length > 1) || typeof onDelete === 'function') ? (
                                         <div className="collapse-inner">
                                             {item.description && (
                                                 <div className="desc">{item.description}</div>
@@ -103,7 +102,7 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete }) => {
                                                         Delete item
                                                     </button>
                                                 </div>
-                                                )}
+                                            )}
                                         </div>
                                     ) : (
                                         <div className="collapse-inner empty">No extra info.</div>
