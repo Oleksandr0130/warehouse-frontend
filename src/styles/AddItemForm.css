@@ -2,9 +2,7 @@
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
-    /*background: #fff;*/
     border-radius: 16px;
-    /*box-shadow: 0 4px 12px rgba(0,0,0,0.08);*/
     padding: 24px;
     display: flex;
     flex-direction: column;
@@ -31,66 +29,48 @@
     font-weight: 500;
     color: #334155;
 }
-.form-group input {
-    /*width: 100%;          !* важное: не выходить за края *!*/
-    height: 44px;
+
+/* ВАЖНО: ширина 100% всем полям */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
     border-radius: 12px;
     border: 1px solid #e5e7eb;
-    padding: 0 14px;
-    font-size: 0.95rem;
+    padding: 12px 14px;
+    font-size: 16px;        /* 16px — убирает авто-zoom на iOS */
     background: #f9fafb;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37,99,235,0.25);
     outline: none;
     background: #fff;
 }
-
-.submit-btn {
-    height: 46px;
-    border: none;
-    border-radius: 12px;
-    background: #2563eb;
-    color: #fff;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
-    -webkit-tap-highlight-color: transparent;
-}
-.submit-btn:hover { background: #1e40af; }
-.submit-btn:active { transform: scale(0.98); }
-
-/* мобильные правки */
-@media (max-width: 480px) {
-    .add-item-form { padding: 16px; gap: 14px; }
-    .add-item-title { font-size: 1.15rem; }
+.form-group textarea {
+    min-height: 96px;
+    resize: vertical;
 }
 
+/* Две колонки для Price/Currency на десктопе */
 .form-row-two {
     display: grid;
     grid-template-columns: 1fr 160px;
     gap: 12px;
 }
-.form-group select,
-.form-group textarea {
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    padding: 10px 12px;
-    font-size: 0.95rem;
-    background: #f9fafb;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-.form-group textarea:focus,
-.form-group select:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.25);
-    outline: none;
-    background: #fff;
+.form-row-two > * { min-width: 0; }  /* чтобы не раздувало grid */
+
+/* file input — во всю ширину */
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 8px 0;
+    background: transparent;
 }
 
+/* превью изображений */
 .image-previews {
     display: grid;
     grid-template-columns: repeat(auto-fill,minmax(96px,1fr));
@@ -118,17 +98,30 @@
     gap: 6px;
     justify-content: space-between;
 }
-.btn-mini {
+.btn-mini { border: none; border-radius: 8px; padding: 6px 8px; font-size: 12px; background: #2563eb; color: #fff; cursor: pointer; }
+.btn-mini.danger { background: #ef4444; }
+
+.submit-btn {
+    height: 48px;
     border: none;
-    border-radius: 8px;
-    padding: 6px 8px;
-    font-size: 12px;
+    border-radius: 12px;
     background: #2563eb;
     color: #fff;
+    font-weight: 600;
+    font-size: 16px;
     cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
 }
-.btn-mini.danger { background: #ef4444; }
-@media (max-width: 480px) {
-    .form-row-two { grid-template-columns: 1fr 120px; }
-}
+.submit-btn:hover { background: #1e40af; }
+.submit-btn:active { transform: scale(0.98); }
 
+/* мобильные правки */
+@media (max-width: 640px) {
+    .add-item-form { padding: 16px; gap: 14px; }
+    /* Пара Price/Currency — В СТОЛБИК на телефоне */
+    .form-row-two { grid-template-columns: 1fr; gap: 10px; }
+}
+@media (max-width: 480px) {
+    .add-item-title { font-size: 1.15rem; }
+}
