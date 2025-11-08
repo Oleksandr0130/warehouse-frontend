@@ -71,7 +71,6 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         if (activeMenu === 'sold') fetchSoldReservations();
     };
 
-
     const fetchItems = async (sortBy?: string) => {
         setLoading(true);
         try {
@@ -152,6 +151,21 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
         }
     };
 
+    // NEW: обновление описания/цены/валюты/картинок
+    const handleUpdateItem = async (id: string, patch: Partial<Item>) => {
+        setLoading(true);
+        try {
+            await api.put(`/items/${encodeURIComponent(id)}`, patch);
+            // оптимистично обновляем локально — логика сортировки/поиска не ломается
+            setItems(prev => prev.map(it => it.id === id ? { ...it, ...patch } : it));
+            toast.success('Product updated.');
+        } catch (e) {
+            console.error(e);
+            toast.error('Error updating product.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleScan = async (id: string) => {
         setShowScanner(false);
@@ -283,8 +297,12 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
                                     </div>
                                 </div>
 
-                                <ItemList items={items} onDelete={handleDeleteItem} />
-
+                                {/* NEW: передаём onUpdate для режима редактирования в ItemList */}
+                                <ItemList
+                                    items={items}
+                                    onDelete={handleDeleteItem}
+                                    onUpdate={handleUpdateItem}  // NEW
+                                />
                             </>
                         )}
 

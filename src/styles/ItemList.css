@@ -248,3 +248,29 @@
 .btn-delete:hover {
     filter: brightness(0.95);
 }
+
+/* ====== РЕДАКТОР (новое) ====== */
+.lbl { display:block; font-size:.9rem; color:#334155; margin:6px 0 4px; }
+.inp { width:100%; border:1px solid #e5e7eb; border-radius:10px; padding:10px 12px; background:#fff; }
+.textarea { resize:vertical; }
+.row2 { display:grid; grid-template-columns: 1fr 160px; gap:12px; }
+
+.image-previews { display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:10px; margin-top:8px; }
+.image-thumb { position:relative; border:1px solid #e5e7eb; border-radius:10px; overflow:hidden; background:#fff; }
+.image-thumb img { width:100%; height:96px; object-fit:cover; display:block; }
+.image-thumb.cover { outline:2px solid #22c55e; }
+.thumb-actions { position:absolute; inset:auto 6px 6px 6px; display:flex; gap:6px; justify-content:space-between; }
+.btn-mini { border:none; border-radius:8px; padding:6px 8px; font-size:12px; background:#2563eb; color:#fff; cursor:pointer; }
+.btn-mini.danger { background:#ef4444; }
+
+.actions-row { margin-top:12px; display:flex; gap:8px; justify-content:flex-end; }
+.actions-row-wrap { flex-wrap:wrap; }
+
+.btn-edit { background:#0ea5e9; color:#fff; border:none; border-radius:10px; padding:10px 14px; cursor:pointer; }
+.btn-cancel { background:#94a3b8; color:#fff; border:none; border-radius:10px; padding:10px 14px; cursor:pointer; }
+.btn-save { background:#22c55e; color:#fff; border:none; border-radius:10px; padding:10px 14px; cursor:pointer; }
+.btn-edit:hover, .btn-cancel:hover, .btn-save:hover { filter: brightness(0.95); }
+
+@media (max-width: 640px) {
+    .row2 { grid-template-columns: 1fr 120px; }
+}
