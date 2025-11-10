@@ -1,21 +1,22 @@
 // src/components/Account.tsx
-import React, { useEffect, useMemo, useState } from 'react';
-import { fetchMe, adminCreateUser, AdminCreateUserRequest, MeDto, deleteAccount } from '../api';
+import React, { useEffect, useState } from 'react';
+import { fetchMe, adminCreateUser, AdminCreateUserRequest, MeDto } from '../api';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
 import '../styles/Account.css';
-import SubscriptionBanner from './SubscriptionBanner';
+import SubscriptionBanner from "./SubscriptionBanner.tsx";
+import { deleteAccount } from '../api';
+import { useNavigate } from 'react-router-dom';
 
 const Account: React.FC = () => {
     const [me, setMe] = useState<MeDto | null>(null);
-    const [loading, setLoading] = useState(false);
 
     // формы для админа
     const [newUser, setNewUser] = useState<AdminCreateUserRequest>({
         username: '',
         email: '',
-        password: '',
+        password: ''
     });
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -31,13 +32,15 @@ const Account: React.FC = () => {
     const navigate = useNavigate();
 
     const handleDeleteAccount = async () => {
-        if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) return;
+        if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+            return;
+        }
         try {
             await deleteAccount();
-            toast.success('Your account has been deleted.');
-            navigate('/login', { replace: true });
+            toast.success("Your account has been deleted.");
+            navigate("/login", { replace: true });
         } catch {
-            toast.error('Failed to delete account');
+            toast.error("Failed to delete account");
         }
     };
 
@@ -60,117 +63,67 @@ const Account: React.FC = () => {
         }
     };
 
-    // Инициалы для аватара
-    const initials = useMemo(() => {
-        const src = me?.username || me?.email || '';
-        if (!src) return '';
-        const parts = src.split(/[.\s_@-]+/).filter(Boolean);
-        const a = (parts[0]?.[0] || '').toUpperCase();
-        const b = (parts[1]?.[0] || '').toUpperCase();
-        return (a + b).trim() || a || 'U';
-    }, [me]);
-
     return (
         <div className="account-page">
-            <div className="account-header">
-                <h1 className="account-title">Account</h1>
-                {/* При желании здесь можно добавить кнопку/линк «Edit profile» */}
-            </div>
+            <h2 className="account-title">Personal account</h2>
 
-            {/* Встроенный тёмный баннер состояния подписки (как в макете) */}
             <SubscriptionBanner embedded />
 
             {!me ? (
                 <div className="account-card">Loading...</div>
             ) : (
-                <div className="account-grid">
-                    {/* Левая колонка — профиль */}
-                    <section className="account-card profile-card">
-                        <div className="profile-head">
-                            <div className="avatar">{initials}</div>
-                            <div className="profile-meta">
-                                <div className="profile-name">{me.username}</div>
-                                <div className="profile-role">{me.admin ? 'Administrator' : 'User'}</div>
-                            </div>
-                        </div>
-
-                        <div className="divider" />
-
-                        <div className="rows">
-                            <div className="row">
-                                <span>Username</span>
-                                <b>{me.username}</b>
-                            </div>
-                            <div className="row">
-                                <span>Email</span>
-                                <b>{me.email}</b>
-                            </div>
-                            <div className="row">
-                                <span>Company</span>
-                                <b>{me.companyName ?? '—'}</b>
-                            </div>
-                            <div className="row">
-                                <span>Role</span>
-                                <b>{me.admin ? 'Admin' : 'User'}</b>
-                            </div>
-                        </div>
-
+                <>
+                    <div className="account-card">
+                        <div className="row"><span>User:</span><b>{me.username}</b></div>
+                        <div className="row"><span>Email:</span><b>{me.email}</b></div>
+                        <div className="row"><span>Company:</span><b>{me.companyName ?? '—'}</b></div>
+                        <div className="row"><span>Role:</span><b>{me.admin ? 'Admin' : 'User'}</b></div>
                         <button className="delete-btn" onClick={handleDeleteAccount}>
                             Delete my account
                         </button>
-                    </section>
+                    </div>
 
-                    {/* Правая колонка — админские действия */}
                     {me.admin && (
-                        <section className="account-card admin-card">
-                            <h3 className="account-subtitle">Create new user</h3>
-
+                        <div className="account-card">
+                            <h3 className="account-subtitle">Create User</h3>
                             <form className="admin-form" onSubmit={handleCreate}>
-                                <label className="field">
-                                    <span className="label">Username</span>
-                                    <input
-                                        className="account-input"
-                                        name="username"
-                                        placeholder="User"
-                                        value={newUser.username}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </label>
-
-                                <label className="field">
-                                    <span className="label">Email</span>
-                                    <input
-                                        className="account-input"
-                                        name="email"
-                                        type="email"
-                                        placeholder="Email"
-                                        value={newUser.email}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </label>
-
-                                <label className="field">
-                                    <span className="label">Password</span>
-                                    <input
-                                        className="account-input"
-                                        name="password"
-                                        type="password"
-                                        placeholder="Password"
-                                        value={newUser.password}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </label>
-
-                                <button type="submit" className="account-btn" disabled={loading}>
-                                    {loading ? 'Adding…' : 'Create user'}
+                                <input
+                                    className="account-input"
+                                    name="username"
+                                    placeholder="User"
+                                    value={newUser.username}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <input
+                                    className="account-input"
+                                    name="email"
+                                    type="email"
+                                    placeholder="Email"
+                                    value={newUser.email}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <input
+                                    className="account-input"
+                                    name="password"
+                                    type="password"
+                                    placeholder="Password"
+                                    value={newUser.password}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <button
+                                    type="submit"
+                                    className="account-btn"
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Adding…' : 'Create'}
                                 </button>
                             </form>
-                        </section>
+                        </div>
                     )}
-                </div>
+                </>
             )}
         </div>
     );
