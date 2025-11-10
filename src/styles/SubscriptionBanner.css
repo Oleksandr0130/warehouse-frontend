@@ -1,37 +1,234 @@
-/* тёмная карточка подписки */
-.sb{
-    display:flex;justify-content:space-between;gap:16px;align-items:center;
-    background:linear-gradient(180deg,#0b1225,#0a0f20);
-    border-radius:14px;color:#e5edff;padding:16px;border:1px solid rgba(255,255,255,.08);
-    box-shadow:0 10px 28px rgba(2,6,23,.35);
+/* src/styles/SubscriptionBanner.css */
+
+/* ====== Общие токены ====== */
+:root {
+    --sb-bg: #0b1220;              /* тёмная карточка (embedded) */
+    --sb-fg: #e2e8f0;              /* текст на тёмной */
+    --sb-muted: #94a3b8;           /* вторичный текст */
+    --sb-border: #1f2937;          /* рамки/делители */
+    --sb-accent: #2563eb;          /* синий акцент */
+    --sb-accent-2: #1e40af;
+    --sb-green: #16a34a;
+    --sb-green-2: #15803d;
+    --sb-red: #ef4444;
+    --sb-yellow: #f59e0b;
+    --sb-surface: #ffffff;         /* белая карточка (баннер) */
+    --sb-surface-border: #e5e7eb;
+
+    --sb-radius: 16px;
+    --sb-radius-sm: 12px;
+    --sb-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
-.sb-left{display:flex;flex-direction:column;gap:10px;min-width:0;}
-.sb-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.sb-status{font-weight:700;}
-.sb-pill{background:#083c9d;color:#dbeafe;border:1px solid rgba(255,255,255,.15);padding:4px 8px;border-radius:999px;font-size:.8rem;}
-.sb-row--progress{gap:12px;}
-.sb-days,.sb-total{color:#9fb0ff;font-size:.9rem;}
-.sb-bar{flex:1 1 240px;height:8px;border-radius:99px;background:#12193a;overflow:hidden;}
-.sb-bar__fill{height:100%;background:#3b82f6;}
 
-.sb-row--renew{color:#c7d2fe;font-size:.95rem;}
-
-.sb-right .sb-btn{
-    display:inline-flex;align-items:center;gap:8px;
-    background:#1241d8;color:#fff;border:none;border-radius:12px;padding:10px 14px;cursor:pointer;
-    font-weight:700;
+/* ====== Skeleton ====== */
+.sub-skeleton {
+    border-radius: var(--sb-radius);
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    padding: 16px;
 }
-.sb-right .sb-btn:hover{filter:brightness(.95);}
+.sub-skel-line {
+    height: 14px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #e5e7eb 25%, #f1f5f9 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: sbShimmer 1.2s infinite linear;
+    margin-bottom: 10px;
+}
+.sub-skel-line.short { width: 60%; }
+@keyframes sbShimmer {
+    from { background-position: 200% 0; }
+    to   { background-position:   0% 0; }
+}
 
-/* иконки */
-.sb-ico{display:inline-block;width:16px;height:16px;background:currentColor;mask-size:contain;mask-repeat:no-repeat;}
-.sb-ico--bolt{mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23fff' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M13 2L3 14h7l-1 8 11-12h-7l0-8z'/%3E%3C/svg%3E");}
-.sb-ico--calendar{mask-image:url('data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"%23fff\" stroke-width=\"2\" viewBox=\"0 0 24 24\"%3E%3Crect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/%3E%3Cpath d=\"M16 2v4M8 2v4M3 10h18\"/%3E%3C/svg%3E');}
-.sb-ico--card{mask-image:url('data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"%23fff\" stroke-width=\"2\" viewBox=\"0 0 24 24\"%3E%3Crect x=\"2\" y=\"5\" width=\"20\" height=\"14\" rx=\"2\"/%3E%3Cpath d=\"M2 10h20\"/%3E%3C/svg%3E');}
+/* ====== EMBEDDED: тёмная карточка ====== */
+.sub-card {
+    background: var(--sb-bg);
+    color: var(--sb-fg);
+    border-radius: var(--sb-radius);
+    box-shadow: var(--sb-shadow);
+    padding: 16px;
+    margin: 12px 0;
+    border: 1px solid var(--sb-border);
+}
 
-@media (max-width:720px){
-    .sb{flex-direction:column;align-items:flex-start;}
-    .sb-right{width:100%;}
-    .sb-right .sb-btn{width:100%;justify-content:center;}
-    .sb-bar{flex-basis:120px;}
+.sub-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+.sub-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: .2px;
+}
+
+.sub-dates {
+    color: var(--sb-muted);
+    font-size: .9rem;
+    margin-bottom: 8px;
+}
+
+/* Плашка-статус */
+.sub-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: .78rem;
+    letter-spacing: .4px;
+    border-radius: 999px;
+    padding: 6px 10px;
+    border: 1px solid rgba(148,163,184,.3);
+    color: var(--sb-fg);
+    background: rgba(148,163,184,.1);
+}
+.sub-pill.active{
+    color: #22c55e;                                   /* текст */
+    border-color: rgba(34,197,94,.35);                /* рамка */
+    background: rgba(34,197,94,.12);                  /* фон */
+}
+
+/* (необязательно) маленькая зелёная точка слева */
+.sub-pill.active::before{
+    content:"";
+    width:6px; height:6px;
+    border-radius:999px;
+    background:#22c55e;
+    box-shadow:0 0 0 3px rgba(34,197,94,.18);
+}
+.sub-pill.trial     { color: #fbbf24; border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.12); }
+.sub-pill.expired   { color: var(--sb-red); border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.12); }
+.sub-pill.anon      { color: #38bdf8; border-color: rgba(56,189,248,.35); background: rgba(56,189,248,.12); }
+.sub-pill.no_company{ color: #a78bfa; border-color: rgba(167,139,250,.35); background: rgba(167,139,250,.12); }
+.sub-pill.ending    { box-shadow: 0 0 0 2px rgba(245,158,11,.25) inset; }
+
+/* Прогресс (оставшиеся дни) */
+.sub-progress {
+    height: 10px;
+    background: rgba(148,163,184,.18);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(148,163,184,.25);
+}
+.sub-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sb-accent), #22c55e);
+    width: 0%;
+    transition: width .35s ease;
+}
+
+/* Действия в embedded */
+.sub-actions { margin-top: 12px; }
+.sub-actions-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Тоггл валюты */
+.sub-currency-toggle label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(148,163,184,.35);
+    color: var(--sb-fg);
+    cursor: pointer;
+    font-size: .88rem;
+    user-select: none;
+}
+.sub-currency-toggle input {
+    accent-color: var(--sb-accent);
+}
+
+/* Кнопка «оплатить» */
+.sub-btn {
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background: var(--sb-accent);
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: .3px;
+    cursor: pointer;
+    transition: background .2s ease, transform .1s ease, box-shadow .2s ease;
+    box-shadow: 0 6px 18px rgba(37,99,235,.25);
+}
+.sub-btn:hover   { background: var(--sb-accent-2); }
+.sub-btn:active  { transform: translateY(1px); box-shadow: 0 4px 12px rgba(37,99,235,.22); }
+.sub-btn:disabled{ opacity: .65; cursor: not-allowed; box-shadow: none; }
+
+/* Жёлтая рамка для «скоро закончится» */
+.sub-ending {
+    outline: 2px solid rgba(245,158,11,.35);
+    outline-offset: 2px;
+}
+
+/* ====== Баннер (верхний, светлый) ====== */
+.subscription-banner {
+    background: var(--sb-surface);
+    border: 1px solid var(--sb-surface-border);
+    border-radius: var(--sb-radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.05);
+    margin: 12px 0;
+}
+.subscription-banner .sub-title {
+    color: #0f172a;
+    font-weight: 700;
+}
+.subscription-banner .sub-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.subscription-banner .button {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid var(--sb-surface-border);
+    background: #0ea5e9;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: .3px;
+    cursor: pointer;
+    transition: background .2s ease, transform .1s ease, box-shadow .2s ease;
+    box-shadow: 0 6px 16px rgba(14,165,233,.25);
+}
+.subscription-banner .button:hover { background: #0284c7; }
+.subscription-banner .button:disabled { opacity: .65; cursor: not-allowed; }
+
+.subscription-banner .sub-currency-toggle label {
+    border-color: var(--sb-surface-border);
+    color: #0f172a;
+}
+.subscription-banner .sub-hint {
+    color: #64748b;
+    font-size: .95rem;
+}
+
+/* ====== Мелочи ====== */
+.sub-hint {
+    color: var(--sb-muted);
+    font-size: .95rem;
+}
+
+@media (max-width: 560px) {
+    .subscription-banner {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .subscription-banner .sub-actions {
+        justify-content: space-between;
+    }
 }
