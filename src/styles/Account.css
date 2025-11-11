@@ -68,7 +68,7 @@
 .account-btn {
     height: 44px;
     border-radius: 12px;
-    background: #2563eb;
+    background: #0b0b14;
     color: #fff;
     font-weight: 600;
     font-size: 15px;
@@ -78,7 +78,7 @@
 }
 
 .account-btn:hover {
-    background: #1e40af;
+    filter: brightness(0.95);
 }
 .account-btn:disabled {
     opacity: 0.6;
@@ -102,4 +102,3 @@
 .delete-btn:hover {
     background: #b91c1c;
 }
-

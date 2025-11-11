@@ -65,7 +65,7 @@ const Account: React.FC = () => {
 
     return (
         <div className="account-page">
-            <h2 className="account-title">Personal account</h2>
+            <h2 className="account-title">Account Settings</h2>
 
             <SubscriptionBanner embedded />
 
@@ -74,10 +74,10 @@ const Account: React.FC = () => {
             ) : (
                 <>
                     <div className="account-card">
-                        <div className="row"><span>User:</span><b>{me.username}</b></div>
-                        <div className="row"><span>Email:</span><b>{me.email}</b></div>
-                        <div className="row"><span>Company:</span><b>{me.companyName ?? '—'}</b></div>
-                        <div className="row"><span>Role:</span><b>{me.admin ? 'Admin' : 'User'}</b></div>
+                        <div className="row"><span>Username</span><b>{me.username}</b></div>
+                        <div className="row"><span>Email</span><b>{me.email}</b></div>
+                        <div className="row"><span>Company</span><b>{me.companyName ?? '—'}</b></div>
+                        <div className="row"><span>Role</span><b>{me.admin ? 'Admin' : 'User'}</b></div>
                         <button className="delete-btn" onClick={handleDeleteAccount}>
                             Delete my account
                         </button>
@@ -85,12 +85,12 @@ const Account: React.FC = () => {
 
                     {me.admin && (
                         <div className="account-card">
-                            <h3 className="account-subtitle">Create User</h3>
+                            <h3 className="account-subtitle">Invite New Member</h3>
                             <form className="admin-form" onSubmit={handleCreate}>
                                 <input
                                     className="account-input"
                                     name="username"
-                                    placeholder="User"
+                                    placeholder="Enter username"
                                     value={newUser.username}
                                     onChange={handleChange}
                                     required
@@ -99,7 +99,7 @@ const Account: React.FC = () => {
                                     className="account-input"
                                     name="email"
                                     type="email"
-                                    placeholder="Email"
+                                    placeholder="user@example.com"
                                     value={newUser.email}
                                     onChange={handleChange}
                                     required
@@ -118,7 +118,7 @@ const Account: React.FC = () => {
                                     className="account-btn"
                                     disabled={loading}
                                 >
-                                    {loading ? 'Adding…' : 'Create'}
+                                    {loading ? 'Adding…' : 'Create User'}
                                 </button>
                             </form>
                         </div>
