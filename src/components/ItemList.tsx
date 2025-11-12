@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Item } from '../types/Item';
 import '../styles/ItemList.css';
+import { useTranslation } from 'react-i18next';
 
 interface ItemListProps {
     items: Item[];
@@ -15,7 +16,11 @@ type EditState = {
     images: string[];
 };
 
+const MAX_IMAGES = 5;
+
 const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
+    const { t } = useTranslation();
+
     const [query, setQuery] = useState('');
     const [openId, setOpenId] = useState<string | null>(null);
     const [editingId, setEditingId] = useState<string | null>(null); // NEW
@@ -65,7 +70,7 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
 
     const handleFiles = async (files: FileList | null) => {
         if (!edit || !files || files.length === 0) return;
-        const max = 5 - edit.images.length;
+        const max = MAX_IMAGES - edit.images.length;
         if (max <= 0) return;
         const slice = Array.from(files).slice(0, Math.max(0, max));
         const toBase64 = (file: File) =>
@@ -76,7 +81,7 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
                 reader.readAsDataURL(file);
             });
         const list = await Promise.all(slice.map((f) => toBase64(f)));
-        setEdit({ ...edit, images: [...edit.images, ...list].slice(0, 5) });
+        setEdit({ ...edit, images: [...edit.images, ...list].slice(0, MAX_IMAGES) });
     };
 
     const removeImage = (idx: number) => {
@@ -96,7 +101,7 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
         if (!onUpdate || !edit) return;
         const priceNum = edit.price.trim() ? Number(edit.price) : undefined;
         if (edit.price.trim() && (isNaN(priceNum!) || priceNum! < 0)) {
-            alert('Price must be a non-negative number');
+            alert(t('itemList.errors.priceNonNegative'));
             return;
         }
         const patch: Partial<Item> = {
@@ -117,7 +122,7 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
 
     return (
         <div className="item-list">
-            <h3 className="item-list-title">Stock</h3>
+            <h3 className="item-list-title">{t('itemList.title')}</h3>
 
             <div className="item-search">
                 <input
@@ -125,13 +130,16 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search by name, available amount, sold, price, or description"
+                    placeholder={t('itemList.search.placeholder')}
+                    aria-label={t('itemList.search.aria')}
                 />
-                <span className="item-search-count">{filtered.length} / {items.length}</span>
+                <span className="item-search-count">
+          {t('itemList.search.count', { filtered: filtered.length, total: items.length })}
+        </span>
             </div>
 
             {filtered.length === 0 ? (
-                <p className="empty-message">No items match your search.</p>
+                <p className="empty-message">{t('itemList.empty')}</p>
             ) : (
                 <ul className="item-list-ul">
                     {filtered.map((item) => {
@@ -146,15 +154,25 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
                             >
                                 <button className="row" onClick={() => toggle(item.id)} aria-expanded={isOpen}>
                                     <div className="avatar">
-                                        {avatar ? <img src={avatar} alt={`${item.name} cover`} /> : <div className="avatar-placeholder" />}
+                                        {avatar ? (
+                                            <img src={avatar} alt={t('itemList.alt.cover', { name: item.name })} />
+                                        ) : (
+                                            <div className="avatar-placeholder" />
+                                        )}
                                     </div>
 
                                     <div className="item-details">
                                         <span className="item-name">{item.name}</span>
-                                        <span className="item-quantity">Available: {item.quantity}</span>
-                                        <span className="item-sold">Sold: {item.sold}</span>
+                                        <span className="item-quantity">
+                      {t('itemList.labels.available')}: {item.quantity}
+                    </span>
+                                        <span className="item-sold">
+                      {t('itemList.labels.sold')}: {item.sold}
+                    </span>
                                         {(!isEditing && typeof item.price === 'number' && item.currency) && (
-                                            <span className="item-price">Price: {item.price.toFixed(2)} {item.currency}</span>
+                                            <span className="item-price">
+                        {t('itemList.labels.price')}: {item.price.toFixed(2)} {item.currency}
+                      </span>
                                         )}
                                     </div>
 
@@ -179,7 +197,7 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
                                                 <div className="actions-row actions-row-wrap">
                                                     {onUpdate && (
                                                         <button type="button" className="btn-edit" onClick={() => startEdit(item)}>
-                                                            Edit
+                                                            {t('itemList.actions.edit')}
                                                         </button>
                                                     )}
                                                     {onDelete && (
@@ -188,18 +206,18 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
                                                             className="btn-delete"
                                                             onClick={() => onDelete(item.id)}
                                                         >
-                                                            Delete item
+                                                            {t('itemList.actions.deleteItem')}
                                                         </button>
                                                     )}
                                                 </div>
                                             </div>
                                         ) : (
                                             <div className="collapse-inner empty">
-                                                No extra info.
+                                                {t('itemList.noExtra')}
                                                 {onUpdate && (
                                                     <div className="actions-row">
                                                         <button type="button" className="btn-edit" onClick={() => startEdit(item)}>
-                                                            Edit
+                                                            {t('itemList.actions.edit')}
                                                         </button>
                                                     </div>
                                                 )}
@@ -211,19 +229,19 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
                                     {isEditing && edit && (
                                         <div className="collapse-inner">
                                             {/* Описание */}
-                                            <label className="lbl">Description</label>
+                                            <label className="lbl">{t('itemList.form.description')}</label>
                                             <textarea
                                                 className="inp textarea"
                                                 rows={3}
                                                 value={edit.description}
                                                 onChange={(e) => setEdit({ ...edit, description: e.target.value })}
-                                                placeholder="Short item description…"
+                                                placeholder={t('itemList.form.descriptionPlaceholder')}
                                             />
 
                                             {/* Цена + валюта */}
                                             <div className="row2">
                                                 <div className="col">
-                                                    <label className="lbl">Price</label>
+                                                    <label className="lbl">{t('itemList.form.price')}</label>
                                                     <input
                                                         className="inp"
                                                         type="number"
@@ -231,11 +249,11 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
                                                         step="0.01"
                                                         value={edit.price}
                                                         onChange={(e) => setEdit({ ...edit, price: e.target.value })}
-                                                        placeholder="0.00"
+                                                        placeholder={t('itemList.form.pricePlaceholder')}
                                                     />
                                                 </div>
                                                 <div className="col">
-                                                    <label className="lbl">Currency</label>
+                                                    <label className="lbl">{t('itemList.form.currency')}</label>
                                                     <select
                                                         className="inp"
                                                         value={edit.currency ?? 'EUR'}
@@ -252,7 +270,7 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
                                             </div>
 
                                             {/* Картинки */}
-                                            <label className="lbl">Images (up to 5)</label>
+                                            <label className="lbl">{t('itemList.form.images', { max: MAX_IMAGES })}</label>
                                             <input
                                                 className="inp"
                                                 type="file"
@@ -267,9 +285,13 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
                                                             <img src={src} alt={`img-${idx}`} />
                                                             <div className="thumb-actions">
                                                                 {idx !== 0 && (
-                                                                    <button type="button" className="btn-mini" onClick={() => makeCover(idx)}>Set as cover</button>
+                                                                    <button type="button" className="btn-mini" onClick={() => makeCover(idx)}>
+                                                                        {t('itemList.images.setCover')}
+                                                                    </button>
                                                                 )}
-                                                                <button type="button" className="btn-mini danger" onClick={() => removeImage(idx)}>Remove</button>
+                                                                <button type="button" className="btn-mini danger" onClick={() => removeImage(idx)}>
+                                                                    {t('common.remove')}
+                                                                </button>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -279,10 +301,10 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
                                             {/* Кнопки */}
                                             <div className="actions-row actions-row-wrap">
                                                 <button type="button" className="btn-cancel" onClick={cancelEdit} disabled={saving}>
-                                                    Cancel
+                                                    {t('itemList.actions.cancel')}
                                                 </button>
                                                 <button type="button" className="btn-save" onClick={() => saveEdit(item)} disabled={saving}>
-                                                    {saving ? 'Saving…' : 'Save'}
+                                                    {saving ? t('itemList.actions.saving') : t('itemList.actions.save')}
                                                 </button>
                                             </div>
                                         </div>

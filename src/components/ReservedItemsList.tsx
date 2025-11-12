@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ReservedItem } from '../types/ReservedItem';
 import '../styles/ReservedItemList.css';
 import QRScanner from './QRScanner';
+import { useTranslation } from 'react-i18next';
 
 interface ReservedItemsListProps {
     reservedItems: ReservedItem[];
@@ -21,6 +22,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                                                                  onScan,
                                                                  onReservationRemoved,
                                                              }) => {
+    const { t } = useTranslation();
     const [showScanner, setShowScanner] = useState(false);
     const [query, setQuery] = useState('');
 
@@ -40,48 +42,41 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
 
     // ---- удаление резервации (устойчивое к 204/текстовым ответам)
     const handleDelete = async (id: string) => {
-        if (!confirm('Do you really want to delete this reservation?')) return;
+        if (!confirm(t('reservedList.confirm.delete'))) return;
 
         try {
             const res = await fetch(`/api/reservations/${id}`, { method: 'DELETE' });
 
             if (!res.ok) {
-                // даже если сервер вернул текст ошибки — попробуем вытащить и показать
                 const maybeText = await res.text().catch(() => '');
-                throw new Error(maybeText || 'Failed to delete reservation');
+                throw new Error(maybeText || t('reservedList.errors.deleteFailed'));
             }
 
             const ct = res.headers.get('content-type') || '';
 
             if (res.status === 204 || !ct.includes('application/json')) {
-                // Сервер ничего не вернул или вернул не-JSON -> убираем локально
                 const newList = reservedItems.filter((r) => r.id !== id);
                 setReservedItems(newList);
-                // Если нужно откатить количество на складе прямо сейчас,
-                // тут нечем кормить onReservationRemoved (нет itemId/returnedQuantity).
-                // Количество обновится при следующей загрузке или если бэкенд будет возвращать JSON.
-                toast.success('Reservation successfully deleted.');
+                toast.success(t('reservedList.toasts.deleted'));
                 return;
             }
 
-            // Нормальный JSON-ответ с полями itemId и returnedQuantity
             const updated = await res.json();
             if (updated?.itemId != null && updated?.returnedQuantity != null) {
                 onReservationRemoved(updated.itemId, updated.returnedQuantity);
             }
-            // На всякий случай удалим локально и из списка
             const newList = reservedItems.filter((r) => r.id !== id);
             setReservedItems(newList);
-            toast.success('Reservation successfully deleted.');
+            toast.success(t('reservedList.toasts.deleted'));
         } catch (err) {
             console.error(err);
-            toast.error('Deleting the reservation failed.');
+            toast.error(t('reservedList.errors.deleteFailed'));
         }
     };
 
     return (
         <div className="reserved-list">
-            <h3 className="reserved-title">Reservations</h3>
+            <h3 className="reserved-title">{t('reservedList.title')}</h3>
 
             <div className="reserved-search">
                 <input
@@ -89,15 +84,16 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search by order number, name, week, or amount"
+                    placeholder={t('reservedList.search.placeholder')}
+                    aria-label={t('reservedList.search.aria')}
                 />
                 <span className="reserved-search-count">
-          {filtered.length} / {reservedItems.length}
+          {t('reservedList.search.count', { filtered: filtered.length, total: reservedItems.length })}
         </span>
             </div>
 
             {filtered.length === 0 ? (
-                <p className="empty-message">No reserved items found.</p>
+                <p className="empty-message">{t('reservedList.empty')}</p>
             ) : (
                 <ul className="reserved-ul">
                     {filtered.map((item) => (
@@ -105,15 +101,15 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                             <div className="reserved-item-details">
                                 <span className="reserved-name">{item.name}</span>
                                 <span className="reserved-info">
-                  Order № <b>{item.orderNumber}</b> | Week: {item.week} | Amount: {item.quantity}
+                  {t('reservedList.labels.order')} <b>{item.orderNumber}</b> | {t('reservedList.labels.week')} {item.week} | {t('reservedList.labels.amount')} {item.quantity}
                 </span>
                             </div>
                             <div className="reserved-item-actions">
                                 <button onClick={() => setShowScanner(true)} className="reserved-btn scan">
-                                    Complete via QR
+                                    {t('reservedList.actions.completeViaQR')}
                                 </button>
                                 <button onClick={() => handleDelete(item.id)} className="reserved-btn delete">
-                                    Remove
+                                    {t('reservedList.actions.remove')}
                                 </button>
                             </div>
                         </li>
@@ -132,21 +128,21 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                         <div className="ri-modal" onClick={(e) => e.stopPropagation()}>
                             <button
                                 className="ri-modal__close"
-                                aria-label="Close scanner"
+                                aria-label={t('reservedList.modal.closeAria')}
                                 onClick={() => setShowScanner(false)}
                                 type="button"
                             >
                                 ×
                             </button>
 
-                            <div className="ri-modal__title">QR-Code Scanner</div>
+                            <div className="ri-modal__title">{t('reservedList.modal.title')}</div>
 
                             <div className="ri-modal__viewport">
                                 <QRScanner
                                     onScan={(orderNumber) => {
                                         setShowScanner(false);
                                         onScan(orderNumber);
-                                        toast.success('Reservation via QR code successfully completed.');
+                                        toast.success(t('reservedList.toasts.completedViaQR'));
                                     }}
                                     onClose={() => setShowScanner(false)}
                                 />
@@ -158,7 +154,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                                     type="button"
                                     onClick={() => setShowScanner(false)}
                                 >
-                                    Close Scanner
+                                    {t('reservedList.modal.close')}
                                 </button>
                             </div>
                         </div>

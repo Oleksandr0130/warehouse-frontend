@@ -3,12 +3,17 @@ import { Item } from '../types/Item';
 import '../styles/AddItemForm.css';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { useTranslation } from 'react-i18next';
 
 interface AddItemFormProps {
     onAdd: (item: Item) => void;
 }
 
+const MAX_IMAGES = 5;
+
 function AddItemForm({ onAdd }: AddItemFormProps) {
+    const { t } = useTranslation();
+
     const [id, setId] = useState('');
     const [name, setName] = useState('');
     const [quantity, setQuantity] = useState('');
@@ -20,7 +25,7 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
 
     const handleFiles = async (files: FileList | null) => {
         if (!files || files.length === 0) return;
-        const max = 5 - images.length;
+        const max = MAX_IMAGES - images.length;
         const slice = Array.from(files).slice(0, Math.max(0, max));
 
         const toBase64 = (file: File) =>
@@ -28,15 +33,15 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
                 const reader = new FileReader();
                 reader.onload = () => resolve(String(reader.result));
                 reader.onerror = reject;
-                reader.readAsDataURL(file); // никакого URL — инлайн base64
+                reader.readAsDataURL(file); // inline base64
             });
 
         try {
             const list = await Promise.all(slice.map(f => toBase64(f)));
-            const next = [...images, ...list].slice(0, 5);
+            const next = [...images, ...list].slice(0, MAX_IMAGES);
             setImages(next);
         } catch {
-            toast.error('Failed to read image(s).');
+            toast.error(t('addItemForm.errors.readImages'));
         }
     };
 
@@ -49,7 +54,7 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
             if (idx === 0) return prev;
             const next = [...prev];
             const [picked] = next.splice(idx, 1);
-            next.unshift(picked); // первая — аватарка
+            next.unshift(picked); // first — cover
             return next;
         });
     };
@@ -58,15 +63,15 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
         e.preventDefault();
         const quantityNum = parseInt(quantity, 10);
 
-        if (!id.trim()) { toast.error('ID must not be empty.'); return; }
-        if (!name.trim()) { toast.error('Name cannot be empty.'); return; }
+        if (!id.trim()) { toast.error(t('addItemForm.validation.idEmpty')); return; }
+        if (!name.trim()) { toast.error(t('addItemForm.validation.nameEmpty')); return; }
         if (isNaN(quantityNum) || quantityNum <= 0) {
-            toast.error('The quantity must be a positive number.'); return;
+            toast.error(t('addItemForm.validation.quantityPositive')); return;
         }
 
         const priceNum = price.trim() ? Number(price) : undefined;
         if (price.trim() && (isNaN(Number(price)) || Number(price) < 0)) {
-            toast.error('Price must be a non-negative number.'); return;
+            toast.error(t('addItemForm.validation.priceNonNegative')); return;
         }
 
         const item: Item = {
@@ -86,72 +91,73 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
         setId(''); setName(''); setQuantity('');
         setDescription(''); setPrice(''); setCurrency('EUR'); setImages([]);
         if (fileInputRef.current) fileInputRef.current.value = '';
-        toast.success('Item successfully added!');
+        toast.success(t('addItemForm.success.added'));
     };
 
     return (
         <form className="add-item-form" onSubmit={handleSubmit}>
-            <h2 className="add-item-title">Add new item</h2>
+            <h2 className="add-item-title">{t('addItemForm.title')}</h2>
 
             <div className="form-group">
-                <label htmlFor="id">Name QR</label>
+                <label htmlFor="id">{t('addItemForm.fields.id.label')}</label>
                 <input
                     type="text"
                     id="id"
                     value={id}
                     onChange={(e) => setId(e.target.value)}
                     required
-                    placeholder="Name QR"
+                    placeholder={t('addItemForm.fields.id.placeholder')}
                 />
             </div>
 
             <div className="form-group">
-                <label htmlFor="name">Name</label>
+                <label htmlFor="name">{t('addItemForm.fields.name.label')}</label>
                 <input
                     type="text"
                     id="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    placeholder="Item name"
+                    placeholder={t('addItemForm.fields.name.placeholder')}
                 />
             </div>
 
             <div className="form-group">
-                <label htmlFor="quantity">Amount</label>
+                <label htmlFor="quantity">{t('addItemForm.fields.quantity.label')}</label>
                 <input
                     type="number"
                     id="quantity"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                     required
-                    placeholder="Enter amount"
+                    placeholder={t('addItemForm.fields.quantity.placeholder')}
                     min="0"
                 />
             </div>
 
-            {/* NEW: price + currency (необязательные) */}
+            {/* price + currency (optional) */}
             <div className="form-row-two">
                 <div className="form-group">
-                    <label htmlFor="price">Price (optional)</label>
+                    <label htmlFor="price">{t('addItemForm.fields.price.label')}</label>
                     <input
                         type="number"
                         id="price"
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
-                        placeholder="0.00"
+                        placeholder={t('addItemForm.fields.price.placeholder')}
                         min="0"
                         step="0.01"
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="currency">Currency</label>
+                    <label htmlFor="currency">{t('addItemForm.fields.currency.label')}</label>
                     <select
                         id="currency"
                         value={currency}
                         onChange={(e) => setCurrency(e.target.value as any)}
                         disabled={!price.trim()}
                     >
+                        {/* коды валют как есть */}
                         <option value="EUR">EUR</option>
                         <option value="USD">USD</option>
                         <option value="PLN">PLN</option>
@@ -161,21 +167,21 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
                 </div>
             </div>
 
-            {/* NEW: optional description */}
+            {/* optional description */}
             <div className="form-group">
-                <label htmlFor="description">Description (optional)</label>
+                <label htmlFor="description">{t('addItemForm.fields.description.label')}</label>
                 <textarea
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Short item description…"
+                    placeholder={t('addItemForm.fields.description.placeholder')}
                     rows={3}
                 />
             </div>
 
-            {/* NEW: images uploader */}
+            {/* images uploader */}
             <div className="form-group">
-                <label>Images (up to 5)</label>
+                <label>{t('addItemForm.fields.images.label', { max: MAX_IMAGES })}</label>
                 <input
                     ref={fileInputRef}
                     type="file"
@@ -190,9 +196,13 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
                                 <img src={src} alt={`img-${idx}`} />
                                 <div className="thumb-actions">
                                     {idx !== 0 && (
-                                        <button type="button" onClick={() => makeCover(idx)} className="btn-mini">Set as cover</button>
+                                        <button type="button" onClick={() => makeCover(idx)} className="btn-mini">
+                                            {t('addItemForm.images.setCover')}
+                                        </button>
                                     )}
-                                    <button type="button" onClick={() => removeImage(idx)} className="btn-mini danger">Remove</button>
+                                    <button type="button" onClick={() => removeImage(idx)} className="btn-mini danger">
+                                        {t('common.remove')}
+                                    </button>
                                 </div>
                             </div>
                         ))}
@@ -200,7 +210,7 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
                 )}
             </div>
 
-            <button type="submit" className="submit-btn">Add Item</button>
+            <button type="submit" className="submit-btn">{t('addItemForm.submit')}</button>
         </form>
     );
 }

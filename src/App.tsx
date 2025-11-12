@@ -1,5 +1,6 @@
 import { JSX, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import Register from './components/Register';
@@ -19,6 +20,7 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 }
 
 function App() {
+    const { t } = useTranslation();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
@@ -29,13 +31,13 @@ function App() {
             logout();
             setIsAuthenticated(false);
             if (!alreadyOnLogin) {
-                toast.info('Сессия завершена. Войдите снова.');
+                toast.info(t('auth.sessionEnded'));
                 navigate('/login', { replace: true });
             }
         };
         window.addEventListener('auth:logout', onLogout);
         return () => window.removeEventListener('auth:logout', onLogout);
-    }, [navigate, location.pathname]);
+    }, [navigate, location.pathname, t]);
 
     useEffect(() => {
         const init = async () => {
@@ -64,8 +66,8 @@ function App() {
 
             toast.warn(
                 res.status === 'TRIAL'
-                    ? `Your trial ends in ${daysLeft} day(s).`
-                    : `Your access period ends in ${daysLeft} day(s).`,
+                    ? t('billing.trialWarn', { days: daysLeft })
+                    : t('billing.activeWarn', { days: daysLeft }),
                 { toastId: 'billing-warn' }
             );
         } catch {
@@ -75,7 +77,7 @@ function App() {
 
     const handleAuthSuccess = () => {
         setIsAuthenticated(true);
-        toast.success('Successful Login!', { toastId: 'auth-login' });
+        toast.success(t('auth.loginSuccess'), { toastId: 'auth-login' });
         // на всякий случай в следующий тик — чтобы токен точно попал в localStorage
         setTimeout(() => warnOnLogin(), 0);
     };
@@ -83,7 +85,7 @@ function App() {
     const handleLogout = () => {
         logout();
         setIsAuthenticated(false);
-        toast.info('Successful Logout!', { toastId: 'auth-logout' });
+        toast.info(t('auth.logoutSuccess'), { toastId: 'auth-logout' });
         navigate('/login', { replace: true });
     };
 

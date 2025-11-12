@@ -1,5 +1,6 @@
 import React from 'react';
 import '../styles/DashboardCards.css';
+import { useTranslation } from 'react-i18next';
 
 type Active = 'stock' | 'reserved' | 'qr';
 
@@ -7,7 +8,7 @@ type Props = {
     itemsCount: number;
     reservedCount: number;
     qrCount: number;
-    active: Active;                    // <— кто подсвечен
+    active: Active;
     onGoStock: () => void;
     onGoReserved: () => void;
     onGoQRCodes: () => void;
@@ -18,6 +19,8 @@ const DashboardCards: React.FC<Props> = ({
                                              active,
                                              onGoStock, onGoReserved, onGoQRCodes
                                          }) => {
+    const { t } = useTranslation();
+
     return (
         <div className="dash-cards">
             <button
@@ -25,8 +28,10 @@ const DashboardCards: React.FC<Props> = ({
                 onClick={onGoStock}
             >
                 <div className="dash-card__icon">📦</div>
-                <div className="dash-card__title">Stock</div>
-                <div className="dash-card__subtitle">{itemsCount} Items</div>
+                <div className="dash-card__title">{t('dashboard.stock.title')}</div>
+                <div className="dash-card__subtitle">
+                    {t('dashboard.stock.subtitle', { count: itemsCount })}
+                </div>
             </button>
 
             <button
@@ -34,8 +39,10 @@ const DashboardCards: React.FC<Props> = ({
                 onClick={onGoReserved}
             >
                 <div className="dash-card__icon">🧾</div>
-                <div className="dash-card__title">Reserved Items</div>
-                <div className="dash-card__subtitle">{reservedCount} active</div>
+                <div className="dash-card__title">{t('dashboard.reserved.title')}</div>
+                <div className="dash-card__subtitle">
+                    {t('dashboard.reserved.subtitle', { count: reservedCount })}
+                </div>
             </button>
 
             <button
@@ -43,8 +50,10 @@ const DashboardCards: React.FC<Props> = ({
                 onClick={onGoQRCodes}
             >
                 <div className="dash-card__icon">🔳</div>
-                <div className="dash-card__title">QR Codes</div>
-                <div className="dash-card__subtitle">{qrCount} generated</div>
+                <div className="dash-card__title">{t('dashboard.qr.title')}</div>
+                <div className="dash-card__subtitle">
+                    {t('dashboard.qr.subtitle', { count: qrCount })}
+                </div>
             </button>
         </div>
     );

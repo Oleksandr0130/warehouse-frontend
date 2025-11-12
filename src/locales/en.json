@@ -1,0 +1,427 @@
+{
+  "auth": {
+    "sessionEnded": "Session ended. Please sign in again.",
+    "loginSuccess": "Successful Login!",
+    "logoutSuccess": "Successful Logout!"
+  },
+  "billing": {
+    "trialWarn": "Your trial ends in {{days}} day(s).",
+    "activeWarn": "Your access period ends in {{days}} day(s)."
+  },
+
+  "common": {
+    "loading": "Loading...",
+    "create": "Create",
+    "adding": "Adding…"
+  },
+  "account": {
+    "title": "Personal account",
+    "fields": {
+      "user": "User",
+      "email": "Email",
+      "company": "Company",
+      "role": "Role"
+    },
+    "roles": {
+      "admin": "Admin",
+      "user": "User"
+    },
+    "delete": {
+      "button": "Delete my account",
+      "confirm": "Are you sure you want to delete your account? This action cannot be undone.",
+      "success": "Your account has been deleted.",
+      "fail": "Failed to delete account"
+    },
+    "errors": {
+      "fetchMe": "Failed to get account"
+    },
+    "admin": {
+      "create": {
+        "title": "Create User",
+        "success": "User created",
+        "fail": "Failed to create user"
+      },
+      "form": {
+        "usernamePlaceholder": "User",
+        "emailPlaceholder": "Email",
+        "passwordPlaceholder": "Password"
+      }
+    }
+  },
+
+  "common": {
+    "remove": "Remove"
+  },
+  "addItemForm": {
+    "title": "Add new item",
+    "success": { "added": "Item successfully added!" },
+    "errors": { "readImages": "Failed to read image(s)." },
+    "validation": {
+      "idEmpty": "ID must not be empty.",
+      "nameEmpty": "Name cannot be empty.",
+      "quantityPositive": "The quantity must be a positive number.",
+      "priceNonNegative": "Price must be a non-negative number."
+    },
+    "fields": {
+      "id": { "label": "Name QR", "placeholder": "Name QR" },
+      "name": { "label": "Name", "placeholder": "Item name" },
+      "quantity": { "label": "Amount", "placeholder": "Enter amount" },
+      "price": { "label": "Price (optional)", "placeholder": "0.00" },
+      "currency": { "label": "Currency" },
+      "description": { "label": "Description (optional)", "placeholder": "Short item description…" },
+      "images": { "label": "Images (up to {{max}})" }
+    },
+    "images": {
+      "setCover": "Set as cover"
+    },
+    "submit": "Add Item"
+  },
+  "common": { "loading": "Loading..." },
+  "appContent": {
+    "errors": {
+      "loadProducts": "Error loading products.",
+      "loadReserved": "Error loading reserved items.",
+      "loadSold": "Error loading sold items.",
+      "addProduct": "Error adding product.",
+      "deleteProduct": "Error deleting product.",
+      "updateProduct": "Error updating product.",
+      "incorrectQR": "Incorrect QR code.",
+      "processReserve": "Error processing reserve."
+    },
+    "success": {
+      "productAdded": "Product added successfully!",
+      "productDeleted": "Product deleted.",
+      "productUpdated": "Product updated.",
+      "reservationDeleted": "Reservation deleted.",
+      "reservationProcessed": "Reservation processed!"
+    },
+    "menu": {
+      "stock": "Stock",
+      "createItem": "Create item",
+      "reservedItems": "Reserved items",
+      "createReservation": "Create a reservation",
+      "soldItems": "Sold items",
+      "qrCodes": "QR-Codes",
+      "about": "About App",
+      "account": "Personal account",
+      "logout": "Log out"
+    },
+    "sort": {
+      "aria": "Sort items",
+      "label": "Sort by",
+      "options": {
+        "standard": "Standard",
+        "name": "Name",
+        "amount": "Amount",
+        "sold": "Sold"
+      }
+    },
+    "scan": {
+      "scanToAdd": "Scan to add",
+      "scanToRemove": "Scan to remove",
+      "action": { "add": "add", "remove": "remove" },
+      "enterQty": "Enter quantity for {{action}}:",
+      "enterValidNumber": "Please enter a valid number.",
+      "completed": "Operation {{action}} completed. Quantity: {{quantity}}",
+      "operationError": "Operation error."
+    },
+    "a11y": {
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    }
+  },
+  "confirmation": {
+    "title": "Email confirmation",
+    "checking": "Checking the confirmation status…",
+    "success": "Email successfully confirmed!",
+    "fail": "Failed to confirm email. Try again.",
+    "login": "Login",
+    "redirectHint": "Now you will be automatically redirected to the login page..."
+  },
+  "dashboard": {
+    "stock": {
+      "title": "Stock",
+      "subtitle": "{{count}} items"
+    },
+    "reserved": {
+      "title": "Reserved Items",
+      "subtitle": "{{count}} active"
+    },
+    "qr": {
+      "title": "QR Codes",
+      "subtitle": "{{count}} generated"
+    }
+  },
+  "common": { "loading": "Loading..." },
+  "fileViewer": {
+    "toolbar": {
+      "searchPlaceholder": "Search by name...",
+      "searchAria": "Search by name",
+      "print": "Print"
+    },
+    "sections": {
+      "warehouseTitle": "Warehouse QR",
+      "reservedTitle": "Reserved QR"
+    },
+    "actions": {
+      "download": "Download",
+      "close": "Close"
+    },
+    "labels": {
+      "orderNumber": "Order number: {{order}}"
+    },
+    "alt": {
+      "item": "QR code of item {{id}}",
+      "reservation": "QR code for reservation {{order}}"
+    },
+    "a11y": {
+      "selectForPrintItem": "Select {{id}} for print",
+      "selectForPrintReservation": "Select reservation {{order}} for print",
+      "qrPreview": "QR preview",
+      "qrCanvas": "QR preview canvas"
+    },
+    "errors": {
+      "noneSelected": "You have not selected any QR codes to print.",
+      "downloadFail": "Failed to download QR code with ID: {{id}}"
+    },
+    "print": {
+      "title": "Selected: {{ids}}"
+    }
+  },
+  "common": {
+    "remove": "Remove",
+    "loading": "Loading...",
+    "saving": "Saving…"
+  },
+  "itemList": {
+    "title": "Stock",
+    "search": {
+      "placeholder": "Search by name, available amount, sold, price, or description",
+      "aria": "Search items",
+      "count": "{{filtered}} / {{total}}"
+    },
+    "empty": "No items match your search.",
+    "alt": {
+      "cover": "{{name}} cover"
+    },
+    "labels": {
+      "available": "Available",
+      "sold": "Sold",
+      "price": "Price"
+    },
+    "noExtra": "No extra info.",
+    "actions": {
+      "edit": "Edit",
+      "deleteItem": "Delete item",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving…"
+    },
+    "form": {
+      "description": "Description",
+      "descriptionPlaceholder": "Short item description…",
+      "price": "Price",
+      "pricePlaceholder": "0.00",
+      "currency": "Currency",
+      "images": "Images (up to {{max}})"
+    },
+    "images": {
+      "setCover": "Set as cover"
+    },
+    "errors": {
+      "priceNonNegative": "Price must be a non-negative number"
+    }
+  },
+  "common": { "loading": "Loading..." },
+  "itemsPage": {
+    "errors": { "loadItems": "Failed to load items" }
+  },
+  "login": {
+    "formAria": "Login form",
+    "fields": {
+      "username": { "placeholder": "User", "aria": "Username" },
+      "password": { "placeholder": "Password", "aria": "Password" }
+    },
+    "cta": { "submit": "Login", "progress": "Logging in…" },
+    "noAccount": { "question": "Don’t have an account?", "signup": "Sign up" },
+    "footer": { "rights": "All rights reserved." },
+    "errors": {
+      "incorrect": "Incorrect username or password",
+      "network": "Network error. Please check your connection and try again.",
+      "generic": "Something went wrong. Please try again.",
+      "unexpected": "Unexpected error. Please try again."
+    }
+  },
+  "qrScanner": {
+    "title": "Scan QR-Code",
+    "actions": {
+      "close": "Close Scanner"
+    },
+    "errors": {
+      "cameraDenied": "Camera access denied. Please enable camera permissions. Details: {{message}}"
+    },
+    "a11y": {
+      "video": "QR scanner camera preview",
+      "close": "Close QR scanner"
+    }
+  },
+  "register": {
+    "title": "Create your account",
+    "aria": { "form": "Registration form" },
+    "fields": {
+      "username": "User",
+      "email": "Email",
+      "password": "Password",
+      "companyName": "Company name"
+    },
+    "cta": { "submit": "Sign up" },
+    "alt": {
+      "hasAccount": "Already have an account?",
+      "login": "Login"
+    },
+    "footer": { "rights": "All rights reserved." },
+    "success": "Registration successfully sent. Please check your email for confirmation.",
+    "error": "Registration error"
+  },
+  "reservedList": {
+    "title": "Reservations",
+    "search": {
+      "placeholder": "Search by order number, name, week, or amount",
+      "aria": "Search reservations",
+      "count": "{{filtered}} / {{total}}"
+    },
+    "empty": "No reserved items found.",
+    "labels": {
+      "order": "Order №",
+      "week": "Week:",
+      "amount": "Amount:"
+    },
+    "actions": {
+      "completeViaQR": "Complete via QR",
+      "remove": "Remove"
+    },
+    "confirm": {
+      "delete": "Do you really want to delete this reservation?"
+    },
+    "toasts": {
+      "deleted": "Reservation successfully deleted.",
+      "completedViaQR": "Reservation via QR code successfully completed."
+    },
+    "errors": {
+      "deleteFailed": "Deleting the reservation failed."
+    },
+    "modal": {
+      "title": "QR-Code Scanner",
+      "close": "Close Scanner",
+      "closeAria": "Close scanner"
+    }
+  },
+  "reserveForm": {
+    "title": "Create a Reservation",
+    "aria": { "form": "Reservation form" },
+    "labels": {
+      "item": "Select or enter item:",
+      "quantity": "Amount:",
+      "week": "Reservation week:",
+      "order": "Order number:"
+    },
+    "placeholders": {
+      "item": "Enter item name",
+      "week": "Enter week number",
+      "order": "Enter order number"
+    },
+    "suggestions": {
+      "available": "Available: {{qty}}"
+    },
+    "cta": { "submit": "Create reservation" },
+    "toasts": { "created": "Reservation successfully created!" },
+    "errors": {
+      "fillAll": "Please fill in all fields correctly.",
+      "notFound": "The selected item was not found.",
+      "createError": "Error creating reservation."
+    }
+  },
+  "sold": {
+    "title": "Sold items",
+    "search": {
+      "placeholder": "Search by order number, name, week, or date (e.g. 2025-08-23)",
+      "aria": "Search sold items",
+      "count": "{{filtered}} / {{total}}"
+    },
+    "labels": {
+      "order": "Order №",
+      "amount": "Amount:",
+      "week": "Week:"
+    },
+    "emptyAll": "There are no reservations yet.",
+    "emptyFiltered": "No sold items match your search."
+  },
+  "sub": {
+    "title": {
+      "trial": "Trial • {{days}} days left",
+      "active": "Access active • {{days}} days left",
+      "expired": "Access expired",
+      "anon": "Sign in to purchase",
+      "noCompany": "No company"
+    },
+    "badges": {
+      "trial": "Trial",
+      "active": "Active",
+      "expired": "Expired",
+      "anon": "Anon",
+      "noCompany": "No company"
+    },
+    "daysLeft": "{{days}} days left",
+    "currency": {
+      "aria": "Choose payment currency"
+    },
+    "cta": {
+      "buyAndroid": "Buy 1 month (Google Play)",
+      "buyWebEur": "Buy 1 month (EUR · card)",
+      "buyWebPln": "Zapłać 1 miesiąc (PLN · karta/BLIK)"
+    },
+    "hint": {
+      "onlyAdmin": "Extension is available to the company administrator"
+    }
+  },
+  "excel": {
+    "button": "Download Excel",
+    "success": "Excel file downloaded successfully.",
+    "error": "Failed to download file. Try again later."
+  },
+  "about": {
+    "title": "About FLOWQR",
+    "what": {
+      "title": "What is FLOWQR?",
+      "text": "FLOWQR is a modern warehouse management application that helps you organize, control, and track your inventory using QR codes. The system is available both as a web application and as a mobile app."
+    },
+    "features": {
+      "title": "Main Features",
+      "inventory": { "label": "Inventory:", "desc": "View and manage all items stored in the warehouse." },
+      "createItem": { "label": "Create Item:", "desc": "Add new products with details and generate QR codes automatically." },
+      "reserved": { "label": "Reserved Items:", "desc": "Manage reservations and track reserved quantities." },
+      "createReservation": { "label": "Create a Reservation:", "desc": "Reserve products for orders with specific weeks and order numbers." },
+      "sold": { "label": "Sold Items:", "desc": "View items that have been sold and completed." },
+      "qr": { "label": "QR-Codes:", "desc": "Generate and scan warehouse or reserved QR codes for quick access." },
+      "account": { "label": "Personal Account:", "desc": "Manage your subscription, trial period, and account information." }
+    },
+    "subscription": {
+      "title": "Subscription & Trial",
+      "text": "Every new user starts with a trial period. After the trial expires, you can subscribe to continue using all FLOWQR features without limitations."
+    },
+    "why": {
+      "title": "Why FLOWQR?",
+      "text": "By combining warehouse management with QR code technology, FLOWQR makes stock tracking faster, more reliable, and user-friendly. Whether you are managing a small business or a large warehouse, FLOWQR adapts to your needs."
+    },
+    "contact": {
+      "title": "Contact",
+      "text": "For questions or support, please contact:"
+    }
+  },
+  "common": {
+    "lang": {
+      "ariaSwitcher": "Language switcher",
+      "change": "Change language"
+    }
+  }
+}

@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { loginUser } from '../api';
-import '../styles/Login.css';   // 👈 отдельный файл только для логина
+import '../styles/Login.css';
 import logo from '../assets/flowqr-logo.png';
+import { useTranslation } from 'react-i18next';
 
 interface LoginProps {
     onSuccess?: () => void;
@@ -15,6 +16,7 @@ type FieldErrors = {
 };
 
 const Login: React.FC<LoginProps> = ({ onSuccess }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [credentials, setCredentials] = useState({ username: '', password: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,7 +43,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 username: credentials.username,
                 password: credentials.password,
             });
-            localStorage.setItem('token', res.data.token);
+            localStorage.setItem('token', (res as any).data.token);
             onSuccess?.();
             navigate('/app', { replace: true });
         } catch (err) {
@@ -50,16 +52,16 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                 const serverMsg = (err.response?.data as { message?: string } | undefined)?.message;
 
                 if (status === 400 || status === 401) {
-                    const msg = serverMsg || 'Incorrect username or password';
+                    const msg = serverMsg || t('login.errors.incorrect');
                     setFormError(msg);
                     setFieldErrors({ password: msg });
                 } else if (!err.response) {
-                    setFormError('Network error. Please check your connection and try again.');
+                    setFormError(t('login.errors.network'));
                 } else {
-                    setFormError(serverMsg || 'Something went wrong. Please try again.');
+                    setFormError(serverMsg || t('login.errors.generic'));
                 }
             } else {
-                setFormError('Unexpected error. Please try again.');
+                setFormError(t('login.errors.unexpected'));
             }
         } finally {
             setIsSubmitting(false);
@@ -85,18 +87,19 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                     </div>
                 )}
 
-                <div className="login-form" role="form" aria-label="Login form">
+                <div className="login-form" role="form" aria-label={t('login.formAria')}>
                     <div className="field">
                         <input
                             type="text"
                             name="username"
-                            placeholder="User"
+                            placeholder={t('login.fields.username.placeholder')}
                             value={credentials.username}
                             onChange={handleChange}
                             onKeyDown={handleKeyDown}
                             required
                             className={fieldErrors.username ? 'input-error' : ''}
                             autoComplete="username"
+                            aria-label={t('login.fields.username.aria')}
                         />
                         {fieldErrors.username && (
                             <div className="error-text" role="alert">
@@ -109,13 +112,14 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                         <input
                             type="password"
                             name="password"
-                            placeholder="Password"
+                            placeholder={t('login.fields.password.placeholder')}
                             value={credentials.password}
                             onChange={handleChange}
                             onKeyDown={handleKeyDown}
                             required
                             className={fieldErrors.password ? 'input-error' : ''}
                             autoComplete="current-password"
+                            aria-label={t('login.fields.password.aria')}
                         />
                         {fieldErrors.password && (
                             <div className="error-text" role="alert">
@@ -130,19 +134,19 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                         disabled={isSubmitting}
                         onClick={doLogin}
                     >
-                        {isSubmitting ? 'Logging in…' : 'Login'}
+                        {isSubmitting ? t('login.cta.progress') : t('login.cta.submit')}
                     </button>
                 </div>
 
                 <div className="login-alt">
-                    Don’t have an account?{' '}
+                    {t('login.noAccount.question')}{' '}
                     <button type="button" onClick={() => navigate('/register')}>
-                        Sign up
+                        {t('login.noAccount.signup')}
                     </button>
                 </div>
 
                 <footer className="login-footer">
-                    © 2025 Aleksander Starikov. <span>All rights reserved.</span>
+                    © 2025 Aleksander Starikov. <span>{t('login.footer.rights')}</span>
                 </footer>
             </div>
         </div>

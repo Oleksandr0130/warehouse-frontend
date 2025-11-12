@@ -1,8 +1,12 @@
 import React from 'react';
 import api from '../api';
 import '../styles/DownloadExcelButton.css';
+import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 const DownloadExcelButton: React.FC = () => {
+    const { t } = useTranslation();
+
     const handleDownload = async () => {
         try {
             const response = await api.get('/items/download/excel', {
@@ -16,15 +20,17 @@ const DownloadExcelButton: React.FC = () => {
             document.body.appendChild(link);
             link.click();
             link.parentNode?.removeChild(link);
+
+            toast.success(t('excel.success'));
         } catch (error) {
             console.error('Error downloading Excel file:', error);
-            alert('Failed to download file. Try again later.');
+            toast.error(t('excel.error'));
         }
     };
 
     return (
         <button className="download-excel-button" onClick={handleDownload}>
-            📊 Download Excel
+            📊 {t('excel.button')}
         </button>
     );
 };

@@ -1,8 +1,7 @@
-// src/components/SoldItemsList.tsx
-// import { useMemo, useState } from 'react';
 import { useMemo, useState, useEffect } from 'react';
 import { SoldReservation } from '../types/SoldReservation';
 import '../styles/SoldItemsList.css';
+import { useTranslation } from 'react-i18next';
 
 interface SoldItemsListProps {
     reservations: SoldReservation[];
@@ -14,14 +13,14 @@ const toSafeDate = (value: unknown): Date | null => {
 };
 
 function SoldItemsList({ reservations }: SoldItemsListProps) {
+    const { t } = useTranslation();
     const [query, setQuery] = useState('');
 
     const filtered = useMemo(() => {
         const q = String(query ?? '').trim().toLowerCase();
         if (!q) return reservations;
 
-        const contains = (v?: string | number | null) =>
-            String(v ?? '').toLowerCase().includes(q);
+        const contains = (v?: string | number | null) => String(v ?? '').toLowerCase().includes(q);
 
         return reservations.filter((res) => {
             const d = toSafeDate(res.saleDate);
@@ -37,19 +36,21 @@ function SoldItemsList({ reservations }: SoldItemsListProps) {
         });
     }, [reservations, query]);
 
-        useEffect(() => {
-                // Патч: принудительно растягиваем фон на весь экран для старых WebView
-            const appContainer = document.querySelector('.app-container') as HTMLElement;
-            if (appContainer) {appContainer.style.minHeight = `${window.innerHeight}px`;
-            }}, []);
+    useEffect(() => {
+        // Патч: принудительно растягиваем фон на весь экран для старых WebView
+        const appContainer = document.querySelector('.app-container') as HTMLElement | null;
+        if (appContainer) {
+            appContainer.style.minHeight = `${window.innerHeight}px`;
+        }
+    }, []);
 
     if (reservations.length === 0) {
-        return <p className="empty-message">There are no reservations yet.</p>;
+        return <p className="empty-message">{t('sold.emptyAll')}</p>;
     }
 
     return (
         <div className="sold-items-list">
-            <h2 className="sold-title">Sold items</h2>
+            <h2 className="sold-title">{t('sold.title')}</h2>
 
             <div className="sold-search">
                 <input
@@ -57,15 +58,16 @@ function SoldItemsList({ reservations }: SoldItemsListProps) {
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search by order number, name, week, or date (e.g. 2025-08-23)"
+                    placeholder={t('sold.search.placeholder')}
+                    aria-label={t('sold.search.aria')}
                 />
                 <span className="sold-search-count">
-          {filtered.length} / {reservations.length}
+          {t('sold.search.count', { filtered: filtered.length, total: reservations.length })}
         </span>
             </div>
 
             {filtered.length === 0 ? (
-                <p className="empty-message">No sold items match your search.</p>
+                <p className="empty-message">{t('sold.emptyFiltered')}</p>
             ) : (
                 <ul className="sold-list">
                     {filtered.map((reservation) => {
@@ -74,13 +76,19 @@ function SoldItemsList({ reservations }: SoldItemsListProps) {
                         return (
                             <li key={reservation.id ?? reservation.orderNumber} className="sold-item fade-in">
                                 <div className="sold-item-header">
-                                    <span className="sold-order">Order № {reservation.orderNumber}</span>
+                  <span className="sold-order">
+                    {t('sold.labels.order')} {reservation.orderNumber}
+                  </span>
                                     <span className="sold-date">{saleDateLabel}</span>
                                 </div>
                                 <div className="sold-item-body">
                                     <span className="sold-name">{reservation.itemName}</span>
-                                    <span className="sold-qty">Amount: {reservation.reservedQuantity}</span>
-                                    <span className="sold-week">Week: {reservation.reservationWeek}</span>
+                                    <span className="sold-qty">
+                    {t('sold.labels.amount')} {reservation.reservedQuantity}
+                  </span>
+                                    <span className="sold-week">
+                    {t('sold.labels.week')} {reservation.reservationWeek}
+                  </span>
                                 </div>
                             </li>
                         );

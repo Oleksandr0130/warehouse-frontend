@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '../styles/FileViewer.css';
 import api from '../api';
+import { useTranslation } from 'react-i18next';
 
 interface QRFile {
     id: string;
@@ -15,6 +16,8 @@ interface ReservationFile {
 }
 
 const FileViewer: React.FC = () => {
+    const { t } = useTranslation();
+
     const [qrFiles, setQrFiles] = useState<QRFile[]>([]);
     const [reservationFiles, setReservationFiles] = useState<ReservationFile[]>([]);
     const [showModal, setShowModal] = useState(false);
@@ -125,7 +128,7 @@ const FileViewer: React.FC = () => {
             document.body.removeChild(link);
         } catch (error) {
             console.error('Error downloading QR code:', error);
-            alert(`Failed to download QR code with ID: ${id}`);
+            alert(t('fileViewer.errors.downloadFail', { id }));
         }
     };
 
@@ -155,7 +158,7 @@ const FileViewer: React.FC = () => {
 
     const handlePrintSelected = () => {
         if (selectedFiles.length === 0 && selectedReservations.length === 0) {
-            alert('You have not selected any QR codes to print.');
+            alert(t('fileViewer.errors.noneSelected'));
             return;
         }
 
@@ -182,7 +185,7 @@ const FileViewer: React.FC = () => {
                 ),
         ].join('');
 
-        const dynamicTitle = `${selectedFiles.join(', ')}`;
+        const dynamicTitle = t('fileViewer.print.title', { ids: selectedFiles.join(', ') });
 
         const iframe = document.createElement('iframe');
         iframe.style.position = 'absolute';
@@ -219,26 +222,29 @@ const FileViewer: React.FC = () => {
         }
     };
 
-    const filteredQrFiles = qrFiles.filter((file) => file.id.toLowerCase().includes(searchTerm));
+    const filteredQrFiles = qrFiles.filter((file) =>
+        (file.id || '').toLowerCase().includes(searchTerm) ||
+        (file.name || '').toLowerCase().includes(searchTerm)
+    );
 
     return (
         <div className="file-viewer">
             <div className="file-toolbar">
                 <input
                     type="text"
-                    placeholder="Search by name..."
+                    placeholder={t('fileViewer.toolbar.searchPlaceholder')}
                     value={searchTerm}
                     onChange={handleSearchChange}
                     className="search-input"
-                    aria-label="Search by name"
+                    aria-label={t('fileViewer.toolbar.searchAria')}
                 />
                 <button className="btn btn-primary" onClick={handlePrintSelected}>
-                    Print
+                    {t('fileViewer.toolbar.print')}
                 </button>
             </div>
 
             <section className="file-section" role="region" aria-labelledby="fv-wh-title">
-                <h2 id="fv-wh-title" className="file-title">Warehouse QR</h2>
+                <h2 id="fv-wh-title" className="file-title">{t('fileViewer.sections.warehouseTitle')}</h2>
                 <ul className="file-grid">
                     {filteredQrFiles.map((file) => (
                         <li className="file-card" key={file.id}>
@@ -248,14 +254,14 @@ const FileViewer: React.FC = () => {
                                     className="select-checkbox"
                                     checked={selectedFiles.includes(file.id)}
                                     onChange={() => toggleSelectFile(file.id)}
-                                    aria-label={`Select ${file.id} for print`}
+                                    aria-label={t('fileViewer.a11y.selectForPrintItem', { id: file.id })}
                                 />
                                 <span />
                             </label>
 
                             <img
                                 src={`data:image/png;base64,${file.qrCode}`}
-                                alt={`QR code of item ${file.id}`}
+                                alt={t('fileViewer.alt.item', { id: file.id })}
                                 className="qr-thumb"
                                 onClick={() => handleImageClick(file.qrCode)}
                             />
@@ -265,7 +271,7 @@ const FileViewer: React.FC = () => {
                                     className="btn btn-outline"
                                     onClick={() => handleDownloadQRCode(file.id, 'item')}
                                 >
-                                    Load
+                                    {t('fileViewer.actions.download')}
                                 </button>
                             </div>
                         </li>
@@ -274,7 +280,7 @@ const FileViewer: React.FC = () => {
             </section>
 
             <section className="file-section" role="region" aria-labelledby="fv-rsv-title">
-                <h2 id="fv-rsv-title" className="file-title">Reserved QR</h2>
+                <h2 id="fv-rsv-title" className="file-title">{t('fileViewer.sections.reservedTitle')}</h2>
                 <ul className="file-grid">
                     {reservationFiles.map((file) => (
                         <li className="file-card reservation" key={file.id}>
@@ -284,24 +290,26 @@ const FileViewer: React.FC = () => {
                                     className="select-checkbox"
                                     checked={selectedReservations.includes(file.id)}
                                     onChange={() => toggleSelectReservation(file.id)}
-                                    aria-label={`Select reservation ${file.orderNumber} for print`}
+                                    aria-label={t('fileViewer.a11y.selectForPrintReservation', { order: file.orderNumber })}
                                 />
                                 <span />
                             </label>
 
                             <img
                                 src={`data:image/png;base64,${file.qrCode}`}
-                                alt={`QR code for reservation ${file.orderNumber}`}
+                                alt={t('fileViewer.alt.reservation', { order: file.orderNumber })}
                                 className="qr-thumb"
                                 onClick={() => handleImageClick(file.qrCode)}
                             />
                             <div className="file-meta">
-                                <span className="file-name">Order number: {file.orderNumber}</span>
+                <span className="file-name">
+                  {t('fileViewer.labels.orderNumber', { order: file.orderNumber })}
+                </span>
                                 <button
                                     className="btn btn-outline"
                                     onClick={() => handleDownloadQRCode(file.id, 'reservation')}
                                 >
-                                    Load
+                                    {t('fileViewer.actions.download')}
                                 </button>
                             </div>
                         </li>
@@ -315,13 +323,17 @@ const FileViewer: React.FC = () => {
                     onClick={handleCloseModal}
                     role="dialog"
                     aria-modal="true"
-                    aria-label="QR preview"
+                    aria-label={t('fileViewer.a11y.qrPreview')}
                 >
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <canvas ref={canvasRef} className="modal-canvas" aria-label="QR preview canvas" />
-                        {!canvasReady && <div className="modal-loading">Loading…</div>}
+                        <canvas
+                            ref={canvasRef}
+                            className="modal-canvas"
+                            aria-label={t('fileViewer.a11y.qrCanvas')}
+                        />
+                        {!canvasReady && <div className="modal-loading">{t('common.loading')}</div>}
                         <button className="btn btn-danger modal-close" onClick={handleCloseModal}>
-                            Close
+                            {t('fileViewer.actions.close')}
                         </button>
                     </div>
                 </div>

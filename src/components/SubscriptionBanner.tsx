@@ -8,6 +8,7 @@ import {
     getErrorMessage,
 } from '../api';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 declare global {
     interface Window {
@@ -24,11 +25,12 @@ function isCurrency(v: unknown): v is Currency {
 }
 
 export default function SubscriptionBanner({ embedded }: Props) {
+    const { t, i18n } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState<BillingStatusDto | null>(null);
     const [currency, setCurrency] = useState<Currency>('EUR');
 
-    // Детектируем APK (WebView с JS-мостом)
+    // APK (WebView с JS-мостом)
     const isAndroidApp = typeof window !== 'undefined' && !!window.billing;
 
     const load = async () => {
@@ -40,7 +42,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
                 // Валюты касаются только веб-Stripe
                 if (isCurrency(s.billingCurrency)) {
                     setCurrency(s.billingCurrency);
-                } else if (navigator.language?.toLowerCase().startsWith('pl')) {
+                } else if ((navigator.language || i18n.language)?.toLowerCase().startsWith('pl')) {
                     setCurrency('PLN');
                 }
             }
@@ -51,6 +53,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
 
     useEffect(() => {
         void load();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const isEnding = useMemo(() => {
@@ -62,17 +65,19 @@ export default function SubscriptionBanner({ embedded }: Props) {
         if (!status) return '';
         switch (status.status) {
             case 'TRIAL':
-                return `Trial • ${status.daysLeft ?? 0} days left`;
+                return t('sub.title.trial', { days: status.daysLeft ?? 0 });
             case 'ACTIVE':
-                return `Access active • ${status.daysLeft ?? 0} days left`;
+                return t('sub.title.active', { days: status.daysLeft ?? 0 });
             case 'EXPIRED':
-                return 'Access expired';
+                return t('sub.title.expired');
             case 'ANON':
-                return 'Sign in to purchase';
+                return t('sub.title.anon');
             case 'NO_COMPANY':
-                return 'No company';
+                return t('sub.title.noCompany');
+            default:
+                return '';
         }
-    }, [status]);
+    }, [status, t]);
 
     const pillClass = useMemo(() => {
         if (!status) return 'sub-pill';
@@ -130,21 +135,27 @@ export default function SubscriptionBanner({ embedded }: Props) {
                 <div className="sub-header">
                     <div className="sub-title">{title}</div>
                     <span className={pillClass}>
-                        {status.status === 'TRIAL' && 'Trial'}
-                        {status.status === 'ACTIVE' && 'Active'}
-                        {status.status === 'EXPIRED' && 'Expired'}
-                        {status.status === 'ANON' && 'Anon'}
-                        {status.status === 'NO_COMPANY' && 'No company'}
-                    </span>
+            {status.status === 'TRIAL' && t('sub.badges.trial')}
+                        {status.status === 'ACTIVE' && t('sub.badges.active')}
+                        {status.status === 'EXPIRED' && t('sub.badges.expired')}
+                        {status.status === 'ANON' && t('sub.badges.anon')}
+                        {status.status === 'NO_COMPANY' && t('sub.badges.noCompany')}
+          </span>
                 </div>
 
                 {(status.status === 'TRIAL' || status.status === 'ACTIVE') && (
                     <>
                         <div className="sub-dates">
-                            {typeof status.daysLeft === 'number' ? `${status.daysLeft} days left` : ''}
+                            {typeof status.daysLeft === 'number' ? t('sub.daysLeft', { days: status.daysLeft }) : ''}
                         </div>
 
-                        <div className="sub-progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progressPct)}>
+                        <div
+                            className="sub-progress"
+                            role="progressbar"
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                            aria-valuenow={Math.round(progressPct)}
+                        >
                             <div className="sub-progress-fill" style={{ width: `${progressPct}%` }} />
                         </div>
                     </>
@@ -154,7 +165,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
                     {status.isAdmin ? (
                         <div className="sub-actions-row">
                             {!isAndroidApp && (
-                                <div className="sub-currency-toggle">
+                                <div className="sub-currency-toggle" aria-label={t('sub.currency.aria')}>
                                     <label>
                                         <input
                                             type="radio"
@@ -181,15 +192,15 @@ export default function SubscriptionBanner({ embedded }: Props) {
                             <div style={{ marginTop: 8 }}>
                                 <button className="sub-btn" onClick={onPay} disabled={loading}>
                                     {isAndroidApp
-                                        ? 'Buy 1 month (Google Play)'
+                                        ? t('sub.cta.buyAndroid')
                                         : currency === 'EUR'
-                                            ? 'Buy 1 month (EUR · card)'
-                                            : 'Zapłać 1 miesiąc (PLN · karta/BLIK)'}
+                                            ? t('sub.cta.buyWebEur')
+                                            : t('sub.cta.buyWebPln')}
                                 </button>
                             </div>
                         </div>
                     ) : (
-                        <div className="sub-hint">Extension is available to the company administrator</div>
+                        <div className="sub-hint">{t('sub.hint.onlyAdmin')}</div>
                     )}
                 </div>
             </div>
@@ -207,7 +218,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
                 {status.isAdmin ? (
                     <>
                         {!isAndroidApp && (
-                            <div className="sub-currency-toggle" style={{ marginRight: 12 }}>
+                            <div className="sub-currency-toggle" style={{ marginRight: 12 }} aria-label={t('sub.currency.aria')}>
                                 <label>
                                     <input
                                         type="radio"
@@ -233,14 +244,14 @@ export default function SubscriptionBanner({ embedded }: Props) {
 
                         <button className="subscription-banner button" onClick={onPay} disabled={loading}>
                             {isAndroidApp
-                                ? 'Buy 1 month (Google Play)'
+                                ? t('sub.cta.buyAndroid')
                                 : currency === 'EUR'
-                                    ? 'Buy 1 month (EUR · card)'
-                                    : 'Zapłać 1 miesiąc (PLN · karta/BLIK)'}
+                                    ? t('sub.cta.buyWebEur')
+                                    : t('sub.cta.buyWebPln')}
                         </button>
                     </>
                 ) : (
-                    <div className="sub-hint">Extension is available to the company administrator</div>
+                    <div className="sub-hint">{t('sub.hint.onlyAdmin')}</div>
                 )}
             </div>
         </div>

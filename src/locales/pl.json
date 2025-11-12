@@ -1,0 +1,426 @@
+{
+  "auth": {
+    "sessionEnded": "Sesja zakończona. Zaloguj się ponownie.",
+    "loginSuccess": "Pomyślne logowanie!",
+    "logoutSuccess": "Pomyślne wylogowanie!"
+  },
+  "billing": {
+    "trialWarn": "Twój okres próbny kończy się za {{days}} dni(a).",
+    "activeWarn": "Twój okres dostępu kończy się za {{days}} dni(a)."
+  },
+
+  "common": {
+    "loading": "Ładowanie...",
+    "create": "Utwórz",
+    "adding": "Dodawanie…"
+  },
+  "account": {
+    "title": "Konto osobiste",
+    "fields": {
+      "user": "Użytkownik",
+      "email": "E-mail",
+      "company": "Firma",
+      "role": "Rola"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "user": "Użytkownik"
+    },
+    "delete": {
+      "button": "Usuń moje konto",
+      "confirm": "Czy na pewno chcesz usunąć swoje konto? Tej operacji nie można cofnąć.",
+      "success": "Twoje konto zostało usunięte.",
+      "fail": "Nie udało się usunąć konta"
+    },
+    "errors": {
+      "fetchMe": "Nie udało się pobrać danych konta"
+    },
+    "admin": {
+      "create": {
+        "title": "Utwórz użytkownika",
+        "success": "Użytkownik został utworzony",
+        "fail": "Nie udało się utworzyć użytkownika"
+      },
+      "form": {
+        "usernamePlaceholder": "Użytkownik",
+        "emailPlaceholder": "E-mail",
+        "passwordPlaceholder": "Hasło"
+      }
+    }
+  },
+  "common": {
+    "remove": "Usuń"
+  },
+  "addItemForm": {
+    "title": "Dodaj nowy produkt",
+    "success": { "added": "Produkt został dodany!" },
+    "errors": { "readImages": "Nie udało się odczytać obrazów." },
+    "validation": {
+      "idEmpty": "ID nie może być puste.",
+      "nameEmpty": "Nazwa nie może być pusta.",
+      "quantityPositive": "Ilość musi być liczbą dodatnią.",
+      "priceNonNegative": "Cena musi być liczbą nieujemną."
+    },
+    "fields": {
+      "id": { "label": "Nazwa QR", "placeholder": "Nazwa QR" },
+      "name": { "label": "Nazwa", "placeholder": "Nazwa produktu" },
+      "quantity": { "label": "Ilość", "placeholder": "Wpisz ilość" },
+      "price": { "label": "Cena (opcjonalnie)", "placeholder": "0,00" },
+      "currency": { "label": "Waluta" },
+      "description": { "label": "Opis (opcjonalnie)", "placeholder": "Krótki opis produktu…" },
+      "images": { "label": "Obrazy (maks. {{max}})" }
+    },
+    "images": {
+      "setCover": "Ustaw jako okładkę"
+    },
+    "submit": "Dodaj produkt"
+  },
+  "common": { "loading": "Ładowanie..." },
+  "appContent": {
+    "errors": {
+      "loadProducts": "Błąd podczas ładowania produktów.",
+      "loadReserved": "Błąd podczas ładowania zarezerwowanych pozycji.",
+      "loadSold": "Błąd podczas ładowania sprzedanych pozycji.",
+      "addProduct": "Błąd podczas dodawania produktu.",
+      "deleteProduct": "Błąd podczas usuwania produktu.",
+      "updateProduct": "Błąd podczas aktualizacji produktu.",
+      "incorrectQR": "Nieprawidłowy kod QR.",
+      "processReserve": "Błąd przetwarzania rezerwacji."
+    },
+    "success": {
+      "productAdded": "Produkt został pomyślnie dodany!",
+      "productDeleted": "Produkt usunięty.",
+      "productUpdated": "Produkt zaktualizowany.",
+      "reservationDeleted": "Rezerwacja usunięta.",
+      "reservationProcessed": "Rezerwacja przetworzona!"
+    },
+    "menu": {
+      "stock": "Magazyn",
+      "createItem": "Utwórz produkt",
+      "reservedItems": "Zarezerwowane",
+      "createReservation": "Utwórz rezerwację",
+      "soldItems": "Sprzedane",
+      "qrCodes": "Kody QR",
+      "about": "O aplikacji",
+      "account": "Konto osobiste",
+      "logout": "Wyloguj"
+    },
+    "sort": {
+      "aria": "Sortuj pozycje",
+      "label": "Sortuj według",
+      "options": {
+        "standard": "Standard",
+        "name": "Nazwa",
+        "amount": "Ilość",
+        "sold": "Sprzedane"
+      }
+    },
+    "scan": {
+      "scanToAdd": "Skanuj, aby dodać",
+      "scanToRemove": "Skanuj, aby usunąć",
+      "action": { "add": "dodanie", "remove": "usunięcie" },
+      "enterQty": "Podaj ilość dla {{action}}:",
+      "enterValidNumber": "Wpisz prawidłową liczbę.",
+      "completed": "Operacja {{action}} zakończona. Ilość: {{quantity}}",
+      "operationError": "Błąd operacji."
+    },
+    "a11y": {
+      "openMenu": "Otwórz menu",
+      "closeMenu": "Zamknij menu"
+    }
+  },
+  "confirmation": {
+    "title": "Potwierdzenie e-mail",
+    "checking": "Sprawdzanie statusu potwierdzenia…",
+    "success": "E-mail został pomyślnie potwierdzony!",
+    "fail": "Nie udało się potwierdzić e-maila. Spróbuj ponownie.",
+    "login": "Zaloguj się",
+    "redirectHint": "Za chwilę nastąpi automatyczne przekierowanie do strony logowania..."
+  },
+  "dashboard": {
+    "stock": {
+      "title": "Magazyn",
+      "subtitle": "{{count}} produktów"
+    },
+    "reserved": {
+      "title": "Zarezerwowane",
+      "subtitle": "{{count}} aktywnych"
+    },
+    "qr": {
+      "title": "Kody QR",
+      "subtitle": "{{count}} wygenerowanych"
+    }
+  },
+  "common": { "loading": "Ładowanie..." },
+  "fileViewer": {
+    "toolbar": {
+      "searchPlaceholder": "Szukaj po nazwie...",
+      "searchAria": "Szukaj po nazwie",
+      "print": "Drukuj"
+    },
+    "sections": {
+      "warehouseTitle": "Magazyn — QR",
+      "reservedTitle": "Rezerwacje — QR"
+    },
+    "actions": {
+      "download": "Pobierz",
+      "close": "Zamknij"
+    },
+    "labels": {
+      "orderNumber": "Numer zamówienia: {{order}}"
+    },
+    "alt": {
+      "item": "Kod QR produktu {{id}}",
+      "reservation": "Kod QR rezerwacji {{order}}"
+    },
+    "a11y": {
+      "selectForPrintItem": "Zaznacz {{id}} do druku",
+      "selectForPrintReservation": "Zaznacz rezerwację {{order}} do druku",
+      "qrPreview": "Podgląd QR",
+      "qrCanvas": "Płótno podglądu QR"
+    },
+    "errors": {
+      "noneSelected": "Nie wybrano żadnych kodów QR do druku.",
+      "downloadFail": "Nie udało się pobrać kodu QR o ID: {{id}}"
+    },
+    "print": {
+      "title": "Wybrane: {{ids}}"
+    }
+  },
+  "common": {
+    "remove": "Usuń",
+    "loading": "Ładowanie...",
+    "saving": "Zapisywanie…"
+  },
+  "itemList": {
+    "title": "Magazyn",
+    "search": {
+      "placeholder": "Szukaj po nazwie, dostępnej ilości, sprzedanych, cenie lub opisie",
+      "aria": "Szukaj produktów",
+      "count": "{{filtered}} / {{total}}"
+    },
+    "empty": "Brak pozycji spełniających kryteria wyszukiwania.",
+    "alt": {
+      "cover": "Okładka {{name}}"
+    },
+    "labels": {
+      "available": "Dostępne",
+      "sold": "Sprzedane",
+      "price": "Cena"
+    },
+    "noExtra": "Brak dodatkowych informacji.",
+    "actions": {
+      "edit": "Edytuj",
+      "deleteItem": "Usuń produkt",
+      "cancel": "Anuluj",
+      "save": "Zapisz",
+      "saving": "Zapisywanie…"
+    },
+    "form": {
+      "description": "Opis",
+      "descriptionPlaceholder": "Krótki opis produktu…",
+      "price": "Cena",
+      "pricePlaceholder": "0,00",
+      "currency": "Waluta",
+      "images": "Obrazy (maks. {{max}})"
+    },
+    "images": {
+      "setCover": "Ustaw jako okładkę"
+    },
+    "errors": {
+      "priceNonNegative": "Cena musi być liczbą nieujemną"
+    }
+  },
+  "common": { "loading": "Ładowanie..." },
+  "itemsPage": {
+    "errors": { "loadItems": "Nie udało się wczytać pozycji" }
+  },
+  "login": {
+    "formAria": "Formularz logowania",
+    "fields": {
+      "username": { "placeholder": "Użytkownik", "aria": "Nazwa użytkownika" },
+      "password": { "placeholder": "Hasło", "aria": "Hasło" }
+    },
+    "cta": { "submit": "Zaloguj się", "progress": "Logowanie…" },
+    "noAccount": { "question": "Nie masz konta?", "signup": "Zarejestruj się" },
+    "footer": { "rights": "Wszelkie prawa zastrzeżone." },
+    "errors": {
+      "incorrect": "Nieprawidłowa nazwa użytkownika lub hasło",
+      "network": "Błąd sieci. Sprawdź połączenie i spróbuj ponownie.",
+      "generic": "Coś poszło nie tak. Spróbuj ponownie.",
+      "unexpected": "Nieoczekiwany błąd. Spróbuj ponownie."
+    }
+  },
+  "qrScanner": {
+    "title": "Skanuj kod QR",
+    "actions": {
+      "close": "Zamknij skaner"
+    },
+    "errors": {
+      "cameraDenied": "Odmowa dostępu do kamery. Włącz uprawnienia do kamery. Szczegóły: {{message}}"
+    },
+    "a11y": {
+      "video": "Podgląd kamery skanera QR",
+      "close": "Zamknij skaner QR"
+    }
+  },
+  "register": {
+    "title": "Utwórz konto",
+    "aria": { "form": "Formularz rejestracyjny" },
+    "fields": {
+      "username": "Użytkownik",
+      "email": "E-mail",
+      "password": "Hasło",
+      "companyName": "Nazwa firmy"
+    },
+    "cta": { "submit": "Zarejestruj się" },
+    "alt": {
+      "hasAccount": "Masz już konto?",
+      "login": "Zaloguj się"
+    },
+    "footer": { "rights": "Wszelkie prawa zastrzeżone." },
+    "success": "Rejestracja zakończona pomyślnie. Sprawdź swoją pocztę e-mail, aby potwierdzić.",
+    "error": "Błąd rejestracji"
+  },
+  "reservedList": {
+    "title": "Rezerwacje",
+    "search": {
+      "placeholder": "Szukaj po numerze zamówienia, nazwie, tygodniu lub ilości",
+      "aria": "Szukaj rezerwacji",
+      "count": "{{filtered}} / {{total}}"
+    },
+    "empty": "Nie znaleziono zarezerwowanych pozycji.",
+    "labels": {
+      "order": "Zamówienie nr",
+      "week": "Tydzień:",
+      "amount": "Ilość:"
+    },
+    "actions": {
+      "completeViaQR": "Zakończ przez QR",
+      "remove": "Usuń"
+    },
+    "confirm": {
+      "delete": "Czy na pewno chcesz usunąć tę rezerwację?"
+    },
+    "toasts": {
+      "deleted": "Rezerwacja została usunięta.",
+      "completedViaQR": "Rezerwacja przez kod QR zakończona pomyślnie."
+    },
+    "errors": {
+      "deleteFailed": "Nie udało się usunąć rezerwacji."
+    },
+    "modal": {
+      "title": "Skaner kodów QR",
+      "close": "Zamknij skaner",
+      "closeAria": "Zamknij skaner"
+    }
+  },
+  "reserveForm": {
+    "title": "Utwórz rezerwację",
+    "aria": { "form": "Formularz rezerwacji" },
+    "labels": {
+      "item": "Wybierz lub wpisz produkt:",
+      "quantity": "Ilość:",
+      "week": "Tydzień rezerwacji:",
+      "order": "Numer zamówienia:"
+    },
+    "placeholders": {
+      "item": "Wpisz nazwę produktu",
+      "week": "Podaj numer tygodnia",
+      "order": "Podaj numer zamówienia"
+    },
+    "suggestions": {
+      "available": "Dostępne: {{qty}}"
+    },
+    "cta": { "submit": "Utwórz rezerwację" },
+    "toasts": { "created": "Rezerwacja została pomyślnie utworzona!" },
+    "errors": {
+      "fillAll": "Uzupełnij poprawnie wszystkie pola.",
+      "notFound": "Wybrany produkt nie został znaleziony.",
+      "createError": "Błąd podczas tworzenia rezerwacji."
+    }
+  },
+  "sold": {
+    "title": "Sprzedane pozycje",
+    "search": {
+      "placeholder": "Szukaj po numerze zamówienia, nazwie, tygodniu lub dacie (np. 2025-08-23)",
+      "aria": "Szukaj sprzedanych pozycji",
+      "count": "{{filtered}} / {{total}}"
+    },
+    "labels": {
+      "order": "Zamówienie nr",
+      "amount": "Ilość:",
+      "week": "Tydzień:"
+    },
+    "emptyAll": "Nie ma jeszcze żadnych rezerwacji.",
+    "emptyFiltered": "Brak sprzedanych pozycji spełniających kryteria."
+  },
+  "sub": {
+    "title": {
+      "trial": "Okres próbny • pozostało {{days}} dni",
+      "active": "Dostęp aktywny • pozostało {{days}} dni",
+      "expired": "Dostęp wygasł",
+      "anon": "Zaloguj się, aby kupić",
+      "noCompany": "Brak firmy"
+    },
+    "badges": {
+      "trial": "Próba",
+      "active": "Aktywny",
+      "expired": "Wygasł",
+      "anon": "Anon",
+      "noCompany": "Brak firmy"
+    },
+    "daysLeft": "Pozostało {{days}} dni",
+    "currency": {
+      "aria": "Wybierz walutę płatności"
+    },
+    "cta": {
+      "buyAndroid": "Kup 1 miesiąc (Google Play)",
+      "buyWebEur": "Kup 1 miesiąc (EUR · karta)",
+      "buyWebPln": "Zapłać 1 miesiąc (PLN · karta/BLIK)"
+    },
+    "hint": {
+      "onlyAdmin": "Przedłużenie dostępne jest dla administratora firmy"
+    }
+  },
+  "excel": {
+    "button": "Pobierz Excel",
+    "success": "Plik Excel został pobrany pomyślnie.",
+    "error": "Nie udało się pobrać pliku. Spróbuj ponownie później."
+  },
+  "about": {
+    "title": "O FLOWQR",
+    "what": {
+      "title": "Czym jest FLOWQR?",
+      "text": "FLOWQR to nowoczesna aplikacja do zarządzania magazynem, która pomaga organizować, kontrolować i śledzić zapasy za pomocą kodów QR. System jest dostępny zarówno jako aplikacja internetowa, jak i mobilna."
+    },
+    "features": {
+      "title": "Główne funkcje",
+      "inventory": { "label": "Magazyn:", "desc": "Przeglądaj i zarządzaj wszystkimi pozycjami przechowywanymi w magazynie." },
+      "createItem": { "label": "Dodaj pozycję:", "desc": "Dodaj nowe produkty i automatycznie generuj dla nich kody QR." },
+      "reserved": { "label": "Rezerwacje:", "desc": "Zarządzaj rezerwacjami i ilościami zarezerwowanymi." },
+      "createReservation": { "label": "Utwórz rezerwację:", "desc": "Rezerwuj produkty dla zamówień z określonymi tygodniami i numerami zamówień." },
+      "sold": { "label": "Sprzedane pozycje:", "desc": "Przeglądaj pozycje, które zostały sprzedane i zakończone." },
+      "qr": { "label": "Kody QR:", "desc": "Generuj i skanuj kody QR dla magazynu i rezerwacji." },
+      "account": { "label": "Konto osobiste:", "desc": "Zarządzaj subskrypcją, okresem próbnym i danymi konta." }
+    },
+    "subscription": {
+      "title": "Subskrypcja i okres próbny",
+      "text": "Każdy nowy użytkownik zaczyna od okresu próbnego. Po jego zakończeniu możesz wykupić subskrypcję, aby korzystać z FLOWQR bez ograniczeń."
+    },
+    "why": {
+      "title": "Dlaczego FLOWQR?",
+      "text": "Łącząc zarządzanie magazynem z technologią kodów QR, FLOWQR sprawia, że śledzenie zapasów jest szybsze, dokładniejsze i prostsze w obsłudze. Niezależnie od tego, czy zarządzasz małą firmą, czy dużym magazynem, FLOWQR dopasowuje się do Twoich potrzeb."
+    },
+    "contact": {
+      "title": "Kontakt",
+      "text": "W razie pytań lub potrzeby wsparcia skontaktuj się z nami:"
+    }
+  },
+  "common": {
+    "lang": {
+      "ariaSwitcher": "Przełącznik języka",
+      "change": "Zmień język"
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import i18n from './i18n'; // 🔹 добавили i18n для передачи языка
 import axios, {
     AxiosError,
     AxiosRequestConfig,
@@ -163,10 +164,14 @@ export async function deleteAccount(): Promise<void> {
     const token = localStorage.getItem('token');
     if (!token) throw new Error("Not authenticated");
 
+    // 🔹 добавили Accept-Language также для fetch-вызова
+    const lang = (i18n?.language || localStorage.getItem('i18nLng') || navigator.language || 'en');
+
     const res = await fetch(`/users/me`, {
         method: 'DELETE',
         headers: {
             'Authorization': `Bearer ${token}`,
+            'Accept-Language': lang,
         },
     });
 
@@ -180,7 +185,7 @@ export async function deleteAccount(): Promise<void> {
 
 /* ===================== Интерцепторы ===================== */
 
-// request: проставляем Authorization, если токен есть
+// request: проставляем Authorization, если токен есть, и текущий язык
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         const raw =
@@ -192,6 +197,11 @@ api.interceptors.request.use(
             }
             setAuthHeader(config.headers as AxiosRequestHeaders, token);
         }
+
+        // 🔹 добавили Accept-Language для всех axios-запросов
+        const lang = (i18n?.language || localStorage.getItem('i18nLng') || navigator.language || 'en');
+        (config.headers as AxiosRequestHeaders)['Accept-Language'] = lang;
+
         return config;
     },
     (error) => Promise.reject(error)

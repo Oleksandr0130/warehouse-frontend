@@ -1,0 +1,136 @@
+.langsw {
+    position: relative;
+    display: inline-block;
+    font: inherit;
+}
+
+/* Кнопка-пилюля */
+.langsw__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(0,0,0,.08);
+    background: linear-gradient(180deg, #ffffff 0%, #f6f7fb 100%);
+    color: #1f2937;
+    padding: 8px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(16,24,40,0.06), 0 1px 1px rgba(16,24,40,0.04);
+    transition: box-shadow .2s ease, transform .05s ease, border-color .2s ease;
+    user-select: none;
+}
+
+.langsw__btn:hover {
+    box-shadow: 0 4px 8px rgba(16,24,40,0.08), 0 2px 4px rgba(16,24,40,0.06);
+    border-color: rgba(0,0,0,.12);
+}
+
+.langsw__btn:active {
+    transform: translateY(1px);
+}
+
+.langsw__flag {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.langsw__label {
+    font-weight: 600;
+    letter-spacing: .2px;
+    font-size: 14px;
+}
+
+.langsw__chev {
+    margin-left: 4px;
+    opacity: .7;
+}
+
+/* Поповер */
+.langsw__pop {
+    position: absolute;
+    right: 0;
+    margin-top: 8px;
+    min-width: 200px;
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 14px;
+    box-shadow: 0 12px 24px rgba(16,24,40,0.12), 0 6px 12px rgba(16,24,40,0.08);
+    padding: 8px;
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity .15s ease, transform .15s ease;
+    z-index: 50;
+}
+
+.langsw__pop.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Опции */
+.langsw__opt {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 10px;
+    border: 0;
+    background: transparent;
+    border-radius: 10px;
+    text-align: left;
+    cursor: pointer;
+    transition: background .15s ease, transform .05s ease;
+    color: #111827;
+    font-size: 14px;
+}
+
+.langsw__opt:hover {
+    background: #f3f4f6;
+}
+
+.langsw__opt.is-active {
+    background: #eef2ff;
+    color: #3730a3;
+    font-weight: 600;
+}
+
+.langsw__opt:active {
+    transform: translateY(1px);
+}
+
+.langsw__opt-flag {
+    font-size: 18px;
+    line-height: 1;
+}
+
+/* Тёмный режим (если у тебя есть .dark на body, стили подхватятся) */
+.dark .langsw__btn {
+    background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+    color: #f9fafb;
+    border-color: rgba(255,255,255,.08);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.dark .langsw__btn:hover {
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    border-color: rgba(255,255,255,.16);
+}
+
+.dark .langsw__pop {
+    background: #111827;
+    color: #f9fafb;
+    border-color: rgba(255,255,255,.06);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.6), 0 6px 12px rgba(0,0,0,0.4);
+}
+
+.dark .langsw__opt:hover {
+    background: #1f2937;
+}
+
+.dark .langsw__opt.is-active {
+    background: #1e293b;
+    color: #93c5fd;
+}

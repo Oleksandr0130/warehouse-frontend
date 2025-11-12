@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import jsQR from 'jsqr';
 import '../styles/QRScanner.css';
+import { useTranslation } from 'react-i18next';
 
 interface QRScannerProps {
     onScan: (data: string) => void;
@@ -8,6 +9,7 @@ interface QRScannerProps {
 }
 
 function QRScanner({ onScan, onClose }: QRScannerProps) {
+    const { t } = useTranslation();
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(document.createElement('canvas'));
     const animationFrameIdRef = useRef<number | null>(null);
@@ -24,16 +26,18 @@ function QRScanner({ onScan, onClose }: QRScannerProps) {
 
             video.srcObject = mediaStream;
             video.onloadedmetadata = () => {
-                video.play().catch((err) => {
-                    console.error('Error starting video playback:', err);
-                });
+                video
+                    .play()
+                    .catch((err) => {
+                        console.error('Error starting video playback:', err);
+                    });
             };
             tick();
         };
 
         const handleError = (err: Error) => {
             console.error('Camera error:', err);
-            alert(`Camera access denied. Please enable camera permissions: ${err.message}`);
+            alert(t('qrScanner.errors.cameraDenied', { message: err.message }));
         };
 
         navigator.mediaDevices
@@ -78,16 +82,17 @@ function QRScanner({ onScan, onClose }: QRScannerProps) {
         return () => {
             stopCamera();
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [onScan]);
 
     return (
         <div className="qr-scanner">
-            <h2 className="qr-title">Scan QR-Code</h2>
-            <video ref={videoRef} className="qr-video" />
+            <h2 className="qr-title">{t('qrScanner.title')}</h2>
+            <video ref={videoRef} className="qr-video" aria-label={t('qrScanner.a11y.video')} />
 
             {onClose && (
-                <button className="btn-close" onClick={onClose}>
-                    ✕ Close Scanner
+                <button className="btn-close" onClick={onClose} aria-label={t('qrScanner.a11y.close')}>
+                    ✕ {t('qrScanner.actions.close')}
                 </button>
             )}
         </div>

@@ -1,11 +1,11 @@
-// src/components/Register.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../api';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../styles/Register.css';   // 👈 отдельный css только для регистрации
+import '../styles/Register.css';
 import logo from '../assets/flowqr-logo.png';
+import { useTranslation } from 'react-i18next';
 
 interface RegisterProps {
     onSuccess?: () => void;
@@ -19,6 +19,7 @@ interface RegisterForm {
 }
 
 const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [form, setForm] = useState<RegisterForm>({
         username: '',
@@ -36,12 +37,12 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
         event.preventDefault();
         try {
             await registerUser(form);
-            toast.success('Registration successfully sent. Please check your email for confirmation.');
+            toast.success(t('register.success'));
             onSuccess?.();
             navigate('/login', { replace: true });
         } catch (err) {
             console.error(err);
-            toast.error('Registration error');
+            toast.error(t('register.error'));
         }
     };
 
@@ -50,13 +51,13 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
             <div className="register-card">
                 <img src={logo} alt="FlowQR" className="register-logo" />
 
-                <h1 className="register-title">Create your account</h1>
+                <h1 className="register-title">{t('register.title')}</h1>
 
-                <form className="register-form" onSubmit={handleSubmit}>
+                <form className="register-form" onSubmit={handleSubmit} aria-label={t('register.aria.form')}>
                     <input
                         className="register-input"
                         name="username"
-                        placeholder="User"
+                        placeholder={t('register.fields.username')}
                         value={form.username}
                         onChange={handleChange}
                         required
@@ -65,7 +66,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
                         className="register-input"
                         name="email"
                         type="email"
-                        placeholder="Email"
+                        placeholder={t('register.fields.email')}
                         value={form.email}
                         onChange={handleChange}
                         required
@@ -74,7 +75,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
                         className="register-input"
                         name="password"
                         type="password"
-                        placeholder="Password"
+                        placeholder={t('register.fields.password')}
                         value={form.password}
                         onChange={handleChange}
                         required
@@ -82,24 +83,26 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
                     <input
                         className="register-input"
                         name="companyName"
-                        placeholder="Company name"
+                        placeholder={t('register.fields.companyName')}
                         value={form.companyName}
                         onChange={handleChange}
                         required
                     />
 
-                    <button type="submit" className="register-button">Sign up</button>
+                    <button type="submit" className="register-button">
+                        {t('register.cta.submit')}
+                    </button>
                 </form>
 
                 <div className="register-alt">
-                    Already have an account?{' '}
+                    {t('register.alt.hasAccount')}{' '}
                     <button type="button" onClick={() => navigate('/login')}>
-                        Login
+                        {t('register.alt.login')}
                     </button>
                 </div>
 
                 <footer className="register-footer">
-                    © 2025 Aleksander Starikov. <span>All rights reserved.</span>
+                    © 2025 Aleksander Starikov. <span>{t('register.footer.rights')}</span>
                 </footer>
             </div>
         </div>
