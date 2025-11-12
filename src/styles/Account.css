@@ -3,7 +3,9 @@
 .account-page {
     padding: 24px;
     background: #f9fafb;
-    min-height: 100vh;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
 }
 
 .account-title {
