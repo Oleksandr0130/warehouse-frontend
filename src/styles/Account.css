@@ -1,161 +1,248 @@
 /* src/styles/Account.css */
 
-/* Global mobile tweaks */
-* { -webkit-tap-highlight-color: transparent; }
-:root{
-    --r12:12px;--r14:14px;--r16:16px;
+.account-page {
+    padding: 24px;
+    background: #f9fafb;
+    min-height: 100vh;
 }
 
-.account-page{
-    padding:24px;
-    background:#f9fafb;
-    min-height:100svh;              /* modern viewport unit */
-    height:-webkit-fill-available;  /* iOS/Android WebView */
-    overscroll-behavior:contain;
+.account-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 16px;
 }
 
-.account-title{
-    font-size:1.5rem;
-    font-weight:700;
-    margin-bottom:16px;
-}
-
-.account-card{
-    background:#fff;
-    border-radius:var(--r16);
-    box-shadow:0 2px 10px rgba(0,0,0,.05); /* мягче для WebView */
-    padding:20px;
-    margin-bottom:20px;
+.account-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 20px;
+    margin-bottom: 20px;
 }
 
 /* profile rows */
-.row{
-    display:flex;
-    justify-content:space-between;
-    padding:8px 0;
-    border-bottom:1px solid #f1f5f9;
+.row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
 }
-.row:last-child{border-bottom:none;}
-.row span{color:#64748b;font-size:.95rem;}
-.row b{font-weight:600;}
+.row:last-child { border-bottom: none; }
+.row span { color: #64748b; font-size: 0.95rem; }
+.row b { font-weight: 600; }
 
-/* ─── Team block ───────────────────────────────────────── */
+/* ─── Team block ───────────────────────────────────────────── */
 
-.team-title{font-size:1.1rem;font-weight:700;}
-.team-subtitle{color:#64748b;margin-top:2px;font-size:.95rem;}
-
-.team-section{margin-top:18px;}
-.team-section-title{font-weight:600;margin:8px 0 10px;}
-
-.team-list{
-    display:flex;
-    flex-direction:column;
-    margin:0;padding:0;list-style:none;
+.team-title {
+    font-size: 1.1rem;
+    font-weight: 700;
 }
-.team-list>li+li{margin-top:12px;} /* вместо gap */
-
-.team-item{
-    display:flex;align-items:center;justify-content:space-between;
-    background:#fafafa;border:1px solid #eef2f7;border-radius:var(--r14);
-    padding:12px 14px;
+.team-subtitle {
+    color: #64748b;
+    margin-top: 2px;
+    font-size: .95rem;
 }
 
-.team-left{display:flex;align-items:center;}
-.team-left>*+*{margin-left:12px;} /* вместо gap */
-
-.avatar{
-    width:36px;height:36px;border-radius:999px;
-    background:linear-gradient(180deg,#7c3aed,#6366f1);
-    color:#fff;font-weight:700;display:grid;place-items:center;flex:0 0 36px;
+.team-section { margin-top: 18px; }
+.team-section-title {
+    font-weight: 600;
+    margin: 8px 0 10px;
 }
-.who-name{font-weight:600;}
-.who-email{color:#64748b;font-size:.92rem;}
 
-.team-right{display:flex;align-items:center;}
-.team-right>*+*{margin-left:10px;} /* вместо gap */
-
-/* role pill */
-.role-pill{
-    height:36px;min-width:120px;border-radius:999px;
-    border:1px solid #e5e7eb;padding:0 10px;background:#fff;
-    font-weight:600;font-size:.95rem;-webkit-appearance:none;appearance:none;
+.team-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
-.role-admin{color:#1e40af;border-color:#bfdbfe;background:#eff6ff;}
-.role-user{color:#374151;}
 
-/* icon btn */
-.icon-btn{
-    width:38px;height:38px;border-radius:10px;border:1px solid #e5e7eb;
-    background:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+.team-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fafafa;
+    border: 1px solid #eef2f7;
+    border-radius: 14px;
+    padding: 12px 14px;
 }
-.icon-btn.danger:hover{background:#fff1f2;border-color:#fecdd3;}
+
+.team-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #7c3aed, #6366f1);
+    color: #fff;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+}
+.who-name { font-weight: 600; }
+.who-email { color: #64748b; font-size: .92rem; }
+
+.team-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* pill-like select for role */
+.role-pill {
+    height: 32px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    padding: 0 10px;
+    background: #fff;
+    font-weight: 600;
+}
+.role-admin {
+    color: #1e40af;
+    border-color: #bfdbfe;
+    background: #eff6ff;
+}
+.role-user {
+    color: #374151;
+}
+
+/* small icon button */
+.icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    cursor: pointer;
+}
+.icon-btn.danger:hover { background: #fff1f2; border-color: #fecdd3; }
 
 /* empty / skeleton */
-.team-empty{
-    color:#64748b;background:#f8fafc;border:1px dashed #e2e8f0;border-radius:var(--r12);
-    padding:18px;text-align:center;
+.team-empty {
+    color: #64748b;
+    background: #f8fafc;
+    border: 1px dashed #e2e8f0;
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
 }
-.team-skeleton{
-    height:64px;border-radius:var(--r12);
-    background:linear-gradient(90deg,#f3f4f6,#eceff4,#f3f4f6);
-    background-size:200% 100%;animation:shimmer 1.2s infinite;
+.team-skeleton {
+    height: 64px;
+    border-radius: 12px;
+    background: linear-gradient(90deg,#f3f4f6, #eceff4, #f3f4f6);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
 }
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-/* ─── Invite form ───────────────────────────────────────── */
-
-.invite-grid{
-    display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;margin-top:8px;
-}
-@media (max-width:820px){.invite-grid{grid-template-columns:1fr;}}
-
-.field{display:flex;flex-direction:column;}
-.field+.field{margin-top:6px;} /* запаска, если grid-gap глючит */
-.label{font-size:.9rem;color:#64748b;}
-
-.account-input{
-    height:46px;padding:0 14px;border-radius:var(--r12);
-    border:1px solid #e5e7eb;background:#fff;font-size:15px;
-    transition:border-color .2s, box-shadow .2s;
-    -webkit-appearance:none;appearance:none;
-}
-.account-input:focus{
-    border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.15);outline:none;
-}
-.account-input.select{background-image:none;}
-
-.invite-submit{grid-column:1 / -1;}
-.invite-btn{
-    width:100%;height:48px;border:none;border-radius:var(--r12);
-    background:#0b0f1a;color:#fff;font-weight:700;
-    display:inline-flex;align-items:center;justify-content:center;padding:0 14px;
-    cursor:pointer;touch-action:manipulation;
-}
-.invite-btn__icon{font-size:1.1rem;line-height:1;}
-.invite-btn:disabled{opacity:.65;cursor:not-allowed;}
-
-/* ─── Danger Zone ───────────────────────────────────────── */
-
-.danger-zone{
-    background:#fff1f2;border:1px solid #fecaca;border-radius:var(--r16);
-    padding:18px;margin-top:20px;
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
-.danger-head{margin-bottom:12px;}
-.danger-title{color:#b91c1c;font-weight:800;margin-bottom:2px;}
-.danger-sub{color:#991b1b;font-size:.95rem;}
-
-.danger-card{
-    background:#fff;border:1px solid #fca5a5;border-radius:var(--r12);
-    padding:14px;display:flex;align-items:center;justify-content:space-between;
+/* Invite form grid */
+.invite-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 16px;
+    margin-top: 8px;
+}
+@media (max-width: 820px) {
+    .invite-grid { grid-template-columns: 1fr; }
 }
 
-.danger-info-title{font-weight:700;}
-.danger-info-sub{color:#475569;font-size:.95rem;margin-top:4px;}
+.field { display: flex; flex-direction: column; gap: 6px; }
+.label { font-size: .9rem; color: #64748b; }
 
-.danger-btn{
-    height:44px;padding:0 16px;border-radius:10px;border:none;
-    background:#dc2626;color:#fff;font-weight:700;cursor:pointer;
-    white-space:nowrap;transition:background-color .15s;touch-action:manipulation;
+.account-input {
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    font-size: 15px;
+    transition: .2s ease;
 }
-.danger-btn:hover{background:#b91c1c;}
+.account-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+    outline: none;
+}
+.account-input.select { appearance: none; }
+
+.invite-submit { grid-column: 1 / -1; }
+.invite-btn {
+    width: 100%;
+    height: 46px;
+    border: none;
+    border-radius: 12px;
+    background: #0b0f1a;
+    color: #fff;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+}
+.invite-btn__icon { font-size: 1.1rem; }
+.invite-btn:disabled { opacity: .65; cursor: not-allowed; }
+
+/* ─── Danger Zone ─────────────────────────────────────────── */
+
+.danger-zone {
+    background: #fff1f2;
+    border: 1px solid #fecaca;
+    border-radius: 16px;
+    padding: 18px;
+    margin-top: 20px;
+}
+
+.danger-head {
+    margin-bottom: 12px;
+}
+.danger-title {
+    color: #b91c1c;
+    font-weight: 800;
+    margin-bottom: 2px;
+}
+.danger-sub {
+    color: #991b1b;
+    font-size: .95rem;
+}
+
+.danger-card {
+    background: #fff;
+    border: 1px solid #fca5a5;
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.danger-info-title {
+    font-weight: 700;
+}
+.danger-info-sub {
+    color: #475569;
+    font-size: .95rem;
+    margin-top: 4px;
+}
+
+.danger-btn {
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 10px;
+    border: none;
+    background: #dc2626;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: .15s ease;
+}
+.danger-btn:hover { background: #b91c1c; }
