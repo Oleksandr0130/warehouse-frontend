@@ -51,6 +51,20 @@
         "emailPlaceholder": "Email",
         "passwordPlaceholder": "Password"
       }
+    },
+    "team": {
+      "title": "Team Management",
+      "subtitle": "Invite team members and manage their access",
+      "members": "Team Members",
+      "empty": "No members yet",
+      "invite": "Invite New Member",
+      "form": { "role": "Role" },
+      "roles": { "manager": "Manager", "user": "User" },
+      "cta": { "create": "Create User" },
+      "confirm": { "delete": "Remove this member?" },
+      "success": { "delete": "Member removed", "role": "Role updated" },
+      "errors": { "load": "Failed to load team", "delete": "Failed to remove member", "role": "Failed to update role" },
+      "aria": { "role": "Change role", "delete": "Remove member" }
     }
   },
   "addItemForm": {

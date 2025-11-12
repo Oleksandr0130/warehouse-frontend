@@ -67,6 +67,38 @@ export interface VerifyPlayPurchaseResponse {
     expiryTime: number;
 }
 
+
+export interface TeamUser {
+    id: number;
+    username: string;
+    email: string;
+    admin: boolean;
+}
+
+/* ===================== Admin: team ===================== */
+
+// список пользователей компании (для админа)
+export const fetchTeam = async (): Promise<TeamUser[]> => {
+    const { data } = await api.get<TeamUser[]>('/admin/users');
+    return data ?? [];
+};
+
+// удаление пользователя (админ)
+export const deleteUserAdmin = async (userId: number): Promise<void> => {
+    await api.delete(`/admin/users/${userId}`);
+};
+
+// смена роли (админ) — поддерживаем два возможных формата на бэке
+export const updateUserRole = async (userId: number, role: 'ADMIN' | 'USER'): Promise<void> => {
+    try {
+        await api.put(`/admin/users/${userId}/role`, { role });
+    } catch {
+        // fallback: некий другой контракт
+        await api.put(`/admin/users/${userId}`, { admin: role === 'ADMIN' });
+    }
+};
+
+
 /* ===================== Helpers ===================== */
 
 export const getErrorMessage = (e: unknown): string => {
