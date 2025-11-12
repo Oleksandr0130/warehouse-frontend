@@ -136,7 +136,6 @@ img, canvas, svg, video { max-width: 100%; height: auto; }
 
 .account-input {
     height: 46px;
-    padding: 0 14px;
     border-radius: 12px;
     border: 1px solid #e5e7eb;
     background: #fff;
