@@ -42,7 +42,26 @@
         "emailPlaceholder": "Email",
         "passwordPlaceholder": "Hasło"
       }
+    },
+    "team": {
+      "title": "Zarządzanie zespołem",
+      "subtitle": "Zaproś członków zespołu i zarządzaj ich dostępem",
+      "members": "Członkowie zespołu",
+      "empty": "Brak członków",
+      "invite": "Zaproś nowego członka",
+      "form": { "role": "Rola" },
+      "roles": { "manager": "Administrator", "user": "Użytkownik" },
+      "cta": { "create": "Utwórz użytkownika" },
+      "confirm": { "delete": "Usunąć tego członka?" },
+      "success": { "delete": "Członek został usunięty", "role": "Rola zaktualizowana" },
+      "errors": {
+        "load": "Nie udało się załadować zespołu",
+        "delete": "Nie udało się usunąć członka",
+        "role": "Nie udało się zaktualizować roli"
+      },
+      "aria": { "role": "Zmień rolę", "delete": "Usuń członka" }
     }
+
   },
   "addItemForm": {
     "title": "Dodaj nowy produkt",

@@ -37,7 +37,26 @@
         "emailPlaceholder": "E-Mail",
         "passwordPlaceholder": "Passwort"
       }
+    },
+    "team": {
+      "title": "Teamverwaltung",
+      "subtitle": "Lade Teammitglieder ein und verwalte deren Zugriffsrechte",
+      "members": "Teammitglieder",
+      "empty": "Noch keine Mitglieder",
+      "invite": "Neues Mitglied einladen",
+      "form": { "role": "Rolle" },
+      "roles": { "manager": "Administrator", "user": "Benutzer" },
+      "cta": { "create": "Benutzer erstellen" },
+      "confirm": { "delete": "Dieses Mitglied entfernen?" },
+      "success": { "delete": "Mitglied entfernt", "role": "Rolle aktualisiert" },
+      "errors": {
+        "load": "Team konnte nicht geladen werden",
+        "delete": "Mitglied konnte nicht entfernt werden",
+        "role": "Rolle konnte nicht aktualisiert werden"
+      },
+      "aria": { "role": "Rolle ändern", "delete": "Mitglied entfernen" }
     }
+
   },
   "addItemForm": {
     "title": "Neuen Artikel hinzufügen",

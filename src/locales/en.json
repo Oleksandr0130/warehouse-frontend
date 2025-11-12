@@ -59,7 +59,7 @@
       "empty": "No members yet",
       "invite": "Invite New Member",
       "form": { "role": "Role" },
-      "roles": { "manager": "Manager", "user": "User" },
+      "roles": { "manager": "Admin", "user": "User" },
       "cta": { "create": "Create User" },
       "confirm": { "delete": "Remove this member?" },
       "success": { "delete": "Member removed", "role": "Role updated" },
