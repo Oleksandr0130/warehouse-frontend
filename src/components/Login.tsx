@@ -5,6 +5,7 @@ import { loginUser } from '../api';
 import '../styles/Login.css';
 import logo from '../assets/flowqr-logo.png';
 import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 interface LoginProps {
     onSuccess?: () => void;
@@ -25,9 +26,9 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setCredentials((prev) => ({ ...prev, [name]: value }));
+        setCredentials(prev => ({ ...prev, [name]: value }));
         if (fieldErrors[name as keyof FieldErrors]) {
-            setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
+            setFieldErrors(prev => ({ ...prev, [name]: undefined }));
         }
         if (formError) setFormError(null);
     };
@@ -37,12 +38,8 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
         setIsSubmitting(true);
         setFormError(null);
         setFieldErrors({});
-
         try {
-            const res = await loginUser({
-                username: credentials.username,
-                password: credentials.password,
-            });
+            const res = await loginUser({ username: credentials.username, password: credentials.password });
             localStorage.setItem('token', (res as any).data.token);
             onSuccess?.();
             navigate('/app', { replace: true });
@@ -50,7 +47,6 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
             if (err instanceof AxiosError) {
                 const status = err.response?.status;
                 const serverMsg = (err.response?.data as { message?: string } | undefined)?.message;
-
                 if (status === 400 || status === 401) {
                     const msg = serverMsg || t('login.errors.incorrect');
                     setFormError(msg);
@@ -79,7 +75,10 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
     return (
         <div className="login-page">
             <div className="login-card">
-                <img src={logo} alt="FlowQR" className="login-logo" />
+                <div className="login-card-top" style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,marginBottom:12}}>
+                    <img src={logo} alt="FlowQR" className="login-logo" />
+                    <LanguageSwitcher />
+                </div>
 
                 {formError && (
                     <div className="form-error" role="alert" aria-live="assertive">
@@ -101,11 +100,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                             autoComplete="username"
                             aria-label={t('login.fields.username.aria')}
                         />
-                        {fieldErrors.username && (
-                            <div className="error-text" role="alert">
-                                {fieldErrors.username}
-                            </div>
-                        )}
+                        {fieldErrors.username && <div className="error-text" role="alert">{fieldErrors.username}</div>}
                     </div>
 
                     <div className="field">
@@ -121,19 +116,10 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
                             autoComplete="current-password"
                             aria-label={t('login.fields.password.aria')}
                         />
-                        {fieldErrors.password && (
-                            <div className="error-text" role="alert">
-                                {fieldErrors.password}
-                            </div>
-                        )}
+                        {fieldErrors.password && <div className="error-text" role="alert">{fieldErrors.password}</div>}
                     </div>
 
-                    <button
-                        type="button"
-                        className="login-button"
-                        disabled={isSubmitting}
-                        onClick={doLogin}
-                    >
+                    <button type="button" className="login-button" disabled={isSubmitting} onClick={doLogin}>
                         {isSubmitting ? t('login.cta.progress') : t('login.cta.submit')}
                     </button>
                 </div>

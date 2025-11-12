@@ -20,7 +20,7 @@ const LanguageSwitcher: React.FC = () => {
     const btnRef = useRef<HTMLButtonElement | null>(null);
     const popRef = useRef<HTMLDivElement | null>(null);
 
-    // Закрытие по клику вне
+    // Закрытие поповера по клику вне
     useEffect(() => {
         const onDocClick = (e: MouseEvent) => {
             if (!open) return;
@@ -33,7 +33,7 @@ const LanguageSwitcher: React.FC = () => {
         return () => document.removeEventListener('mousedown', onDocClick);
     }, [open]);
 
-    // Синхронизация с localStorage
+    // Берём сохранённый язык из localStorage
     useEffect(() => {
         try {
             const saved = localStorage.getItem(STORAGE_KEY) as Lang | null;
@@ -55,7 +55,7 @@ const LanguageSwitcher: React.FC = () => {
             <button
                 ref={btnRef}
                 className={`langsw__btn ${open ? 'is-open' : ''}`}
-                onClick={() => setOpen((v) => !v)}
+                onClick={() => setOpen(v => !v)}
                 aria-haspopup="listbox"
                 aria-expanded={open}
                 title={t('common.lang.change', 'Change language')}
@@ -71,7 +71,7 @@ const LanguageSwitcher: React.FC = () => {
                 role="listbox"
                 aria-activedescendant={`lang-${current}`}
             >
-                {(Object.keys(LANGS) as Lang[]).map((lng) => (
+                {(Object.keys(LANGS) as Lang[]).map(lng => (
                     <button
                         key={lng}
                         id={`lang-${lng}`}
