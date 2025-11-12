@@ -39,7 +39,8 @@
       "create": {
         "title": "Create User",
         "success": "User created",
-        "fail": "Failed to create user"
+        "fail": "Failed to create user",
+        "create": "Create"
       },
       "form": {
         "usernamePlaceholder": "User",

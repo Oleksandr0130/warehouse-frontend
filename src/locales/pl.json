@@ -39,7 +39,8 @@
       "create": {
         "title": "Utwórz użytkownika",
         "success": "Użytkownik został utworzony",
-        "fail": "Nie udało się utworzyć użytkownika"
+        "fail": "Nie udało się utworzyć użytkownika",
+        "create": "Utwórz"
       },
       "form": {
         "usernamePlaceholder": "Użytkownik",
