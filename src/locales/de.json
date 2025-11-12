@@ -55,8 +55,19 @@
         "role": "Rolle konnte nicht aktualisiert werden"
       },
       "aria": { "role": "Rolle ändern", "delete": "Mitglied entfernen" }
+    },
+    "danger": {
+      "title": "Gefahrenzone",
+      "subtitle": "Unumkehrbare Aktionen, die Ihr Konto betreffen"
+    },
+    "delete": {
+      "title": "Konto löschen",
+      "description": "Löschen Sie Ihr Konto und alle zugehörigen Daten dauerhaft",
+      "button": "Mein Konto löschen",
+      "confirm": "Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "success": "Ihr Konto wurde gelöscht.",
+      "fail": "Konto konnte nicht gelöscht werden"
     }
-
   },
   "addItemForm": {
     "title": "Neuen Artikel hinzufügen",

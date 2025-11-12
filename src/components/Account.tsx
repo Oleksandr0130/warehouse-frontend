@@ -6,7 +6,7 @@ import {
     AdminCreateUserRequest,
     MeDto,
     deleteAccount,
-    // ⬇️ новые API
+    // team API
     fetchTeam,
     deleteUserAdmin,
     updateUserRole,
@@ -25,11 +25,11 @@ const Account: React.FC = () => {
     const [me, setMe] = useState<MeDto | null>(null);
     const [loading, setLoading] = useState(false);
 
-    // ─── Team state ─────────────────────────────────────────────
+    // Team state
     const [team, setTeam] = useState<TeamUser[]>([]);
     const [teamLoading, setTeamLoading] = useState(false);
 
-    // ─── Invite form ────────────────────────────────────────────
+    // Invite form
     const [newUser, setNewUser] = useState<AdminCreateUserRequest>({
         username: '',
         email: '',
@@ -37,7 +37,7 @@ const Account: React.FC = () => {
     });
     const [newUserRole, setNewUserRole] = useState<'USER' | 'ADMIN'>('USER');
 
-    // ─── effects ────────────────────────────────────────────────
+    // effects
     useEffect(() => {
         (async () => {
             try {
@@ -51,6 +51,7 @@ const Account: React.FC = () => {
 
     useEffect(() => {
         if (me?.admin) void loadTeam();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [me]);
 
     const loadTeam = async () => {
@@ -65,7 +66,7 @@ const Account: React.FC = () => {
         }
     };
 
-    // ─── account deletion ───────────────────────────────────────
+    // account deletion
     const handleDeleteAccount = async () => {
         if (!window.confirm(t('account.delete.confirm'))) return;
         try {
@@ -77,7 +78,7 @@ const Account: React.FC = () => {
         }
     };
 
-    // ─── invite form ────────────────────────────────────────────
+    // invite form
     const handleInviteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setNewUser((prev) => ({ ...prev, [name]: value }));
@@ -87,17 +88,18 @@ const Account: React.FC = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            // создаём пользователя
             await adminCreateUser(newUser);
-            // если выбрана ADMIN — апдейтим роль
+
             if (newUserRole === 'ADMIN') {
-                // найдём только что созданного по email
                 const refreshed = await fetchTeam();
-                const created = refreshed.find((u) => u.email?.toLowerCase() === newUser.email.toLowerCase());
+                const created = refreshed.find(
+                    (u) => u.email?.toLowerCase() === newUser.email.toLowerCase()
+                );
                 if (created) {
                     await updateUserRole(created.id, 'ADMIN');
                 }
             }
+
             toast.success(t('account.admin.create.success'));
             setNewUser({ username: '', email: '', password: '' });
             setNewUserRole('USER');
@@ -109,11 +111,13 @@ const Account: React.FC = () => {
         }
     };
 
-    // ─── team actions ───────────────────────────────────────────
+    // team actions
     const handleRoleChange = async (id: number, role: 'USER' | 'ADMIN') => {
         try {
             await updateUserRole(id, role);
-            setTeam((prev) => prev.map((u) => (u.id === id ? { ...u, admin: role === 'ADMIN' } : u)));
+            setTeam((prev) =>
+                prev.map((u) => (u.id === id ? { ...u, admin: role === 'ADMIN' } : u))
+            );
             toast.success(t('account.team.success.role', 'Role updated'));
         } catch {
             toast.error(t('account.team.errors.role', 'Failed to update role'));
@@ -131,7 +135,7 @@ const Account: React.FC = () => {
         }
     };
 
-    // ─── render ─────────────────────────────────────────────────
+    // render
     return (
         <div className="account-page">
             <h2 className="account-title">{t('account.title')}</h2>
@@ -160,9 +164,6 @@ const Account: React.FC = () => {
                             <span>{t('account.fields.role')}:</span>
                             <b>{me.admin ? t('account.roles.admin') : t('account.roles.user')}</b>
                         </div>
-                        <button className="delete-btn" onClick={handleDeleteAccount}>
-                            {t('account.delete.button')}
-                        </button>
                     </div>
 
                     {/* Team management (admins only) */}
@@ -170,27 +171,38 @@ const Account: React.FC = () => {
                         <div className="account-card team-card">
                             <div className="team-head">
                                 <div>
-                                    <div className="team-title">{t('account.team.title', 'Team Management')}</div>
+                                    <div className="team-title">
+                                        {t('account.team.title', 'Team Management')}
+                                    </div>
                                     <div className="team-subtitle">
-                                        {t('account.team.subtitle', 'Invite team members and manage their access')}
+                                        {t(
+                                            'account.team.subtitle',
+                                            'Invite team members and manage their access'
+                                        )}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Members list */}
                             <div className="team-section">
-                                <div className="team-section-title">{t('account.team.members', 'Team Members')}</div>
+                                <div className="team-section-title">
+                                    {t('account.team.members', 'Team Members')}
+                                </div>
 
                                 {teamLoading ? (
                                     <div className="team-skeleton" />
                                 ) : team.length === 0 ? (
-                                    <div className="team-empty">{t('account.team.empty', 'No members yet')}</div>
+                                    <div className="team-empty">
+                                        {t('account.team.empty', 'No members yet')}
+                                    </div>
                                 ) : (
                                     <ul className="team-list">
                                         {team.map((u) => (
                                             <li key={u.id} className="team-item">
                                                 <div className="team-left">
-                                                    <div className="avatar">{(u.username || u.email || '?')[0]?.toUpperCase()}</div>
+                                                    <div className="avatar">
+                                                        {(u.username || u.email || '?')[0]?.toUpperCase()}
+                                                    </div>
                                                     <div className="who">
                                                         <div className="who-name">{u.username}</div>
                                                         <div className="who-email">{u.email}</div>
@@ -199,19 +211,36 @@ const Account: React.FC = () => {
 
                                                 <div className="team-right">
                                                     <select
-                                                        className={`role-pill ${u.admin ? 'role-admin' : 'role-user'}`}
+                                                        className={`role-pill ${
+                                                            u.admin ? 'role-admin' : 'role-user'
+                                                        }`}
                                                         value={u.admin ? 'ADMIN' : 'USER'}
-                                                        onChange={(e) => handleRoleChange(u.id, e.target.value as 'ADMIN' | 'USER')}
-                                                        aria-label={t('account.team.aria.role', 'Change role')}
+                                                        onChange={(e) =>
+                                                            handleRoleChange(
+                                                                u.id,
+                                                                e.target.value as 'ADMIN' | 'USER'
+                                                            )
+                                                        }
+                                                        aria-label={t(
+                                                            'account.team.aria.role',
+                                                            'Change role'
+                                                        )}
                                                     >
-                                                        <option value="ADMIN">{t('account.team.roles.manager', 'Manager')}</option>
-                                                        <option value="USER">{t('account.team.roles.user', 'User')}</option>
+                                                        <option value="ADMIN">
+                                                            {t('account.team.roles.manager', 'Manager')}
+                                                        </option>
+                                                        <option value="USER">
+                                                            {t('account.team.roles.user', 'User')}
+                                                        </option>
                                                     </select>
 
                                                     <button
                                                         className="icon-btn danger"
                                                         onClick={() => handleRemoveUser(u.id)}
-                                                        aria-label={t('account.team.aria.delete', 'Remove member')}
+                                                        aria-label={t(
+                                                            'account.team.aria.delete',
+                                                            'Remove member'
+                                                        )}
                                                         title={t('account.team.aria.delete', 'Remove member')}
                                                     >
                                                         🗑️
@@ -225,11 +254,15 @@ const Account: React.FC = () => {
 
                             {/* Invite form */}
                             <div className="team-section">
-                                <div className="team-section-title">{t('account.team.invite', 'Invite New Member')}</div>
+                                <div className="team-section-title">
+                                    {t('account.team.invite', 'Invite New Member')}
+                                </div>
 
                                 <form className="invite-grid" onSubmit={handleInvite}>
                                     <div className="field">
-                                        <label className="label">{t('account.admin.form.usernamePlaceholder')}</label>
+                                        <label className="label">
+                                            {t('account.admin.form.usernamePlaceholder')}
+                                        </label>
                                         <input
                                             className="account-input"
                                             name="username"
@@ -241,7 +274,9 @@ const Account: React.FC = () => {
                                     </div>
 
                                     <div className="field">
-                                        <label className="label">{t('account.admin.form.emailPlaceholder')}</label>
+                                        <label className="label">
+                                            {t('account.admin.form.emailPlaceholder')}
+                                        </label>
                                         <input
                                             className="account-input"
                                             name="email"
@@ -254,7 +289,9 @@ const Account: React.FC = () => {
                                     </div>
 
                                     <div className="field">
-                                        <label className="label">{t('account.admin.form.passwordPlaceholder')}</label>
+                                        <label className="label">
+                                            {t('account.admin.form.passwordPlaceholder')}
+                                        </label>
                                         <input
                                             className="account-input"
                                             name="password"
@@ -267,27 +304,73 @@ const Account: React.FC = () => {
                                     </div>
 
                                     <div className="field">
-                                        <label className="label">{t('account.team.form.role', 'Role')}</label>
+                                        <label className="label">
+                                            {t('account.team.form.role', 'Role')}
+                                        </label>
                                         <select
                                             className="account-input select"
                                             value={newUserRole}
-                                            onChange={(e) => setNewUserRole(e.target.value as 'USER' | 'ADMIN')}
+                                            onChange={(e) =>
+                                                setNewUserRole(e.target.value as 'USER' | 'ADMIN')
+                                            }
                                         >
-                                            <option value="USER">{t('account.team.roles.user', 'User')}</option>
-                                            <option value="ADMIN">{t('account.team.roles.manager', 'Manager')}</option>
+                                            <option value="USER">
+                                                {t('account.team.roles.user', 'User')}
+                                            </option>
+                                            <option value="ADMIN">
+                                                {t('account.team.roles.manager', 'Manager')}
+                                            </option>
                                         </select>
                                     </div>
 
                                     <div className="invite-submit">
                                         <button type="submit" className="invite-btn" disabled={loading}>
                                             <span className="invite-btn__icon">👥</span>
-                                            {loading ? t('common.adding') : t('account.team.cta.create', 'Create User')}
+                                            {loading
+                                                ? t('common.adding')
+                                                : t('account.team.cta.create', 'Create User')}
                                         </button>
                                     </div>
                                 </form>
                             </div>
                         </div>
                     )}
+
+                    {/* Danger Zone */}
+                    <section className="danger-zone">
+                        <div className="danger-head">
+                            <div className="danger-title">
+                                {t('account.danger.title', 'Danger Zone')}
+                            </div>
+                            <div className="danger-sub">
+                                {t(
+                                    'account.danger.subtitle',
+                                    'Irreversible actions that affect your account'
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="danger-card">
+                            <div className="danger-info">
+                                <div className="danger-info-title">
+                                    {t('account.delete.title', 'Delete Account')}
+                                </div>
+                                <div className="danger-info-sub">
+                                    {t(
+                                        'account.delete.description',
+                                        'Permanently delete your account and all associated data'
+                                    )}
+                                </div>
+                            </div>
+                            <button
+                                className="danger-btn"
+                                onClick={handleDeleteAccount}
+                                type="button"
+                            >
+                                {t('account.delete.button')}
+                            </button>
+                        </div>
+                    </section>
                 </>
             )}
         </div>

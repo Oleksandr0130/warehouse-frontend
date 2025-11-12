@@ -60,6 +60,18 @@
         "role": "Nie udało się zaktualizować roli"
       },
       "aria": { "role": "Zmień rolę", "delete": "Usuń członka" }
+    },
+    "danger": {
+      "title": "Strefa zagrożenia",
+      "subtitle": "Nieodwracalne działania, które wpływają na Twoje konto"
+    },
+    "delete": {
+      "title": "Usuń konto",
+      "description": "Trwale usuń swoje konto i wszystkie powiązane dane",
+      "button": "Usuń moje konto",
+      "confirm": "Czy na pewno chcesz usunąć konto? Tej operacji nie można cofnąć.",
+      "success": "Twoje konto zostało usunięte.",
+      "fail": "Nie udało się usunąć konta"
     }
 
   },

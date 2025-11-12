@@ -31,21 +31,6 @@
 .row span { color: #64748b; font-size: 0.95rem; }
 .row b { font-weight: 600; }
 
-.delete-btn {
-    height: 44px;
-    border-radius: 12px;
-    background: #dc2626;
-    color: #fff;
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-    border: none;
-    transition: .2s ease;
-    width: 100%;
-    margin-top: 12px;
-}
-.delete-btn:hover { background: #b91c1c; }
-
 /* ─── Team block ───────────────────────────────────────────── */
 
 .team-title {
@@ -187,9 +172,7 @@
 }
 .account-input.select { appearance: none; }
 
-.invite-submit {
-    grid-column: 1 / -1;
-}
+.invite-submit { grid-column: 1 / -1; }
 .invite-btn {
     width: 100%;
     height: 46px;
@@ -206,3 +189,60 @@
 }
 .invite-btn__icon { font-size: 1.1rem; }
 .invite-btn:disabled { opacity: .65; cursor: not-allowed; }
+
+/* ─── Danger Zone ─────────────────────────────────────────── */
+
+.danger-zone {
+    background: #fff1f2;
+    border: 1px solid #fecaca;
+    border-radius: 16px;
+    padding: 18px;
+    margin-top: 20px;
+}
+
+.danger-head {
+    margin-bottom: 12px;
+}
+.danger-title {
+    color: #b91c1c;
+    font-weight: 800;
+    margin-bottom: 2px;
+}
+.danger-sub {
+    color: #991b1b;
+    font-size: .95rem;
+}
+
+.danger-card {
+    background: #fff;
+    border: 1px solid #fca5a5;
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.danger-info-title {
+    font-weight: 700;
+}
+.danger-info-sub {
+    color: #475569;
+    font-size: .95rem;
+    margin-top: 4px;
+}
+
+.danger-btn {
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 10px;
+    border: none;
+    background: #dc2626;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: .15s ease;
+}
+.danger-btn:hover { background: #b91c1c; }
