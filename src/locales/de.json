@@ -1,180 +1,130 @@
 {
   "auth": {
-    "sessionEnded": "Sitzung beendet. Bitte melden Sie sich erneut an.",
-    "loginSuccess": "Erfolgreich eingeloggt!",
-    "logoutSuccess": "Erfolgreich ausgeloggt!"
+    "sessionEnded": "Sitzung beendet. Bitte melde dich erneut an.",
+    "loginSuccess": "Erfolgreich angemeldet!",
+    "logoutSuccess": "Erfolgreich abgemeldet!"
   },
   "billing": {
-    "trialWarn": "Ihre Testphase endet in {{days}} Tag(en).",
-    "activeWarn": "Ihr Zugriffszeitraum endet in {{days}} Tag(en)."
+    "trialWarn": "Deine Testphase endet in {{days}} Tag(en).",
+    "activeWarn": "Dein Zugriff endet in {{days}} Tag(en)."
   },
-
   "common": {
-    "loading": "Lädt...",
+    "loading": "Wird geladen...",
     "create": "Erstellen",
-    "adding": "Wird hinzugefügt…"
+    "adding": "Wird hinzugefügt…",
+    "remove": "Entfernen",
+    "saving": "Wird gespeichert…",
+    "lang": {
+      "ariaSwitcher": "Sprachumschalter",
+      "change": "Sprache ändern"
+    }
   },
   "account": {
     "title": "Persönliches Konto",
-    "fields": {
-      "user": "Benutzer",
-      "email": "E-Mail",
-      "company": "Firma",
-      "role": "Rolle"
-    },
-    "roles": {
-      "admin": "Administrator",
-      "user": "Benutzer"
-    },
+    "fields": { "user": "Benutzer", "email": "E-Mail", "company": "Firma", "role": "Rolle" },
+    "roles": { "admin": "Admin", "user": "Benutzer" },
     "delete": {
       "button": "Mein Konto löschen",
-      "confirm": "Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
-      "success": "Ihr Konto wurde gelöscht.",
+      "confirm": "Konto wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "success": "Dein Konto wurde gelöscht.",
       "fail": "Konto konnte nicht gelöscht werden"
     },
-    "errors": {
-      "fetchMe": "Konto konnte nicht geladen werden"
-    },
+    "errors": { "fetchMe": "Konto konnte nicht geladen werden" },
     "admin": {
-      "create": {
-        "title": "Benutzer erstellen",
-        "success": "Benutzer erstellt",
-        "fail": "Fehler beim Erstellen des Benutzers",
-        "create": "Erstellen"
-      },
+      "create": { "title": "Benutzer erstellen", "success": "Benutzer erstellt", "fail": "Fehler beim Erstellen" },
       "form": {
-        "usernamePlaceholder": "Benutzername",
+        "usernamePlaceholder": "Benutzer",
         "emailPlaceholder": "E-Mail",
         "passwordPlaceholder": "Passwort"
       }
     }
   },
-
-  "common": {
-    "remove": "Entfernen"
-  },
   "addItemForm": {
     "title": "Neuen Artikel hinzufügen",
-    "success": { "added": "Artikel wurde erfolgreich hinzugefügt!" },
+    "success": { "added": "Artikel erfolgreich hinzugefügt!" },
     "errors": { "readImages": "Bilder konnten nicht gelesen werden." },
     "validation": {
       "idEmpty": "ID darf nicht leer sein.",
       "nameEmpty": "Name darf nicht leer sein.",
-      "quantityPositive": "Die Menge muss eine positive Zahl sein.",
-      "priceNonNegative": "Der Preis muss eine nicht negative Zahl sein."
+      "quantityPositive": "Menge muss positiv sein.",
+      "priceNonNegative": "Preis muss ≥ 0 sein."
     },
     "fields": {
-      "id": { "label": "Name QR", "placeholder": "Name QR" },
+      "id": { "label": "QR-Name", "placeholder": "QR-Name" },
       "name": { "label": "Name", "placeholder": "Artikelname" },
       "quantity": { "label": "Menge", "placeholder": "Menge eingeben" },
-      "price": { "label": "Preis (optional)", "placeholder": "0,00" },
+      "price": { "label": "Preis (optional)", "placeholder": "0.00" },
       "currency": { "label": "Währung" },
       "description": { "label": "Beschreibung (optional)", "placeholder": "Kurze Artikelbeschreibung…" },
       "images": { "label": "Bilder (bis zu {{max}})" }
     },
-    "images": {
-      "setCover": "Als Titelbild festlegen"
-    },
+    "images": { "setCover": "Als Titelbild setzen" },
     "submit": "Artikel hinzufügen"
   },
-  "common": { "loading": "Lädt..." },
   "appContent": {
     "errors": {
-      "loadProducts": "Fehler beim Laden der Produkte.",
-      "loadReserved": "Fehler beim Laden reservierter Artikel.",
-      "loadSold": "Fehler beim Laden verkaufter Artikel.",
-      "addProduct": "Fehler beim Hinzufügen des Produkts.",
-      "deleteProduct": "Fehler beim Löschen des Produkts.",
-      "updateProduct": "Fehler beim Aktualisieren des Produkts.",
+      "loadProducts": "Fehler beim Laden der Artikel.",
+      "loadReserved": "Fehler beim Laden der Reservierungen.",
+      "loadSold": "Fehler beim Laden der Verkäufe.",
+      "addProduct": "Fehler beim Hinzufügen.",
+      "deleteProduct": "Fehler beim Löschen.",
+      "updateProduct": "Fehler beim Aktualisieren.",
       "incorrectQR": "Ungültiger QR-Code.",
       "processReserve": "Fehler bei der Verarbeitung der Reservierung."
     },
     "success": {
-      "productAdded": "Produkt erfolgreich hinzugefügt!",
-      "productDeleted": "Produkt gelöscht.",
-      "productUpdated": "Produkt aktualisiert.",
+      "productAdded": "Artikel hinzugefügt!",
+      "productDeleted": "Artikel gelöscht.",
+      "productUpdated": "Artikel aktualisiert.",
       "reservationDeleted": "Reservierung gelöscht.",
       "reservationProcessed": "Reservierung verarbeitet!"
     },
     "menu": {
       "stock": "Bestand",
       "createItem": "Artikel erstellen",
-      "reservedItems": "Reservierte Artikel",
+      "reservedItems": "Reserviert",
       "createReservation": "Reservierung erstellen",
-      "soldItems": "Verkaufte Artikel",
+      "soldItems": "Verkauft",
       "qrCodes": "QR-Codes",
       "about": "Über die App",
-      "account": "Persönliches Konto",
+      "account": "Konto",
       "logout": "Abmelden"
     },
     "sort": {
       "aria": "Artikel sortieren",
       "label": "Sortieren nach",
-      "options": {
-        "standard": "Standard",
-        "name": "Name",
-        "amount": "Menge",
-        "sold": "Verkauft"
-      }
+      "options": { "standard": "Standard", "name": "Name", "amount": "Menge", "sold": "Verkauft" }
     },
     "scan": {
       "scanToAdd": "Scannen zum Hinzufügen",
-      "scanToRemove": "Scannen zum Entfernen",
-      "action": { "add": "Hinzufügen", "remove": "Entfernen" },
+      "scanToRemove": "Scannen zum Abziehen",
+      "action": { "add": "Hinzufügen", "remove": "Abziehen" },
       "enterQty": "Menge für {{action}} eingeben:",
       "enterValidNumber": "Bitte eine gültige Zahl eingeben.",
       "completed": "Vorgang {{action}} abgeschlossen. Menge: {{quantity}}",
-      "operationError": "Vorgangsfehler."
+      "operationError": "Vorgang fehlgeschlagen."
     },
-    "a11y": {
-      "openMenu": "Menü öffnen",
-      "closeMenu": "Menü schließen"
-    }
+    "a11y": { "openMenu": "Menü öffnen", "closeMenu": "Menü schließen" }
   },
   "confirmation": {
     "title": "E-Mail-Bestätigung",
-    "checking": "Bestätigungsstatus wird überprüft…",
+    "checking": "Status der Bestätigung wird geprüft…",
     "success": "E-Mail erfolgreich bestätigt!",
-    "fail": "E-Mail-Bestätigung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "fail": "E-Mail konnte nicht bestätigt werden. Versuche es erneut.",
     "login": "Anmelden",
-    "redirectHint": "Sie werden nun automatisch zur Anmeldeseite weitergeleitet..."
+    "redirectHint": "Du wirst gleich zur Anmeldung weitergeleitet…"
   },
   "dashboard": {
-    "stock": {
-      "title": "Bestand",
-      "subtitle": "{{count}} Artikel"
-    },
-    "reserved": {
-      "title": "Reservierte Artikel",
-      "subtitle": "{{count}} aktiv"
-    },
-    "qr": {
-      "title": "QR-Codes",
-      "subtitle": "{{count}} generiert"
-    }
+    "stock": { "title": "Bestand", "subtitle": "{{count}} Artikel" },
+    "reserved": { "title": "Reserviert", "subtitle": "{{count}} aktiv" },
+    "qr": { "title": "QR-Codes", "subtitle": "{{count}} erzeugt" }
   },
-  "common": { "loading": "Lädt..." },
   "fileViewer": {
-    "toolbar": {
-      "searchPlaceholder": "Nach Name suchen...",
-      "searchAria": "Nach Name suchen",
-      "print": "Drucken"
-    },
-    "sections": {
-      "warehouseTitle": "Lager-QR",
-      "reservedTitle": "Reservierte QR"
-    },
-    "actions": {
-      "download": "Herunterladen",
-      "close": "Schließen"
-    },
-    "labels": {
-      "orderNumber": "Bestellnummer: {{order}}"
-    },
-    "alt": {
-      "item": "QR-Code des Artikels {{id}}",
-      "reservation": "QR-Code der Reservierung {{order}}"
-    },
+    "toolbar": { "searchPlaceholder": "Nach Namen suchen...", "searchAria": "Suche nach Namen", "print": "Drucken" },
+    "sections": { "warehouseTitle": "Lager-QR", "reservedTitle": "Reservierungs-QR" },
+    "actions": { "download": "Download", "close": "Schließen" },
+    "labels": { "orderNumber": "Auftragsnummer: {{order}}" },
+    "alt": { "item": "QR-Code des Artikels {{id}}", "reservation": "QR-Code der Reservierung {{order}}" },
     "a11y": {
       "selectForPrintItem": "{{id}} zum Drucken auswählen",
       "selectForPrintReservation": "Reservierung {{order}} zum Drucken auswählen",
@@ -182,63 +132,43 @@
       "qrCanvas": "QR-Vorschau-Canvas"
     },
     "errors": {
-      "noneSelected": "Sie haben keine QR-Codes zum Drucken ausgewählt.",
-      "downloadFail": "QR-Code mit der ID {{id}} konnte nicht heruntergeladen werden."
+      "noneSelected": "Keine QR-Codes zum Drucken ausgewählt.",
+      "downloadFail": "QR-Code mit ID: {{id}} konnte nicht geladen werden."
     },
-    "print": {
-      "title": "Ausgewählt: {{ids}}"
-    }
-  },
-  "common": {
-    "remove": "Entfernen",
-    "loading": "Lädt...",
-    "saving": "Wird gespeichert…"
+    "print": { "title": "Ausgewählt: {{ids}}" }
   },
   "itemList": {
     "title": "Bestand",
     "search": {
-      "placeholder": "Suche nach Name, verfügbarer Menge, verkauft, Preis oder Beschreibung",
+      "placeholder": "Suche nach Name, Bestand, Verkauf, Preis oder Beschreibung",
       "aria": "Artikel suchen",
       "count": "{{filtered}} / {{total}}"
     },
-    "empty": "Keine Artikel entsprechen Ihrer Suche.",
-    "alt": {
-      "cover": "{{name}} Titelbild"
-    },
-    "labels": {
-      "available": "Verfügbar",
-      "sold": "Verkauft",
-      "price": "Preis"
-    },
-    "noExtra": "Keine zusätzlichen Informationen.",
+    "empty": "Keine Treffer.",
+    "alt": { "cover": "{{name}} Titelbild" },
+    "labels": { "available": "Verfügbar", "sold": "Verkauft", "price": "Preis" },
+    "noExtra": "Keine zusätzlichen Infos.",
     "actions": {
       "edit": "Bearbeiten",
       "deleteItem": "Artikel löschen",
       "cancel": "Abbrechen",
       "save": "Speichern",
-      "saving": "Wird gespeichert…"
+      "saving": "Speichern…"
     },
     "form": {
       "description": "Beschreibung",
-      "descriptionPlaceholder": "Krótka charakterystyka produktu…",
+      "descriptionPlaceholder": "Kurze Beschreibung…",
       "price": "Preis",
-      "pricePlaceholder": "0,00",
+      "pricePlaceholder": "0.00",
       "currency": "Währung",
       "images": "Bilder (bis zu {{max}})"
     },
-    "images": {
-      "setCover": "Als Titelbild festlegen"
-    },
-    "errors": {
-      "priceNonNegative": "Der Preis muss eine nicht negative Zahl sein"
-    }
+    "images": { "setCover": "Als Titelbild setzen" },
+    "errors": { "priceNonNegative": "Preis muss ≥ 0 sein" }
   },
-  "common": { "loading": "Lädt..." },
-  "itemsPage": {
-    "errors": { "loadItems": "Elemente konnten nicht geladen werden" }
-  },
+  "itemsPage": { "errors": { "loadItems": "Artikel konnten nicht geladen werden" } },
   "login": {
-    "formAria": "Anmeldeformular",
+    "formAria": "Login-Formular",
     "fields": {
       "username": { "placeholder": "Benutzer", "aria": "Benutzername" },
       "password": { "placeholder": "Passwort", "aria": "Passwort" }
@@ -247,7 +177,7 @@
     "noAccount": { "question": "Noch kein Konto?", "signup": "Registrieren" },
     "footer": { "rights": "Alle Rechte vorbehalten." },
     "errors": {
-      "incorrect": "Falscher Benutzername oder falsches Passwort",
+      "incorrect": "Falscher Benutzername oder Passwort",
       "network": "Netzwerkfehler. Bitte Verbindung prüfen und erneut versuchen.",
       "generic": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
       "unexpected": "Unerwarteter Fehler. Bitte erneut versuchen."
@@ -255,174 +185,113 @@
   },
   "qrScanner": {
     "title": "QR-Code scannen",
-    "actions": {
-      "close": "Scanner schließen"
-    },
+    "actions": { "close": "Scanner schließen" },
     "errors": {
-      "cameraDenied": "Kamerazugriff verweigert. Bitte Kameraberechtigungen aktivieren. Details: {{message}}"
+      "cameraDenied": "Kamerazugriff verweigert. Bitte erlaube den Zugriff. Details: {{message}}"
     },
-    "a11y": {
-      "video": "Kameravorschau des QR-Scanners",
-      "close": "QR-Scanner schließen"
-    }
+    "a11y": { "video": "Kamera-Vorschau des QR-Scanners", "close": "QR-Scanner schließen" }
   },
   "register": {
     "title": "Konto erstellen",
     "aria": { "form": "Registrierungsformular" },
-    "fields": {
-      "username": "Benutzer",
-      "email": "E-Mail",
-      "password": "Passwort",
-      "companyName": "Firmenname"
-    },
+    "fields": { "username": "Benutzer", "email": "E-Mail", "password": "Passwort", "companyName": "Firmenname" },
     "cta": { "submit": "Registrieren" },
-    "alt": {
-      "hasAccount": "Bereits ein Konto?",
-      "login": "Anmelden"
-    },
+    "alt": { "hasAccount": "Bereits ein Konto?", "login": "Anmelden" },
     "footer": { "rights": "Alle Rechte vorbehalten." },
-    "success": "Registrierung erfolgreich gesendet. Bitte überprüfe deine E-Mail zur Bestätigung.",
+    "success": "Registrierung gesendet. Bitte E-Mail zur Bestätigung prüfen.",
     "error": "Registrierungsfehler"
   },
   "reservedList": {
     "title": "Reservierungen",
     "search": {
-      "placeholder": "Suche nach Bestellnummer, Name, Woche oder Menge",
+      "placeholder": "Suche nach Auftragsnr., Name, Woche oder Menge",
       "aria": "Reservierungen suchen",
       "count": "{{filtered}} / {{total}}"
     },
-    "empty": "Keine reservierten Artikel gefunden.",
-    "labels": {
-      "order": "Bestellung Nr.",
-      "week": "Woche:",
-      "amount": "Menge:"
-    },
-    "actions": {
-      "completeViaQR": "Per QR abschließen",
-      "remove": "Entfernen"
-    },
-    "confirm": {
-      "delete": "Möchten Sie diese Reservierung wirklich löschen?"
-    },
+    "empty": "Keine Reservierungen gefunden.",
+    "labels": { "order": "Auftrag Nr.", "week": "Woche:", "amount": "Menge:" },
+    "actions": { "completeViaQR": "Per QR abschließen", "remove": "Entfernen" },
+    "confirm": { "delete": "Diese Reservierung wirklich löschen?" },
     "toasts": {
-      "deleted": "Reservierung erfolgreich gelöscht.",
-      "completedViaQR": "Reservierung per QR-Code erfolgreich abgeschlossen."
+      "deleted": "Reservierung gelöscht.",
+      "completedViaQR": "Reservierung per QR erfolgreich abgeschlossen."
     },
-    "errors": {
-      "deleteFailed": "Löschen der Reservierung fehlgeschlagen."
-    },
-    "modal": {
-      "title": "QR-Code-Scanner",
-      "close": "Scanner schließen",
-      "closeAria": "Scanner schließen"
-    }
+    "errors": { "deleteFailed": "Reservierung konnte nicht gelöscht werden." },
+    "modal": { "title": "QR-Code-Scanner", "close": "Scanner schließen", "closeAria": "Scanner schließen" }
   },
   "reserveForm": {
     "title": "Reservierung erstellen",
     "aria": { "form": "Reservierungsformular" },
     "labels": {
-      "item": "Artikel auswählen oder eingeben:",
+      "item": "Artikel wählen oder eingeben:",
       "quantity": "Menge:",
-      "week": "Reservierungswoche:",
+      "week": "Reservierungs-Woche:",
       "order": "Auftragsnummer:"
     },
-    "placeholders": {
-      "item": "Artikelnamen eingeben",
-      "week": "Wochennummer eingeben",
-      "order": "Auftragsnummer eingeben"
-    },
-    "suggestions": {
-      "available": "Verfügbar: {{qty}}"
-    },
+    "placeholders": { "item": "Artikelname eingeben", "week": "Wochennummer eingeben", "order": "Auftragsnummer eingeben" },
+    "suggestions": { "available": "Verfügbar: {{qty}}" },
     "cta": { "submit": "Reservierung erstellen" },
-    "toasts": { "created": "Reservierung erfolgreich erstellt!" },
+    "toasts": { "created": "Reservierung erstellt!" },
     "errors": {
-      "fillAll": "Bitte füllen Sie alle Felder korrekt aus.",
-      "notFound": "Der ausgewählte Artikel wurde nicht gefunden.",
+      "fillAll": "Bitte alle Felder korrekt ausfüllen.",
+      "notFound": "Ausgewählter Artikel nicht gefunden.",
       "createError": "Fehler beim Erstellen der Reservierung."
     }
   },
   "sold": {
-    "title": "Verkaufte Artikel",
+    "title": "Verkauft",
     "search": {
-      "placeholder": "Suche nach Bestellnummer, Name, Woche oder Datum (z. B. 2025-08-23)",
-      "aria": "Verkaufte Artikel suchen",
+      "placeholder": "Suche nach Auftrag, Name, Woche oder Datum (z. B. 2025-08-23)",
+      "aria": "Verkäufe suchen",
       "count": "{{filtered}} / {{total}}"
     },
-    "labels": {
-      "order": "Bestellung Nr.",
-      "amount": "Menge:",
-      "week": "Woche:"
-    },
-    "emptyAll": "Es gibt noch keine Reservierungen.",
-    "emptyFiltered": "Keine verkauften Artikel entsprechen Ihrer Suche."
+    "labels": { "order": "Auftrag Nr.", "amount": "Menge:", "week": "Woche:" },
+    "emptyAll": "Noch keine Reservierungen.",
+    "emptyFiltered": "Keine Treffer für diesen Filter."
   },
   "sub": {
     "title": {
-      "trial": "Testphase • {{days}} Tage verbleibend",
-      "active": "Zugang aktiv • {{days}} Tage verbleibend",
+      "trial": "Testphase • {{days}} Tage übrig",
+      "active": "Zugang aktiv • {{days}} Tage übrig",
       "expired": "Zugang abgelaufen",
       "anon": "Zum Kauf anmelden",
       "noCompany": "Keine Firma"
     },
-    "badges": {
-      "trial": "Test",
-      "active": "Aktiv",
-      "expired": "Abgelaufen",
-      "anon": "Anon",
-      "noCompany": "Keine Firma"
-    },
-    "daysLeft": "Noch {{days}} Tage",
-    "currency": {
-      "aria": "Zahlungswährung wählen"
-    },
+    "badges": { "trial": "Test", "active": "Aktiv", "expired": "Abgelaufen", "anon": "Anon", "noCompany": "Keine Firma" },
+    "daysLeft": "{{days}} Tage übrig",
+    "currency": { "aria": "Zahlungswährung wählen" },
     "cta": {
       "buyAndroid": "1 Monat kaufen (Google Play)",
       "buyWebEur": "1 Monat kaufen (EUR · Karte)",
       "buyWebPln": "Zapłać 1 miesiąc (PLN · karta/BLIK)"
     },
-    "hint": {
-      "onlyAdmin": "Verlängerung ist nur für den Firmen-Administrator verfügbar"
-    }
+    "hint": { "onlyAdmin": "Verlängerung nur für Firmen-Admin verfügbar" }
   },
-  "excel": {
-    "button": "Excel herunterladen",
-    "success": "Excel-Datei wurde erfolgreich heruntergeladen.",
-    "error": "Fehler beim Herunterladen der Datei. Bitte später erneut versuchen."
-  },
+  "excel": { "button": "Excel herunterladen", "success": "Excel wurde heruntergeladen.", "error": "Datei konnte nicht geladen werden." },
   "about": {
     "title": "Über FLOWQR",
     "what": {
       "title": "Was ist FLOWQR?",
-      "text": "FLOWQR ist eine moderne Lagerverwaltungsanwendung, die Ihnen hilft, Ihr Inventar mit QR-Codes zu organisieren, zu steuern und zu verfolgen. Das System ist sowohl als Webanwendung als auch als mobile App verfügbar."
+      "text": "FLOWQR ist eine moderne Lagerverwaltung mit QR-Codes, verfügbar als Web- und Mobile-App."
     },
     "features": {
       "title": "Hauptfunktionen",
-      "inventory": { "label": "Inventar:", "desc": "Alle im Lager gespeicherten Artikel anzeigen und verwalten." },
-      "createItem": { "label": "Artikel erstellen:", "desc": "Neue Produkte mit Details hinzufügen und automatisch QR-Codes generieren." },
-      "reserved": { "label": "Reservierte Artikel:", "desc": "Reservierungen verwalten und reservierte Mengen verfolgen." },
-      "createReservation": { "label": "Reservierung erstellen:", "desc": "Produkte für Bestellungen mit bestimmten Wochen und Auftragsnummern reservieren." },
-      "sold": { "label": "Verkaufte Artikel:", "desc": "Anzeigen von verkauften und abgeschlossenen Artikeln." },
-      "qr": { "label": "QR-Codes:", "desc": "Lager- oder Reservierungs-QR-Codes generieren und scannen." },
-      "account": { "label": "Persönliches Konto:", "desc": "Verwalten Sie Ihr Abonnement, Ihre Testphase und Ihre Kontoinformationen." }
+      "inventory": { "label": "Bestand:", "desc": "Alle Lagerartikel anzeigen und verwalten." },
+      "createItem": { "label": "Artikel erstellen:", "desc": "Produkte hinzufügen und QR automatisch generieren." },
+      "reserved": { "label": "Reserviert:", "desc": "Reservierungen und Mengen verwalten." },
+      "createReservation": { "label": "Reservierung erstellen:", "desc": "Für Wochen und Auftragsnummern reservieren." },
+      "sold": { "label": "Verkauft:", "desc": "Abgeschlossene Verkäufe ansehen." },
+      "qr": { "label": "QR-Codes:", "desc": "Lager- und Reservierungs-QRs generieren und scannen." },
+      "account": { "label": "Konto:", "desc": "Abo, Testphase und Kontodaten verwalten." }
     },
     "subscription": {
-      "title": "Abonnement & Testphase",
-      "text": "Jeder neue Benutzer beginnt mit einer Testphase. Nach Ablauf der Testphase können Sie ein Abonnement abschließen, um FLOWQR uneingeschränkt weiter zu nutzen."
+      "title": "Abo & Testphase",
+      "text": "Neue Nutzer starten mit einer Testphase. Danach kann ein Abo ohne Einschränkungen abgeschlossen werden."
     },
     "why": {
       "title": "Warum FLOWQR?",
-      "text": "Durch die Kombination von Lagerverwaltung und QR-Code-Technologie macht FLOWQR die Bestandsverfolgung schneller, zuverlässiger und benutzerfreundlicher. Egal ob kleines Unternehmen oder großes Lager – FLOWQR passt sich Ihren Bedürfnissen an."
+      "text": "QR-Codes machen Bestandsführung schneller und zuverlässiger – für kleine und große Lager."
     },
-    "contact": {
-      "title": "Kontakt",
-      "text": "Bei Fragen oder Support kontaktieren Sie bitte:"
-    }
-  },
-  "common": {
-    "lang": {
-      "ariaSwitcher": "Sprachauswahl",
-      "change": "Sprache ändern"
-    }
+    "contact": { "title": "Kontakt", "text": "Fragen oder Support:" }
   }
 }

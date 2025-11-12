@@ -8,11 +8,16 @@
     "trialWarn": "Your trial ends in {{days}} day(s).",
     "activeWarn": "Your access period ends in {{days}} day(s)."
   },
-
   "common": {
     "loading": "Loading...",
     "create": "Create",
-    "adding": "Adding…"
+    "adding": "Adding…",
+    "remove": "Remove",
+    "saving": "Saving…",
+    "lang": {
+      "ariaSwitcher": "Language switcher",
+      "change": "Change language"
+    }
   },
   "account": {
     "title": "Personal account",
@@ -39,8 +44,7 @@
       "create": {
         "title": "Create User",
         "success": "User created",
-        "fail": "Failed to create user",
-        "create": "Create"
+        "fail": "Failed to create user"
       },
       "form": {
         "usernamePlaceholder": "User",
@@ -48,10 +52,6 @@
         "passwordPlaceholder": "Password"
       }
     }
-  },
-
-  "common": {
-    "remove": "Remove"
   },
   "addItemForm": {
     "title": "Add new item",
@@ -77,7 +77,6 @@
     },
     "submit": "Add Item"
   },
-  "common": { "loading": "Loading..." },
   "appContent": {
     "errors": {
       "loadProducts": "Error loading products.",
@@ -153,7 +152,6 @@
       "subtitle": "{{count}} generated"
     }
   },
-  "common": { "loading": "Loading..." },
   "fileViewer": {
     "toolbar": {
       "searchPlaceholder": "Search by name...",
@@ -188,11 +186,6 @@
     "print": {
       "title": "Selected: {{ids}}"
     }
-  },
-  "common": {
-    "remove": "Remove",
-    "loading": "Loading...",
-    "saving": "Saving…"
   },
   "itemList": {
     "title": "Stock",
@@ -233,7 +226,6 @@
       "priceNonNegative": "Price must be a non-negative number"
     }
   },
-  "common": { "loading": "Loading..." },
   "itemsPage": {
     "errors": { "loadItems": "Failed to load items" }
   },
@@ -417,12 +409,6 @@
     "contact": {
       "title": "Contact",
       "text": "For questions or support, please contact:"
-    }
-  },
-  "common": {
-    "lang": {
-      "ariaSwitcher": "Language switcher",
-      "change": "Change language"
     }
   }
 }
