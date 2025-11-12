@@ -246,9 +246,9 @@ const AppContent: React.FC<AppContentProps> = ({ onLogout }) => {
             <aside className={`sidebar ${isMenuOpen ? 'open' : ''}`}>
                 <img src={logo} alt="FLOWQR" className="sidebar-logo" />
                 {/* (опционально) дублируем свитчер в сайдбаре для мобилы */}
-                <div style={{ margin: '10px 0 16px' }}>
-                    <LanguageSwitcher />
-                </div>
+                {/*<div style={{ margin: '10px 0 16px' }}>*/}
+                {/*    <LanguageSwitcher />*/}
+                {/*</div>*/}
 
                 <ul className="sidebar-menu">
                     <li className={`menu-item ${activeMenu === 'inventory' ? 'active' : ''}`} onClick={() => goInternal('inventory')}>
