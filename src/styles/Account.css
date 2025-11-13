@@ -168,7 +168,7 @@ img, canvas, svg, video { max-width: 100%; height: auto; }
     cursor: pointer;
     touch-action: manipulation;
 }
-.invite-btn__icon { font-size: 1.1rem; }
+.invite-btn__icon { font-size: 1.4rem; }
 .invite-btn:disabled { opacity: .65; cursor: not-allowed; }
 
 /* ─── Danger Zone ─────────────────────────────────────────── */
