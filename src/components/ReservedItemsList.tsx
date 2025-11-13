@@ -25,6 +25,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
     const { t } = useTranslation();
     const [showScanner, setShowScanner] = useState(false);
     const [query, setQuery] = useState('');
+    const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null); // id для модалки
 
     const filtered = useMemo(() => {
         const q = String(query ?? '').trim().toLowerCase();
@@ -41,8 +42,10 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
     }, [reservedItems, query]);
 
     // ---- удаление резервации (устойчивое к 204/текстовым ответам)
-    const handleDelete = async (id: string) => {
-        if (!confirm(t('reservedList.confirm.delete'))) return;
+    const handleDeleteConfirmed = async () => {
+        if (!pendingDeleteId) return;
+        const id = pendingDeleteId;
+        setPendingDeleteId(null);
 
         try {
             const res = await fetch(`/api/reservations/${id}`, { method: 'DELETE' });
@@ -88,8 +91,11 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                     aria-label={t('reservedList.search.aria')}
                 />
                 <span className="reserved-search-count">
-          {t('reservedList.search.count', { filtered: filtered.length, total: reservedItems.length })}
-        </span>
+                    {t('reservedList.search.count', {
+                        filtered: filtered.length,
+                        total: reservedItems.length,
+                    })}
+                </span>
             </div>
 
             {filtered.length === 0 ? (
@@ -101,14 +107,22 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                             <div className="reserved-item-details">
                                 <span className="reserved-name">{item.name}</span>
                                 <span className="reserved-info">
-                  {t('reservedList.labels.order')} <b>{item.orderNumber}</b> | {t('reservedList.labels.week')} {item.week} | {t('reservedList.labels.amount')} {item.quantity}
-                </span>
+                                    {t('reservedList.labels.order')} <b>{item.orderNumber}</b> |{' '}
+                                    {t('reservedList.labels.week')} {item.week} |{' '}
+                                    {t('reservedList.labels.amount')} {item.quantity}
+                                </span>
                             </div>
                             <div className="reserved-item-actions">
-                                <button onClick={() => setShowScanner(true)} className="reserved-btn scan">
+                                <button
+                                    onClick={() => setShowScanner(true)}
+                                    className="reserved-btn scan"
+                                >
                                     {t('reservedList.actions.completeViaQR')}
                                 </button>
-                                <button onClick={() => handleDelete(item.id)} className="reserved-btn delete">
+                                <button
+                                    onClick={() => setPendingDeleteId(item.id)}
+                                    className="reserved-btn delete"
+                                >
                                     {t('reservedList.actions.remove')}
                                 </button>
                             </div>
@@ -117,6 +131,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                 </ul>
             )}
 
+            {/* Модалка сканера QR */}
             {showScanner &&
                 createPortal(
                     <div
@@ -135,14 +150,18 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                                 ×
                             </button>
 
-                            <div className="ri-modal__title">{t('reservedList.modal.title')}</div>
+                            <div className="ri-modal__title">
+                                {t('reservedList.modal.title')}
+                            </div>
 
                             <div className="ri-modal__viewport">
                                 <QRScanner
                                     onScan={(orderNumber) => {
                                         setShowScanner(false);
                                         onScan(orderNumber);
-                                        toast.success(t('reservedList.toasts.completedViaQR'));
+                                        toast.success(
+                                            t('reservedList.toasts.completedViaQR')
+                                        );
                                     }}
                                     onClose={() => setShowScanner(false)}
                                 />
@@ -155,6 +174,51 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                                     onClick={() => setShowScanner(false)}
                                 >
                                     {t('reservedList.modal.close')}
+                                </button>
+                            </div>
+                        </div>
+                    </div>,
+                    document.body
+                )}
+
+            {/* Красивая модалка подтверждения удаления резервации */}
+            {pendingDeleteId &&
+                createPortal(
+                    <div
+                        className="reserved-confirm-overlay"
+                        role="dialog"
+                        aria-modal="true"
+                        onClick={() => setPendingDeleteId(null)}
+                    >
+                        <div
+                            className="reserved-confirm"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="reserved-confirm__icon">!</div>
+                            <h2 className="reserved-confirm__title">
+                                {t('reservedList.confirm.title', 'Delete reservation?')}
+                            </h2>
+                            <p className="reserved-confirm__text">
+                                {t(
+                                    'reservedList.confirm.delete',
+                                    'Do you really want to delete this reservation?'
+                                )}
+                            </p>
+
+                            <div className="reserved-confirm__actions">
+                                <button
+                                    type="button"
+                                    className="reserved-confirm__btn reserved-confirm__btn--secondary"
+                                    onClick={() => setPendingDeleteId(null)}
+                                >
+                                    {t('itemList.actions.cancel')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="reserved-confirm__btn reserved-confirm__btn--danger"
+                                    onClick={handleDeleteConfirmed}
+                                >
+                                    {t('reservedList.actions.remove')}
                                 </button>
                             </div>
                         </div>

@@ -4,7 +4,6 @@
     display: block;
     width: 100%;
     max-width: 100%;
-    /* На всякий случай ограничим физической шириной экрана */
     max-width: 100vw;
     background: #fff;
     border-radius: 16px;
@@ -12,8 +11,8 @@
     padding: 20px 24px;
     margin-bottom: 150px;
     box-sizing: border-box;
-    overflow-x: hidden;   /* стоп горизонтального скролла */
-    contain: layout paint;/* изолируем влияние внутренних переполнений */
+    overflow-x: hidden;
+    contain: layout paint;
 }
 
 .reserved-title {
@@ -124,7 +123,7 @@
     background: #fecaca;
 }
 
-/* ==== Модалка ==== */
+/* ==== Модалка сканера ==== */
 .ri-modal-overlay {
     position: fixed;
     inset: 0;
@@ -184,11 +183,94 @@
     background: #e2e8f0;
 }
 
-/* Анимация появления */
+/* Анимация появления списка */
 .fade-in {
     animation: fadeIn 0.3s ease;
 }
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(4px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==== Красивая модалка подтверждения удаления ==== */
+
+.reserved-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2200;
+}
+
+.reserved-confirm {
+    width: 90%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 24px 48px rgba(15,23,42,0.25);
+    padding: 20px 22px;
+    text-align: left;
+    position: relative;
+}
+
+.reserved-confirm__icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: #fee2e2;
+    color: #b91c1c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.reserved-confirm__title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: #111827;
+}
+
+.reserved-confirm__text {
+    margin: 0 0 18px;
+    font-size: 0.95rem;
+    color: #4b5563;
+}
+
+.reserved-confirm__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.reserved-confirm__btn {
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.reserved-confirm__btn--secondary {
+    background: #e5e7eb;
+    color: #111827;
+}
+.reserved-confirm__btn--secondary:hover {
+    background: #d1d5db;
+}
+
+.reserved-confirm__btn--danger {
+    background: #dc2626;
+    color: #fff;
+}
+.reserved-confirm__btn--danger:hover {
+    background: #b91c1c;
 }
