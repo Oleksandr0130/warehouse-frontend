@@ -1,5 +1,6 @@
 // src/components/Account.tsx
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
     fetchMe,
     adminCreateUser,
@@ -37,6 +38,13 @@ const Account: React.FC = () => {
     });
     const [newUserRole, setNewUserRole] = useState<'USER' | 'ADMIN'>('USER');
 
+    // Delete-account modal
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deleteConfirmValue, setDeleteConfirmValue] = useState('');
+
+    // слово, которое нужно ввести (можно перевести в i18n)
+    const confirmWord = t('account.delete.confirmWord', 'DELETE');
+
     // effects
     useEffect(() => {
         (async () => {
@@ -66,9 +74,8 @@ const Account: React.FC = () => {
         }
     };
 
-    // account deletion
+    // реальное удаление аккаунта (без window.confirm)
     const handleDeleteAccount = async () => {
-        if (!window.confirm(t('account.delete.confirm'))) return;
         try {
             await deleteAccount();
             toast.success(t('account.delete.success'));
@@ -76,6 +83,25 @@ const Account: React.FC = () => {
         } catch {
             toast.error(t('account.delete.fail'));
         }
+    };
+
+    // submit формы внутри модалки
+    const handleDeleteSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (deleteConfirmValue.trim().toUpperCase() !== confirmWord.toUpperCase()) {
+            toast.error(
+                t(
+                    'account.delete.confirmWordError',
+                    `Type "${confirmWord}" to confirm.`
+                )
+            );
+            return;
+        }
+
+        await handleDeleteAccount();
+        setIsDeleteModalOpen(false);
+        setDeleteConfirmValue('');
     };
 
     // invite form
@@ -241,7 +267,10 @@ const Account: React.FC = () => {
                                                             'account.team.aria.delete',
                                                             'Remove member'
                                                         )}
-                                                        title={t('account.team.aria.delete', 'Remove member')}
+                                                        title={t(
+                                                            'account.team.aria.delete',
+                                                            'Remove member'
+                                                        )}
                                                     >
                                                         🗑️
                                                     </button>
@@ -364,8 +393,11 @@ const Account: React.FC = () => {
                             </div>
                             <button
                                 className="danger-btn"
-                                onClick={handleDeleteAccount}
                                 type="button"
+                                onClick={() => {
+                                    setIsDeleteModalOpen(true);
+                                    setDeleteConfirmValue('');
+                                }}
                             >
                                 {t('account.delete.button')}
                             </button>
@@ -373,6 +405,77 @@ const Account: React.FC = () => {
                     </section>
                 </>
             )}
+
+            {/* Модалка удаления аккаунта */}
+            {isDeleteModalOpen &&
+                createPortal(
+                    <div
+                        className="acc-modal-overlay"
+                        role="dialog"
+                        aria-modal="true"
+                        onClick={() => setIsDeleteModalOpen(false)}
+                    >
+                        <div
+                            className="acc-modal"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="acc-modal-header">
+                                <div className="acc-modal-icon">⚠️</div>
+                                <div>
+                                    <h3 className="acc-modal-title">
+                                        {t(
+                                            'account.delete.modalTitle',
+                                            t('account.delete.title', 'Delete Account')
+                                        )}
+                                    </h3>
+                                    <p className="acc-modal-text">
+                                        {t(
+                                            'account.delete.modalDescription',
+                                            t(
+                                                'account.delete.confirm',
+                                                'Are you sure you want to delete your account? This action cannot be undone.'
+                                            )
+                                        )}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <form onSubmit={handleDeleteSubmit}>
+                                <p className="acc-modal-hint">
+                                    {t(
+                                        'account.delete.modalHint',
+                                        'Type {{word}} to confirm',
+                                        { word: confirmWord }
+                                    )}
+                                </p>
+                                <input
+                                    className="acc-modal-input"
+                                    value={deleteConfirmValue}
+                                    onChange={(e) => setDeleteConfirmValue(e.target.value)}
+                                    placeholder={confirmWord}
+                                    autoFocus
+                                />
+
+                                <div className="acc-modal-actions">
+                                    <button
+                                        type="button"
+                                        className="acc-modal-btn acc-modal-btn--secondary"
+                                        onClick={() => setIsDeleteModalOpen(false)}
+                                    >
+                                        {t('common.cancel', 'Cancel')}
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="acc-modal-btn acc-modal-btn--danger"
+                                    >
+                                        {t('account.delete.button')}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>,
+                    document.body
+                )}
         </div>
     );
 };

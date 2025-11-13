@@ -8,11 +8,9 @@ img, canvas, svg, video { max-width: 100%; height: auto; }
 .account-page {
     padding: 24px;
     background: #f9fafb;
-    height: auto;             /* <- вместо min-height:100vh */
-    min-height: 0;            /* важно для скролла внутри app-main */
+    height: auto;
+    min-height: 0;
     overflow: visible;
-    /*max-width: 980px;         !* контент не распирает экран *!*/
-    /*margin: 0 auto;*/
     padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 24px);
 }
 
@@ -38,8 +36,8 @@ img, canvas, svg, video { max-width: 100%; height: auto; }
     align-items: center;
     padding: 8px 0;
     border-bottom: 1px solid #f1f5f9;
-    gap: 8px;                 /* фолбэк для узких экранов */
-    flex-wrap: wrap;          /* перенос, если не влазит */
+    gap: 8px;
+    flex-wrap: wrap;
 }
 .row:last-child { border-bottom: none; }
 .row span { color: #64748b; font-size: .95rem; }
@@ -54,8 +52,10 @@ img, canvas, svg, video { max-width: 100%; height: auto; }
 .team-section-title { font-weight: 600; margin: 8px 0 10px; }
 
 .team-list {
-    display: block;           /* вместо gap -> стабильность на старых WebView */
-    margin: 0; padding: 0; list-style: none;
+    display: block;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 .team-list > li { margin: 0; }
 .team-list > li + li { margin-top: 12px; }
@@ -68,16 +68,22 @@ img, canvas, svg, video { max-width: 100%; height: auto; }
     border: 1px solid #eef2f7;
     border-radius: 14px;
     padding: 12px 14px;
-    flex-wrap: wrap;          /* чтобы элементы переносились, а не вылезали */
+    flex-wrap: wrap;
     gap: 10px;
 }
 
 .team-left { display: flex; align-items: center; flex: 1 1 240px; min-width: 0; }
 .team-left > * + * { margin-left: 12px; }
 .avatar {
-    width: 36px; height: 36px; border-radius: 999px;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
     background: linear-gradient(180deg, #7c3aed, #6366f1);
-    color: #fff; font-weight: 700; display: grid; place-items: center; flex: 0 0 36px;
+    color: #fff;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    flex: 0 0 36px;
 }
 .who-name { font-weight: 600; }
 .who-email { color: #64748b; font-size: .92rem; overflow-wrap: anywhere; }
@@ -94,7 +100,8 @@ img, canvas, svg, video { max-width: 100%; height: auto; }
     background: #fff;
     font-weight: 600;
     font-size: .95rem;
-    -webkit-appearance: none; appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
     max-width: 100%;
 }
 .role-admin { color: #1e40af; border-color: #bfdbfe; background: #eff6ff; }
@@ -102,33 +109,50 @@ img, canvas, svg, video { max-width: 100%; height: auto; }
 
 /* small icon button */
 .icon-btn {
-    width: 38px; height: 38px; border-radius: 10px;
-    border: 1px solid #e5e7eb; background: #fff; cursor: pointer;
-    display: inline-flex; align-items: center; justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex: 0 0 38px;
 }
 .icon-btn.danger:hover { background: #fff1f2; border-color: #fecdd3; }
 
 /* empty / skeleton */
 .team-empty {
-    color: #64748b; background: #f8fafc; border: 1px dashed #e2e8f0;
-    border-radius: 12px; padding: 18px; text-align: center;
+    color: #64748b;
+    background: #f8fafc;
+    border: 1px dashed #e2e8f0;
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
 }
 .team-skeleton {
-    height: 64px; border-radius: 12px;
+    height: 64px;
+    border-radius: 12px;
     background: linear-gradient(90deg,#f3f4f6, #eceff4, #f3f4f6);
-    background-size: 200% 100%; animation: shimmer 1.2s infinite;
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
 }
-@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
 
-/* Invite form grid – без ломкого gap на старых WebView */
+/* Invite form grid */
 .invite-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 14px 16px;
     margin-top: 8px;
 }
-@media (max-width: 820px) { .invite-grid { grid-template-columns: 1fr; } }
+@media (max-width: 820px) {
+    .invite-grid { grid-template-columns: 1fr; }
+}
 
 .field { display: flex; flex-direction: column; }
 .field + .field { margin-top: 6px; }
@@ -141,7 +165,8 @@ img, canvas, svg, video { max-width: 100%; height: auto; }
     background: #fff;
     font-size: 15px;
     transition: border-color .2s, box-shadow .2s;
-    -webkit-appearance: none; appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
     width: 100%;
     min-width: 0;
 }
@@ -154,7 +179,6 @@ img, canvas, svg, video { max-width: 100%; height: auto; }
 
 .invite-submit { grid-column: 1 / -1; }
 .invite-btn {
-    /*width: 100%;*/
     height: 48px;
     border: none;
     border-radius: 12px;
@@ -193,11 +217,16 @@ img, canvas, svg, video { max-width: 100%; height: auto; }
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    flex-wrap: wrap;          /* перенос на маленьких экранах */
+    flex-wrap: wrap;
 }
 
 .danger-info-title { font-weight: 700; }
-.danger-info-sub { color: #475569; font-size: .95rem; margin-top: 4px; overflow-wrap: anywhere; }
+.danger-info-sub {
+    color: #475569;
+    font-size: .95rem;
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+}
 
 .danger-btn {
     height: 44px;
@@ -213,3 +242,112 @@ img, canvas, svg, video { max-width: 100%; height: auto; }
     touch-action: manipulation;
 }
 .danger-btn:hover { background: #b91c1c; }
+
+/* ─── Modal delete account ────────────────────────────────── */
+
+.acc-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.acc-modal {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(15,23,42,0.25);
+    padding: 24px 24px 20px;
+    max-width: 480px;
+    width: 100%;
+    margin: 0 16px;
+}
+
+.acc-modal-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.acc-modal-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: #fee2e2;
+    color: #b91c1c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.acc-modal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.acc-modal-text {
+    margin: 0;
+    font-size: .95rem;
+    color: #475569;
+}
+
+.acc-modal-hint {
+    font-size: .9rem;
+    color: #64748b;
+    margin: 0 0 6px;
+}
+
+.acc-modal-input {
+    width: 100%;
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    padding: 0 12px;
+    font-size: 15px;
+    margin-bottom: 16px;
+}
+.acc-modal-input:focus {
+    border-color: #fb7185;
+    box-shadow: 0 0 0 3px rgba(248,113,113,0.25);
+    outline: none;
+}
+
+.acc-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.acc-modal-btn {
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: .95rem;
+}
+
+.acc-modal-btn--secondary {
+    background: #f9fafb;
+    border-color: #e5e7eb;
+    color: #111827;
+}
+
+.acc-modal-btn--danger {
+    background: #dc2626;
+    color: #fff;
+}
+
+.acc-modal-btn--danger:hover { background: #b91c1c; }
+
+@media (max-width: 480px) {
+    .acc-modal {
+        padding: 20px 16px 16px;
+    }
+}
