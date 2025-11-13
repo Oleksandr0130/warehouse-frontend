@@ -153,11 +153,11 @@ const ItemList: React.FC<ItemListProps> = ({ items, onDelete, onUpdate }) => {
                                 className={`item-list-item fade-in ${item.quantity <= 0 ? 'item-low-stock' : 'item-green-stock'}`}
                             >
                                 <button className="row" onClick={() => toggle(item.id)} aria-expanded={isOpen}>
-                                    <div className="avatar">
+                                    <div className="item-avatar">
                                         {avatar ? (
                                             <img src={avatar} alt={t('itemList.alt.cover', { name: item.name })} />
                                         ) : (
-                                            <div className="avatar-placeholder" />
+                                            <div className="item-avatar_ph" />
                                         )}
                                     </div>
 
