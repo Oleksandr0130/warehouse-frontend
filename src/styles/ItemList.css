@@ -130,16 +130,16 @@
     cursor: pointer;
 }
 
-.avatar, .avatar-placeholder {
-    width: 200px;
-    height: 200px;
+.item-avatar, .item-avatar_ph {
+    width: 100px;
+    height: 100px;
     border-radius: 4px;
     overflow: hidden;
     background: #f1f5f9;
     border: 1px solid #e2e8f0;
 }
-.avatar img { width: 100px; height: 100px; object-fit: cover; }
-.avatar-placeholder { display: block; }
+.item-avatar img { width: 100px; height: 100px; object-fit: cover; }
+.item-avatar_ph { display: block; }
 
 .item-price { font-size: 0.9rem; color: #0f172a; }
 
@@ -220,7 +220,7 @@
     .item-name { white-space: normal; text-overflow: unset; }
 
     .row { grid-template-columns: 52px 1fr 18px; gap: 10px; min-height: 52px; }
-    .avatar, .avatar-placeholder { width: 52px; height: 52px; }
+    .item-avatar, .item-avatar_ph { width: 52px; height: 52px; }
 
     /* пара полей "цена/валюта" в редакторе — В СТОЛБИК */
     .row2 { grid-template-columns: 1fr; gap: 10px; }
@@ -233,5 +233,5 @@
 @media (max-width: 360px) {
     .item-list { padding: 12px; }
     .row { grid-template-columns: 48px 1fr 18px; gap: 8px; min-height: 48px; }
-    .avatar, .avatar-placeholder { width: 48px; height: 48px; }
+    .item-avatar, .item-avatar_ph { width: 48px; height: 48px; }
 }
