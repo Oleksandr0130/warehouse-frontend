@@ -42,7 +42,10 @@ const Account: React.FC = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [deleteConfirmValue, setDeleteConfirmValue] = useState('');
 
-    // слово, которое нужно ввести (можно перевести в i18n)
+    // Delete team-member modal
+    const [memberToDelete, setMemberToDelete] = useState<TeamUser | null>(null);
+
+    // слово, которое нужно ввести (можно локализовать)
     const confirmWord = t('account.delete.confirmWord', 'DELETE');
 
     // effects
@@ -74,7 +77,7 @@ const Account: React.FC = () => {
         }
     };
 
-    // реальное удаление аккаунта (без window.confirm)
+    // реальное удаление аккаунта
     const handleDeleteAccount = async () => {
         try {
             await deleteAccount();
@@ -85,7 +88,7 @@ const Account: React.FC = () => {
         }
     };
 
-    // submit формы внутри модалки
+    // submit формы внутри модалки удаления аккаунта
     const handleDeleteSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -116,6 +119,7 @@ const Account: React.FC = () => {
         try {
             await adminCreateUser(newUser);
 
+            // если выбрали роль ADMIN – после создания юзера можно дернуть обновление роли
             if (newUserRole === 'ADMIN') {
                 const refreshed = await fetchTeam();
                 const created = refreshed.find(
@@ -137,27 +141,31 @@ const Account: React.FC = () => {
         }
     };
 
-    // team actions
+    // смена роли: отправляем на бэк и потом подгружаем команду заново
     const handleRoleChange = async (id: number, role: 'USER' | 'ADMIN') => {
         try {
             await updateUserRole(id, role);
-            setTeam((prev) =>
-                prev.map((u) => (u.id === id ? { ...u, admin: role === 'ADMIN' } : u))
-            );
             toast.success(t('account.team.success.role', 'Role updated'));
+
+            // Важно: перезагрузить данные с бэка,
+            // чтобы роль была именно та, что реально сохранена
+            await loadTeam();
         } catch {
             toast.error(t('account.team.errors.role', 'Failed to update role'));
         }
     };
 
-    const handleRemoveUser = async (id: number) => {
-        if (!confirm(t('account.team.confirm.delete', 'Remove this member?'))) return;
+    // фактическое удаление участника команды (без window.confirm)
+    const doRemoveMember = async () => {
+        if (!memberToDelete) return;
         try {
-            await deleteUserAdmin(id);
-            setTeam((prev) => prev.filter((u) => u.id !== id));
+            await deleteUserAdmin(memberToDelete.id);
+            setTeam((prev) => prev.filter((u) => u.id !== memberToDelete.id));
             toast.success(t('account.team.success.delete', 'Member removed'));
         } catch {
             toast.error(t('account.team.errors.delete', 'Failed to remove member'));
+        } finally {
+            setMemberToDelete(null);
         }
     };
 
@@ -262,7 +270,7 @@ const Account: React.FC = () => {
 
                                                     <button
                                                         className="icon-btn danger"
-                                                        onClick={() => handleRemoveUser(u.id)}
+                                                        onClick={() => setMemberToDelete(u)}
                                                         aria-label={t(
                                                             'account.team.aria.delete',
                                                             'Remove member'
@@ -472,6 +480,56 @@ const Account: React.FC = () => {
                                     </button>
                                 </div>
                             </form>
+                        </div>
+                    </div>,
+                    document.body
+                )}
+
+            {/* Модалка удаления пользователя команды */}
+            {memberToDelete &&
+                createPortal(
+                    <div
+                        className="acc-modal-overlay"
+                        role="dialog"
+                        aria-modal="true"
+                        onClick={() => setMemberToDelete(null)}
+                    >
+                        <div
+                            className="acc-modal"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="acc-modal-header">
+                                <div className="acc-modal-icon">⚠️</div>
+                                <div>
+                                    <h3 className="acc-modal-title">
+                                        {t('account.team.modalDeleteTitle', 'Remove member')}
+                                    </h3>
+                                    <p className="acc-modal-text">
+                                        {t(
+                                            'account.team.confirm.delete',
+                                            'Remove this member?'
+                                        )}{' '}
+                                        <b>{memberToDelete.username || memberToDelete.email}</b>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="acc-modal-actions">
+                                <button
+                                    type="button"
+                                    className="acc-modal-btn acc-modal-btn--secondary"
+                                    onClick={() => setMemberToDelete(null)}
+                                >
+                                    {t('common.cancel', 'Cancel')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="acc-modal-btn acc-modal-btn--danger"
+                                    onClick={doRemoveMember}
+                                >
+                                    {t('account.team.modalDeleteCta', 'Remove')}
+                                </button>
+                            </div>
                         </div>
                     </div>,
                     document.body
