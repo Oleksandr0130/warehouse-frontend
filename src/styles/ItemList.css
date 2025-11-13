@@ -131,9 +131,9 @@
 }
 
 .avatar, .avatar-placeholder {
-    width: 100px;
-    height: 100px;
-    border-radius: 10px;
+    width: 200px;
+    height: 200px;
+    border-radius: 4px;
     overflow: hidden;
     background: #f1f5f9;
     border: 1px solid #e2e8f0;
