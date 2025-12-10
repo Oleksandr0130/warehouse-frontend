@@ -100,7 +100,10 @@
       "images": { "label": "Images (up to {{max}})" }
     },
     "images": {
-      "setCover": "Set as cover"
+      "setCover": "Set as cover",
+      "button": "Choose files",
+      "noneSelected": "No files selected",
+      "selectedCount": "{{count}} files selected"
     },
     "submit": "Add Item"
   },

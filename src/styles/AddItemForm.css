@@ -125,3 +125,50 @@
 @media (max-width: 480px) {
     .add-item-title { font-size: 1.15rem; }
 }
+/* NEW: строка с кнопкой и подписью */
+.file-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+/* NEW: скрытый системный input[type=file] */
+.file-input-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    border: 0;
+    clip: rect(0 0 0 0);
+}
+
+/* NEW: наша синяя кнопка выбора файлов */
+.file-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: #2563eb;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.file-btn:hover {
+    filter: brightness(0.95);
+}
+
+/* NEW: текст справа — имя файла / "Нет файлов" */
+.file-text {
+    font-size: 0.9rem;
+    color: #64748b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

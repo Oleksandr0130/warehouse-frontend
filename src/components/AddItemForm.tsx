@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Item } from '../types/Item';
 import '../styles/AddItemForm.css';
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useTranslation } from 'react-i18next';
 
@@ -17,10 +17,12 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
     const [id, setId] = useState('');
     const [name, setName] = useState('');
     const [quantity, setQuantity] = useState('');
-    const [description, setDescription] = useState('');     // NEW
-    const [price, setPrice] = useState('');                 // NEW
-    const [currency, setCurrency] = useState<'EUR' | 'USD' | 'PLN' | 'UAH' | 'GBP'>('EUR'); // NEW
-    const [images, setImages] = useState<string[]>([]);     // NEW base64
+    const [description, setDescription] = useState(''); // NEW field
+    const [price, setPrice] = useState('');             // NEW field
+    const [currency, setCurrency] = useState<'EUR' | 'USD' | 'PLN' | 'UAH' | 'GBP'>('EUR');
+    const [images, setImages] = useState<string[]>([]); // base64 картинок
+    const [filesLabel, setFilesLabel] = useState<string>(''); // NEW: подпись справа от кнопки
+
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const handleFiles = async (files: FileList | null) => {
@@ -54,7 +56,7 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
             if (idx === 0) return prev;
             const next = [...prev];
             const [picked] = next.splice(idx, 1);
-            next.unshift(picked); // first — cover
+            next.unshift(picked); // первая — обложка
             return next;
         });
     };
@@ -63,15 +65,23 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
         e.preventDefault();
         const quantityNum = parseInt(quantity, 10);
 
-        if (!id.trim()) { toast.error(t('addItemForm.validation.idEmpty')); return; }
-        if (!name.trim()) { toast.error(t('addItemForm.validation.nameEmpty')); return; }
+        if (!id.trim()) {
+            toast.error(t('addItemForm.validation.idEmpty'));
+            return;
+        }
+        if (!name.trim()) {
+            toast.error(t('addItemForm.validation.nameEmpty'));
+            return;
+        }
         if (isNaN(quantityNum) || quantityNum <= 0) {
-            toast.error(t('addItemForm.validation.quantityPositive')); return;
+            toast.error(t('addItemForm.validation.quantityPositive'));
+            return;
         }
 
         const priceNum = price.trim() ? Number(price) : undefined;
         if (price.trim() && (isNaN(Number(price)) || Number(price) < 0)) {
-            toast.error(t('addItemForm.validation.priceNonNegative')); return;
+            toast.error(t('addItemForm.validation.priceNonNegative'));
+            return;
         }
 
         const item: Item = {
@@ -88,9 +98,19 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
         onAdd(item);
 
         // reset
-        setId(''); setName(''); setQuantity('');
-        setDescription(''); setPrice(''); setCurrency('EUR'); setImages([]);
-        if (fileInputRef.current) fileInputRef.current.value = '';
+        setId('');
+        setName('');
+        setQuantity('');
+        setDescription('');
+        setPrice('');
+        setCurrency('EUR');
+        setImages([]);
+        setFilesLabel(''); // NEW: сбрасываем подпись
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+
         toast.success(t('addItemForm.success.added'));
     };
 
@@ -157,7 +177,6 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
                         onChange={(e) => setCurrency(e.target.value as any)}
                         disabled={!price.trim()}
                     >
-                        {/* коды валют как есть */}
                         <option value="EUR">EUR</option>
                         <option value="USD">USD</option>
                         <option value="PLN">PLN</option>
@@ -181,26 +200,74 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
 
             {/* images uploader */}
             <div className="form-group">
-                <label>{t('addItemForm.fields.images.label', { max: MAX_IMAGES })}</label>
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={(e) => handleFiles(e.target.files)}
-                />
+                <label htmlFor="images">
+                    {t('addItemForm.fields.images.label', { max: MAX_IMAGES })}
+                </label>
+
+                {/* NEW: свой контрол вместо системного */}
+                <div className="file-row">
+                    {/* спрятанный нативный input */}
+                    <input
+                        ref={fileInputRef}
+                        id="images"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="file-input-hidden" // NEW
+                        onChange={(e) => {
+                            const files = e.target.files;
+                            void handleFiles(files); // прежняя логика
+
+                            const arr = Array.from(files ?? []);
+
+                            if (arr.length === 0) {
+                                setFilesLabel(t('addItemForm.images.noneSelected'));
+                            } else if (arr.length === 1) {
+                                setFilesLabel(arr[0].name);
+                            } else {
+                                setFilesLabel(
+                                    t('addItemForm.images.selectedCount', {
+                                        count: arr.length
+                                    })
+                                );
+                            }
+                        }}
+                    />
+
+                    {/* кастомная кнопка */}
+                    <label htmlFor="images" className="file-btn">
+                        {t('addItemForm.images.button')}
+                    </label>
+
+                    {/* текст справа от кнопки */}
+                    <span className="file-text">
+                        {filesLabel || t('addItemForm.images.noneSelected')}
+                    </span>
+                </div>
+
                 {images.length > 0 && (
                     <div className="image-previews">
                         {images.map((src, idx) => (
-                            <div key={idx} className={`image-thumb ${idx === 0 ? 'cover' : ''}`}>
+                            <div
+                                key={idx}
+                                className={`image-thumb ${idx === 0 ? 'cover' : ''}`}
+                            >
                                 <img src={src} alt={`img-${idx}`} />
                                 <div className="thumb-actions">
                                     {idx !== 0 && (
-                                        <button type="button" onClick={() => makeCover(idx)} className="btn-mini">
+                                        <button
+                                            type="button"
+                                            onClick={() => makeCover(idx)}
+                                            className="btn-mini"
+                                        >
                                             {t('addItemForm.images.setCover')}
                                         </button>
                                     )}
-                                    <button type="button" onClick={() => removeImage(idx)} className="btn-mini danger">
+                                    <button
+                                        type="button"
+                                        onClick={() => removeImage(idx)}
+                                        className="btn-mini danger"
+                                    >
                                         {t('common.remove')}
                                     </button>
                                 </div>
@@ -210,7 +277,9 @@ function AddItemForm({ onAdd }: AddItemFormProps) {
                 )}
             </div>
 
-            <button type="submit" className="submit-btn">{t('addItemForm.submit')}</button>
+            <button type="submit" className="submit-btn">
+                {t('addItemForm.submit')}
+            </button>
         </form>
     );
 }

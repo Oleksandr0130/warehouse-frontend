@@ -89,6 +89,9 @@
       "images": { "label": "Bilder (bis zu {{max}})" }
     },
     "images": { "setCover": "Als Titelbild setzen" },
+    "button": "Dateien auswählen",
+    "noneSelected": "Keine Dateien ausgewählt",
+    "selectedCount": "{{count}} Dateien ausgewählt",
     "submit": "Artikel hinzufügen"
   },
   "appContent": {
