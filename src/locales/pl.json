@@ -94,10 +94,11 @@
       "description": { "label": "Opis (opcjonalnie)", "placeholder": "Krótki opis produktu…" },
       "images": { "label": "Obrazy (do {{max}})" }
     },
-    "images": { "setCover": "Ustaw jako okładkę" },
-    "button": "Wybierz pliki",
-    "noneSelected": "Nie wybrano plików",
-    "selectedCount": "Wybrano plików: {{count}}",
+    "images": { "setCover": "Ustaw jako okładkę",
+      "button": "Wybierz pliki",
+      "noneSelected": "Nie wybrano plików",
+      "selectedCount": "Wybrano plików: {{count}}"
+    },
     "submit": "Dodaj produkt"
   },
   "appContent": {
