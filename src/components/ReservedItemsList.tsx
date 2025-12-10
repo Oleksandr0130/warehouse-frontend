@@ -140,15 +140,15 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                         aria-modal="true"
                         onClick={() => setShowScanner(false)}
                     >
-                        <div className="ri-modal" onClick={(e) => e.stopPropagation()}>
-                            <button
-                                className="ri-modal__close"
-                                aria-label={t('reservedList.modal.closeAria')}
-                                onClick={() => setShowScanner(false)}
-                                type="button"
-                            >
-                                ×
-                            </button>
+                        {/*<div className="ri-modal" onClick={(e) => e.stopPropagation()}>*/}
+                        {/*    <button*/}
+                        {/*        className="ri-modal__close"*/}
+                        {/*        aria-label={t('reservedList.modal.closeAria')}*/}
+                        {/*        onClick={() => setShowScanner(false)}*/}
+                        {/*        type="button"*/}
+                        {/*    >*/}
+                        {/*        ×*/}
+                        {/*    </button>*/}
 
                             <div className="ri-modal__title">
                                 {t('reservedList.modal.title')}
@@ -176,7 +176,7 @@ const ReservedItemsList: React.FC<ReservedItemsListProps> = ({
                                     {t('reservedList.modal.close')}
                                 </button>
                             </div>
-                        </div>
+                        {/*</div>*/}
                     </div>,
                     document.body
                 )}
