@@ -32,7 +32,6 @@
 }
 
 .form-group input {
-    align-self: flex-start;
     width: auto;
     height: 44px;
     border-radius: 12px;
