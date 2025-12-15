@@ -178,6 +178,31 @@ export const verifyPlayPurchase = async (
     return data;
 };
 
+// ✅ ADDED: billing plans catalog (backend decides what exists and how it maps to Stripe/Play)
+export interface BillingPlanDto {
+    id: string;               // internal plan id in your backend
+    title: string;            // "1 Month", "3 Months", "12 Months"
+    subtitle?: string;        // "Best for trying out", "Save 15%", ...
+    priceText: string;        // "€29", "€74", "€244"
+    oldPriceText?: string;    // optional strike-through
+    badge?: string;           // "Best Value"
+    provider: 'STRIPE' | 'PLAY';
+    externalId?: string;      // for Android bridge (e.g. basePlanId or productId+offer)
+}
+
+// GET /billing/plans
+export const fetchBillingPlans = async (): Promise<BillingPlanDto[]> => {
+    const { data } = await api.get<BillingPlanDto[]>('/billing/plans');
+    return data;
+};
+
+// POST /billing/checkout?planId=...
+export const createCheckoutByPlan = async (planId: string): Promise<CheckoutResponse> => {
+    const { data } = await api.post<CheckoutResponse>(`/billing/checkout?planId=${encodeURIComponent(planId)}`);
+    return data;
+};
+
+
 /* ===================== Профиль / Админ ===================== */
 
 export async function fetchMe(): Promise<MeDto> {

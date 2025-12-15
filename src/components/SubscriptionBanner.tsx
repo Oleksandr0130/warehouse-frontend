@@ -2,17 +2,20 @@ import { useEffect, useMemo, useState } from 'react';
 import '../styles/SubscriptionBanner.css';
 import {
     fetchBillingStatus,
-    createOneOffCheckout,
     BillingStatusDto,
     Currency,
     getErrorMessage,
+    // ✅ ADDED:
+    fetchBillingPlans,
+    createCheckoutByPlan,
+    BillingPlanDto,
 } from '../api';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 
 declare global {
     interface Window {
-        billing?: { buy: (productId: string) => void };
+        billing?: { buy: (externalId: string) => void }; // ✅ CHANGED: generic externalId
     }
 }
 
@@ -28,9 +31,16 @@ export default function SubscriptionBanner({ embedded }: Props) {
     const { t, i18n } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState<BillingStatusDto | null>(null);
+
+    // Валюта нужна только для web one-off/stripe, но если ты перейдёшь на planId — можно убрать позже
     const [currency, setCurrency] = useState<Currency>('EUR');
 
-    // APK (WebView с JS-мостом)
+    // ✅ ADDED: modal state
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [plans, setPlans] = useState<BillingPlanDto[]>([]);
+    const [plansLoading, setPlansLoading] = useState(false);
+    const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+
     const isAndroidApp = typeof window !== 'undefined' && !!window.billing;
 
     const load = async () => {
@@ -39,7 +49,6 @@ export default function SubscriptionBanner({ embedded }: Props) {
             setStatus(s);
 
             if (!isAndroidApp) {
-                // Валюты касаются только веб-Stripe
                 if (isCurrency(s.billingCurrency)) {
                     setCurrency(s.billingCurrency);
                 } else if ((navigator.language || i18n.language)?.toLowerCase().startsWith('pl')) {
@@ -92,25 +101,60 @@ export default function SubscriptionBanner({ embedded }: Props) {
         return isEnding ? `${base} ending` : base;
     }, [status, isEnding]);
 
-    // Прогресс (для тёмной карточки)
     const progressPct = useMemo(() => {
         if (!status || (status.status !== 'TRIAL' && status.status !== 'ACTIVE')) return 0;
         const daysLeft = typeof status.daysLeft === 'number' ? status.daysLeft : 0;
-        const base = 30; // fallback
-        const pct = Math.max(0, Math.min(100, (daysLeft / base) * 100));
-        return pct;
+        const base = 30;
+        return Math.max(0, Math.min(100, (daysLeft / base) * 100));
     }, [status]);
 
-    // Покупка: APK → Google Play; Web → Stripe
-    const onPay = async () => {
+    // ✅ ADDED: open modal & load plans from backend (no hardcode)
+    const openModal = async () => {
+        try {
+            setIsModalOpen(true);
+            setPlansLoading(true);
+
+            const list = await fetchBillingPlans(); // GET /billing/plans
+            setPlans(list);
+
+            // preselect (best value / first)
+            const preferred = list.find(p => p.badge?.toLowerCase().includes('best'))?.id ?? list[0]?.id ?? null;
+            setSelectedPlanId(preferred);
+        } catch (e: unknown) {
+            toast.error(getErrorMessage(e));
+            setIsModalOpen(false);
+        } finally {
+            setPlansLoading(false);
+        }
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+    // ✅ ADDED: pay action based on selected plan
+    const onContinueToPayment = async () => {
+        if (!selectedPlanId) return;
+
+        const selected = plans.find(p => p.id === selectedPlanId);
+        if (!selected) return;
+
         try {
             setLoading(true);
+
+            // Android → native Google Play billing (APK decides price/offer in Play Console)
             if (isAndroidApp) {
-                window.billing?.buy('flowqr_standard');
-            } else {
-                const { checkoutUrl } = await createOneOffCheckout(currency);
-                window.location.href = checkoutUrl;
+                if (!selected.externalId) {
+                    toast.error('Missing externalId for Android billing plan');
+                    return;
+                }
+                window.billing?.buy(selected.externalId);
+                return;
             }
+
+            // Web → backend creates Stripe Checkout based on planId (no plan logic on frontend)
+            const { checkoutUrl } = await createCheckoutByPlan(selected.id);
+            window.location.href = checkoutUrl;
         } catch (e: unknown) {
             toast.error(getErrorMessage(e));
         } finally {
@@ -128,132 +172,230 @@ export default function SubscriptionBanner({ embedded }: Props) {
         );
     }
 
-    // Embedded (тёмная карточка + прогресс)
+    // Embedded card (as before)
     if (embedded) {
         return (
-            <div className={`sub-card ${isEnding ? 'sub-ending' : ''}`}>
-                <div className="sub-header">
-                    <div className="sub-title">{title}</div>
-                    <span className={pillClass}>
-            {status.status === 'TRIAL' && t('sub.badges.trial')}
-                        {status.status === 'ACTIVE' && t('sub.badges.active')}
-                        {status.status === 'EXPIRED' && t('sub.badges.expired')}
-                        {status.status === 'ANON' && t('sub.badges.anon')}
-                        {status.status === 'NO_COMPANY' && t('sub.badges.noCompany')}
-          </span>
+            <>
+                <div className={`sub-card ${isEnding ? 'sub-ending' : ''}`}>
+                    <div className="sub-header">
+                        <div className="sub-title">{title}</div>
+                        <span className={pillClass}>
+              {status.status === 'TRIAL' && t('sub.badges.trial')}
+                            {status.status === 'ACTIVE' && t('sub.badges.active')}
+                            {status.status === 'EXPIRED' && t('sub.badges.expired')}
+                            {status.status === 'ANON' && t('sub.badges.anon')}
+                            {status.status === 'NO_COMPANY' && t('sub.badges.noCompany')}
+            </span>
+                    </div>
+
+                    {(status.status === 'TRIAL' || status.status === 'ACTIVE') && (
+                        <>
+                            <div className="sub-dates">
+                                {typeof status.daysLeft === 'number' ? t('sub.daysLeft', { days: status.daysLeft }) : ''}
+                            </div>
+
+                            <div className="sub-progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progressPct)}>
+                                <div className="sub-progress-fill" style={{ width: `${progressPct}%` }} />
+                            </div>
+                        </>
+                    )}
+
+                    <div className="sub-actions">
+                        {status.isAdmin ? (
+                            <div className="sub-actions-row">
+                                {!isAndroidApp && (
+                                    <div className="sub-currency-toggle" aria-label={t('sub.currency.aria')}>
+                                        <label>
+                                            <input type="radio" name="currency" value="EUR" checked={currency === 'EUR'} onChange={() => setCurrency('EUR')} />
+                                            EUR
+                                        </label>
+                                        <label style={{ marginLeft: 12 }}>
+                                            <input type="radio" name="currency" value="PLN" checked={currency === 'PLN'} onChange={() => setCurrency('PLN')} />
+                                            PLN
+                                        </label>
+                                    </div>
+                                )}
+
+                                <div style={{ marginTop: 8 }}>
+                                    {/* ✅ CHANGED: button opens modal */}
+                                    <button className="sub-btn" onClick={openModal} disabled={loading}>
+                                        {t('sub.cta.extend') || 'Extend Subscription'}
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="sub-hint">{t('sub.hint.onlyAdmin')}</div>
+                        )}
+                    </div>
                 </div>
 
-                {(status.status === 'TRIAL' || status.status === 'ACTIVE') && (
-                    <>
-                        <div className="sub-dates">
-                            {typeof status.daysLeft === 'number' ? t('sub.daysLeft', { days: status.daysLeft }) : ''}
-                        </div>
+                {/* ✅ ADDED: modal */}
+                {isModalOpen && (
+                    <div className="sb-modal-overlay" onMouseDown={closeModal}>
+                        <div className="sb-modal" onMouseDown={(e) => e.stopPropagation()}>
+                            <div className="sb-modal-header">
+                                <div>
+                                    <div className="sb-modal-title">Extend Your Subscription</div>
+                                    <div className="sb-modal-subtitle">Choose a plan to extend your access</div>
+                                </div>
+                                <button className="sb-modal-close" onClick={closeModal} aria-label="Close">×</button>
+                            </div>
 
-                        <div
-                            className="sub-progress"
-                            role="progressbar"
-                            aria-valuemin={0}
-                            aria-valuemax={100}
-                            aria-valuenow={Math.round(progressPct)}
-                        >
-                            <div className="sub-progress-fill" style={{ width: `${progressPct}%` }} />
+                            <div className="sb-modal-body">
+                                {plansLoading ? (
+                                    <div className="sb-modal-loading">Loading plans…</div>
+                                ) : plans.length === 0 ? (
+                                    <div className="sb-modal-empty">No plans available.</div>
+                                ) : (
+                                    <div className="sb-plan-list">
+                                        {plans.map((p) => {
+                                            const active = p.id === selectedPlanId;
+                                            return (
+                                                <button
+                                                    key={p.id}
+                                                    type="button"
+                                                    className={`sb-plan ${active ? 'active' : ''}`}
+                                                    onClick={() => setSelectedPlanId(p.id)}
+                                                >
+                                                    <div className="sb-plan-left">
+                                                        <div className="sb-radio" aria-hidden="true">{active ? '●' : ''}</div>
+                                                        <div>
+                                                            <div className="sb-plan-title">
+                                                                {p.title}
+                                                                {p.badge ? <span className="sb-badge">{p.badge}</span> : null}
+                                                            </div>
+                                                            {p.subtitle ? <div className="sb-plan-sub">{p.subtitle}</div> : null}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="sb-plan-right">
+                                                        <div className="sb-plan-price">{p.priceText}</div>
+                                                        {p.oldPriceText ? <div className="sb-plan-old">{p.oldPriceText}</div> : null}
+                                                    </div>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+
+                                <button
+                                    className="sb-continue"
+                                    onClick={onContinueToPayment}
+                                    disabled={loading || plansLoading || !selectedPlanId}
+                                >
+                                    Continue to Payment
+                                </button>
+
+                                <div className="sb-provider-hint">
+                                    {isAndroidApp ? 'Payment will be processed by Google Play.' : 'Payment will be processed by Stripe.'}
+                                </div>
+                            </div>
                         </div>
-                    </>
+                    </div>
                 )}
+            </>
+        );
+    }
+
+    // Top banner (light)
+    return (
+        <>
+            <div className={`subscription-banner ${isEnding ? 'sub-ending' : ''}`}>
+                <div>
+                    <div className="sub-title">{title}</div>
+                </div>
 
                 <div className="sub-actions">
                     {status.isAdmin ? (
-                        <div className="sub-actions-row">
+                        <>
                             {!isAndroidApp && (
-                                <div className="sub-currency-toggle" aria-label={t('sub.currency.aria')}>
+                                <div className="sub-currency-toggle" style={{ marginRight: 12 }} aria-label={t('sub.currency.aria')}>
                                     <label>
-                                        <input
-                                            type="radio"
-                                            name="currency"
-                                            value="EUR"
-                                            checked={currency === 'EUR'}
-                                            onChange={() => setCurrency('EUR')}
-                                        />
+                                        <input type="radio" name="currency" value="EUR" checked={currency === 'EUR'} onChange={() => setCurrency('EUR')} />
                                         EUR
                                     </label>
                                     <label style={{ marginLeft: 12 }}>
-                                        <input
-                                            type="radio"
-                                            name="currency"
-                                            value="PLN"
-                                            checked={currency === 'PLN'}
-                                            onChange={() => setCurrency('PLN')}
-                                        />
+                                        <input type="radio" name="currency" value="PLN" checked={currency === 'PLN'} onChange={() => setCurrency('PLN')} />
                                         PLN
                                     </label>
                                 </div>
                             )}
 
-                            <div style={{ marginTop: 8 }}>
-                                <button className="sub-btn" onClick={onPay} disabled={loading}>
-                                    {isAndroidApp
-                                        ? t('sub.cta.buyAndroid')
-                                        : currency === 'EUR'
-                                            ? t('sub.cta.buyWebEur')
-                                            : t('sub.cta.buyWebPln')}
-                                </button>
-                            </div>
-                        </div>
+                            {/* ✅ CHANGED: open modal */}
+                            <button className="subscription-banner button" onClick={openModal} disabled={loading}>
+                                Extend Subscription
+                            </button>
+                        </>
                     ) : (
                         <div className="sub-hint">{t('sub.hint.onlyAdmin')}</div>
                     )}
                 </div>
             </div>
-        );
-    }
 
-    // Banner (верхний)
-    return (
-        <div className={`subscription-banner ${isEnding ? 'sub-ending' : ''}`}>
-            <div>
-                <div className="sub-title">{title}</div>
-            </div>
-
-            <div className="sub-actions">
-                {status.isAdmin ? (
-                    <>
-                        {!isAndroidApp && (
-                            <div className="sub-currency-toggle" style={{ marginRight: 12 }} aria-label={t('sub.currency.aria')}>
-                                <label>
-                                    <input
-                                        type="radio"
-                                        name="currency"
-                                        value="EUR"
-                                        checked={currency === 'EUR'}
-                                        onChange={() => setCurrency('EUR')}
-                                    />
-                                    EUR
-                                </label>
-                                <label style={{ marginLeft: 12 }}>
-                                    <input
-                                        type="radio"
-                                        name="currency"
-                                        value="PLN"
-                                        checked={currency === 'PLN'}
-                                        onChange={() => setCurrency('PLN')}
-                                    />
-                                    PLN
-                                </label>
+            {/* ✅ ADDED: same modal for banner */}
+            {isModalOpen && (
+                <div className="sb-modal-overlay" onMouseDown={closeModal}>
+                    <div className="sb-modal" onMouseDown={(e) => e.stopPropagation()}>
+                        <div className="sb-modal-header">
+                            <div>
+                                <div className="sb-modal-title">Extend Your Subscription</div>
+                                <div className="sb-modal-subtitle">Choose a plan to extend your access</div>
                             </div>
-                        )}
+                            <button className="sb-modal-close" onClick={closeModal} aria-label="Close">×</button>
+                        </div>
 
-                        <button className="subscription-banner button" onClick={onPay} disabled={loading}>
-                            {isAndroidApp
-                                ? t('sub.cta.buyAndroid')
-                                : currency === 'EUR'
-                                    ? t('sub.cta.buyWebEur')
-                                    : t('sub.cta.buyWebPln')}
-                        </button>
-                    </>
-                ) : (
-                    <div className="sub-hint">{t('sub.hint.onlyAdmin')}</div>
-                )}
-            </div>
-        </div>
+                        <div className="sb-modal-body">
+                            {plansLoading ? (
+                                <div className="sb-modal-loading">Loading plans…</div>
+                            ) : plans.length === 0 ? (
+                                <div className="sb-modal-empty">No plans available.</div>
+                            ) : (
+                                <div className="sb-plan-list">
+                                    {plans.map((p) => {
+                                        const active = p.id === selectedPlanId;
+                                        return (
+                                            <button
+                                                key={p.id}
+                                                type="button"
+                                                className={`sb-plan ${active ? 'active' : ''}`}
+                                                onClick={() => setSelectedPlanId(p.id)}
+                                            >
+                                                <div className="sb-plan-left">
+                                                    <div className="sb-radio" aria-hidden="true">{active ? '●' : ''}</div>
+                                                    <div>
+                                                        <div className="sb-plan-title">
+                                                            {p.title}
+                                                            {p.badge ? <span className="sb-badge">{p.badge}</span> : null}
+                                                        </div>
+                                                        {p.subtitle ? <div className="sb-plan-sub">{p.subtitle}</div> : null}
+                                                    </div>
+                                                </div>
+
+                                                <div className="sb-plan-right">
+                                                    <div className="sb-plan-price">{p.priceText}</div>
+                                                    {p.oldPriceText ? <div className="sb-plan-old">{p.oldPriceText}</div> : null}
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
+                            <button
+                                className="sb-continue"
+                                onClick={onContinueToPayment}
+                                disabled={loading || plansLoading || !selectedPlanId}
+                            >
+                                Continue to Payment
+                            </button>
+
+                            <div className="sb-provider-hint">
+                                {isAndroidApp ? 'Payment will be processed by Google Play.' : 'Payment will be processed by Stripe.'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 }
