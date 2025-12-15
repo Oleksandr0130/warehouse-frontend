@@ -219,7 +219,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
                                 <div style={{ marginTop: 8 }}>
                                     {/* ✅ CHANGED: button opens modal */}
                                     <button className="sub-btn" onClick={openModal} disabled={loading}>
-                                        {t('sub.cta.extend') || 'Extend Subscription'}
+                                        {t('Extend Subscription')}
                                     </button>
                                 </div>
                             </div>
