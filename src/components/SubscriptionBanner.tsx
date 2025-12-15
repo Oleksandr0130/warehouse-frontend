@@ -3,9 +3,9 @@ import '../styles/SubscriptionBanner.css';
 import {
     fetchBillingStatus,
     BillingStatusDto,
-    Currency,
     getErrorMessage,
-    // ✅ ADDED:
+
+    // ✅ REQUIRED (добавишь в api.ts ниже)
     fetchBillingPlans,
     createCheckoutByPlan,
     BillingPlanDto,
@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 
 declare global {
     interface Window {
-        billing?: { buy: (externalId: string) => void }; // ✅ CHANGED: generic externalId
+        billing?: { buy: (basePlanId: string) => void }; // ✅ CHANGED: basePlanId (Google Play basePlanId)
     }
 }
 
@@ -23,19 +23,131 @@ interface Props {
     embedded?: boolean;
 }
 
-function isCurrency(v: unknown): v is Currency {
-    return v === 'PLN' || v === 'EUR';
+/** ✅ NEW: вынесли модалку в отдельный компонент, чтобы не дублировать */
+function PlansModal(props: {
+    open: boolean;
+    loading: boolean;
+    plans: BillingPlanDto[];
+    selectedPlanId: string | null;
+    onSelect: (id: string) => void;
+    onClose: () => void;
+    onContinue: () => void;
+    continuing: boolean;
+    isAndroidApp: boolean;
+}) {
+    const {
+        open,
+        loading,
+        plans,
+        selectedPlanId,
+        onSelect,
+        onClose,
+        onContinue,
+        continuing,
+        isAndroidApp,
+    } = props;
+
+    // ✅ NEW: ESC закрывает модалку
+    useEffect(() => {
+        if (!open) return;
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [open, onClose]);
+
+    // ✅ NEW: блокируем скролл body пока модалка открыта
+    useEffect(() => {
+        if (!open) return;
+        const prev = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = prev;
+        };
+    }, [open]);
+
+    if (!open) return null;
+
+    return (
+        <div className="sb-modal-overlay" onMouseDown={onClose} role="dialog" aria-modal="true">
+            <div className="sb-modal" onMouseDown={(e) => e.stopPropagation()}>
+                <div className="sb-modal-header">
+                    <div>
+                        <div className="sb-modal-title">Extend Your Subscription</div>
+                        <div className="sb-modal-subtitle">Choose a plan to extend your access</div>
+                    </div>
+                    <button className="sb-modal-close" onClick={onClose} aria-label="Close">
+                        ×
+                    </button>
+                </div>
+
+                <div className="sb-modal-body">
+                    {loading ? (
+                        <div className="sb-modal-loading">Loading plans…</div>
+                    ) : plans.length === 0 ? (
+                        <div className="sb-modal-empty">No plans available.</div>
+                    ) : (
+                        <div className="sb-plan-list">
+                            {plans.map((p) => {
+                                const active = p.id === selectedPlanId;
+                                return (
+                                    <button
+                                        key={p.id}
+                                        type="button"
+                                        className={`sb-plan ${active ? 'active' : ''}`}
+                                        onClick={() => onSelect(p.id)}
+                                    >
+                                        <div className="sb-plan-left">
+                                            <div className="sb-radio" aria-hidden="true">
+                                                {active ? '●' : ''}
+                                            </div>
+                                            <div>
+                                                <div className="sb-plan-title">
+                                                    {p.title}
+                                                    {p.badge ? <span className="sb-badge">{p.badge}</span> : null}
+                                                </div>
+                                                {p.subtitle ? <div className="sb-plan-sub">{p.subtitle}</div> : null}
+                                            </div>
+                                        </div>
+
+                                        <div className="sb-plan-right">
+                                            {/* ✅ Важно: цены НЕ хардкодим в фронте — только отображаем что дал бэк */}
+                                            <div className="sb-plan-price">{p.priceText}</div>
+                                            {p.oldPriceText ? <div className="sb-plan-old">{p.oldPriceText}</div> : null}
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    <button
+                        className="sb-continue"
+                        onClick={onContinue}
+                        disabled={continuing || loading || !selectedPlanId}
+                    >
+                        Continue to Payment
+                    </button>
+
+                    <div className="sb-provider-hint">
+                        {isAndroidApp
+                            ? 'Payment will be processed by Google Play.'
+                            : 'Payment will be processed by Stripe.'}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default function SubscriptionBanner({ embedded }: Props) {
-    const { t, i18n } = useTranslation();
-    const [loading, setLoading] = useState(false);
+    const { t } = useTranslation();
+
+    const [loading, setLoading] = useState(false); // ✅ используется для Continue
     const [status, setStatus] = useState<BillingStatusDto | null>(null);
 
-    // Валюта нужна только для web one-off/stripe, но если ты перейдёшь на planId — можно убрать позже
-    const [currency, setCurrency] = useState<Currency>('EUR');
-
-    // ✅ ADDED: modal state
+    // ✅ Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [plans, setPlans] = useState<BillingPlanDto[]>([]);
     const [plansLoading, setPlansLoading] = useState(false);
@@ -47,14 +159,6 @@ export default function SubscriptionBanner({ embedded }: Props) {
         try {
             const s = await fetchBillingStatus();
             setStatus(s);
-
-            if (!isAndroidApp) {
-                if (isCurrency(s.billingCurrency)) {
-                    setCurrency(s.billingCurrency);
-                } else if ((navigator.language || i18n.language)?.toLowerCase().startsWith('pl')) {
-                    setCurrency('PLN');
-                }
-            }
         } catch (e: unknown) {
             toast.error(getErrorMessage(e));
         }
@@ -62,12 +166,11 @@ export default function SubscriptionBanner({ embedded }: Props) {
 
     useEffect(() => {
         void load();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const isEnding = useMemo(() => {
         if (!status?.daysLeft && status?.daysLeft !== 0) return false;
-        return (status?.daysLeft ?? 0) <= 3 && (status?.status === 'TRIAL' || status?.status === 'ACTIVE');
+        return (status.daysLeft ?? 0) <= 3 && (status.status === 'TRIAL' || status.status === 'ACTIVE');
     }, [status]);
 
     const title = useMemo(() => {
@@ -108,7 +211,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
         return Math.max(0, Math.min(100, (daysLeft / base) * 100));
     }, [status]);
 
-    // ✅ ADDED: open modal & load plans from backend (no hardcode)
+    // ✅ FIX: теперь модалка открывается и грузит планы 1 раз, без гонок/автозакрытия
     const openModal = async () => {
         try {
             setIsModalOpen(true);
@@ -117,8 +220,11 @@ export default function SubscriptionBanner({ embedded }: Props) {
             const list = await fetchBillingPlans(); // GET /billing/plans
             setPlans(list);
 
-            // preselect (best value / first)
-            const preferred = list.find(p => p.badge?.toLowerCase().includes('best'))?.id ?? list[0]?.id ?? null;
+            const preferred =
+                list.find((p) => (p.badge ?? '').toLowerCase().includes('best'))?.id ??
+                list[0]?.id ??
+                null;
+
             setSelectedPlanId(preferred);
         } catch (e: unknown) {
             toast.error(getErrorMessage(e));
@@ -128,31 +234,30 @@ export default function SubscriptionBanner({ embedded }: Props) {
         }
     };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
+    const closeModal = () => setIsModalOpen(false);
 
-    // ✅ ADDED: pay action based on selected plan
+    // ✅ FIX: Android -> window.billing.buy(basePlanId), Web -> Stripe checkout by planId
     const onContinueToPayment = async () => {
         if (!selectedPlanId) return;
 
-        const selected = plans.find(p => p.id === selectedPlanId);
+        const selected = plans.find((p) => p.id === selectedPlanId);
         if (!selected) return;
 
         try {
             setLoading(true);
 
-            // Android → native Google Play billing (APK decides price/offer in Play Console)
             if (isAndroidApp) {
-                if (!selected.externalId) {
-                    toast.error('Missing externalId for Android billing plan');
+                // externalId должен быть basePlanId: basic-monthly | basic-3months | basic-year
+                const basePlanId = selected.externalId?.trim();
+                if (!basePlanId) {
+                    toast.error('Missing basePlanId (externalId) for Android plan');
                     return;
                 }
-                window.billing?.buy(selected.externalId);
-                return;
+                window.billing?.buy(basePlanId);
+                return; // ✅ не закрываем модалку — пользователь увидит Play UI
             }
 
-            // Web → backend creates Stripe Checkout based on planId (no plan logic on frontend)
+            // Web: бэк создаёт Checkout URL (логика на бэке, не во фронте)
             const { checkoutUrl } = await createCheckoutByPlan(selected.id);
             window.location.href = checkoutUrl;
         } catch (e: unknown) {
@@ -162,7 +267,6 @@ export default function SubscriptionBanner({ embedded }: Props) {
         }
     };
 
-    // Skeleton
     if (!status) {
         return (
             <div className={embedded ? 'sub-card sub-skeleton' : 'subscription-banner sub-skeleton'}>
@@ -172,7 +276,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
         );
     }
 
-    // Embedded card (as before)
+    // ===== Embedded card =====
     if (embedded) {
         return (
             <>
@@ -194,7 +298,13 @@ export default function SubscriptionBanner({ embedded }: Props) {
                                 {typeof status.daysLeft === 'number' ? t('sub.daysLeft', { days: status.daysLeft }) : ''}
                             </div>
 
-                            <div className="sub-progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progressPct)}>
+                            <div
+                                className="sub-progress"
+                                role="progressbar"
+                                aria-valuemin={0}
+                                aria-valuemax={100}
+                                aria-valuenow={Math.round(progressPct)}
+                            >
                                 <div className="sub-progress-fill" style={{ width: `${progressPct}%` }} />
                             </div>
                         </>
@@ -203,21 +313,7 @@ export default function SubscriptionBanner({ embedded }: Props) {
                     <div className="sub-actions">
                         {status.isAdmin ? (
                             <div className="sub-actions-row">
-                                {!isAndroidApp && (
-                                    <div className="sub-currency-toggle" aria-label={t('sub.currency.aria')}>
-                                        <label>
-                                            <input type="radio" name="currency" value="EUR" checked={currency === 'EUR'} onChange={() => setCurrency('EUR')} />
-                                            EUR
-                                        </label>
-                                        <label style={{ marginLeft: 12 }}>
-                                            <input type="radio" name="currency" value="PLN" checked={currency === 'PLN'} onChange={() => setCurrency('PLN')} />
-                                            PLN
-                                        </label>
-                                    </div>
-                                )}
-
                                 <div style={{ marginTop: 8 }}>
-                                    {/* ✅ CHANGED: button opens modal */}
                                     <button className="sub-btn" onClick={openModal} disabled={loading}>
                                         {t('Extend Subscription')}
                                     </button>
@@ -229,75 +325,22 @@ export default function SubscriptionBanner({ embedded }: Props) {
                     </div>
                 </div>
 
-                {/* ✅ ADDED: modal */}
-                {isModalOpen && (
-                    <div className="sb-modal-overlay" onMouseDown={closeModal}>
-                        <div className="sb-modal" onMouseDown={(e) => e.stopPropagation()}>
-                            <div className="sb-modal-header">
-                                <div>
-                                    <div className="sb-modal-title">Extend Your Subscription</div>
-                                    <div className="sb-modal-subtitle">Choose a plan to extend your access</div>
-                                </div>
-                                <button className="sb-modal-close" onClick={closeModal} aria-label="Close">×</button>
-                            </div>
-
-                            <div className="sb-modal-body">
-                                {plansLoading ? (
-                                    <div className="sb-modal-loading">Loading plans…</div>
-                                ) : plans.length === 0 ? (
-                                    <div className="sb-modal-empty">No plans available.</div>
-                                ) : (
-                                    <div className="sb-plan-list">
-                                        {plans.map((p) => {
-                                            const active = p.id === selectedPlanId;
-                                            return (
-                                                <button
-                                                    key={p.id}
-                                                    type="button"
-                                                    className={`sb-plan ${active ? 'active' : ''}`}
-                                                    onClick={() => setSelectedPlanId(p.id)}
-                                                >
-                                                    <div className="sb-plan-left">
-                                                        <div className="sb-radio" aria-hidden="true">{active ? '●' : ''}</div>
-                                                        <div>
-                                                            <div className="sb-plan-title">
-                                                                {p.title}
-                                                                {p.badge ? <span className="sb-badge">{p.badge}</span> : null}
-                                                            </div>
-                                                            {p.subtitle ? <div className="sb-plan-sub">{p.subtitle}</div> : null}
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="sb-plan-right">
-                                                        <div className="sb-plan-price">{p.priceText}</div>
-                                                        {p.oldPriceText ? <div className="sb-plan-old">{p.oldPriceText}</div> : null}
-                                                    </div>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-
-                                <button
-                                    className="sb-continue"
-                                    onClick={onContinueToPayment}
-                                    disabled={loading || plansLoading || !selectedPlanId}
-                                >
-                                    Continue to Payment
-                                </button>
-
-                                <div className="sb-provider-hint">
-                                    {isAndroidApp ? 'Payment will be processed by Google Play.' : 'Payment will be processed by Stripe.'}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                <PlansModal
+                    open={isModalOpen}
+                    loading={plansLoading}
+                    plans={plans}
+                    selectedPlanId={selectedPlanId}
+                    onSelect={setSelectedPlanId}
+                    onClose={closeModal}
+                    onContinue={onContinueToPayment}
+                    continuing={loading}
+                    isAndroidApp={isAndroidApp}
+                />
             </>
         );
     }
 
-    // Top banner (light)
+    // ===== Top banner =====
     return (
         <>
             <div className={`subscription-banner ${isEnding ? 'sub-ending' : ''}`}>
@@ -307,95 +350,26 @@ export default function SubscriptionBanner({ embedded }: Props) {
 
                 <div className="sub-actions">
                     {status.isAdmin ? (
-                        <>
-                            {!isAndroidApp && (
-                                <div className="sub-currency-toggle" style={{ marginRight: 12 }} aria-label={t('sub.currency.aria')}>
-                                    <label>
-                                        <input type="radio" name="currency" value="EUR" checked={currency === 'EUR'} onChange={() => setCurrency('EUR')} />
-                                        EUR
-                                    </label>
-                                    <label style={{ marginLeft: 12 }}>
-                                        <input type="radio" name="currency" value="PLN" checked={currency === 'PLN'} onChange={() => setCurrency('PLN')} />
-                                        PLN
-                                    </label>
-                                </div>
-                            )}
-
-                            {/* ✅ CHANGED: open modal */}
-                            <button className="subscription-banner button" onClick={openModal} disabled={loading}>
-                                Extend Subscription
-                            </button>
-                        </>
+                        <button className="subscription-banner button" onClick={openModal} disabled={loading}>
+                            Extend Subscription
+                        </button>
                     ) : (
                         <div className="sub-hint">{t('sub.hint.onlyAdmin')}</div>
                     )}
                 </div>
             </div>
 
-            {/* ✅ ADDED: same modal for banner */}
-            {isModalOpen && (
-                <div className="sb-modal-overlay" onMouseDown={closeModal}>
-                    <div className="sb-modal" onMouseDown={(e) => e.stopPropagation()}>
-                        <div className="sb-modal-header">
-                            <div>
-                                <div className="sb-modal-title">Extend Your Subscription</div>
-                                <div className="sb-modal-subtitle">Choose a plan to extend your access</div>
-                            </div>
-                            <button className="sb-modal-close" onClick={closeModal} aria-label="Close">×</button>
-                        </div>
-
-                        <div className="sb-modal-body">
-                            {plansLoading ? (
-                                <div className="sb-modal-loading">Loading plans…</div>
-                            ) : plans.length === 0 ? (
-                                <div className="sb-modal-empty">No plans available.</div>
-                            ) : (
-                                <div className="sb-plan-list">
-                                    {plans.map((p) => {
-                                        const active = p.id === selectedPlanId;
-                                        return (
-                                            <button
-                                                key={p.id}
-                                                type="button"
-                                                className={`sb-plan ${active ? 'active' : ''}`}
-                                                onClick={() => setSelectedPlanId(p.id)}
-                                            >
-                                                <div className="sb-plan-left">
-                                                    <div className="sb-radio" aria-hidden="true">{active ? '●' : ''}</div>
-                                                    <div>
-                                                        <div className="sb-plan-title">
-                                                            {p.title}
-                                                            {p.badge ? <span className="sb-badge">{p.badge}</span> : null}
-                                                        </div>
-                                                        {p.subtitle ? <div className="sb-plan-sub">{p.subtitle}</div> : null}
-                                                    </div>
-                                                </div>
-
-                                                <div className="sb-plan-right">
-                                                    <div className="sb-plan-price">{p.priceText}</div>
-                                                    {p.oldPriceText ? <div className="sb-plan-old">{p.oldPriceText}</div> : null}
-                                                </div>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            )}
-
-                            <button
-                                className="sb-continue"
-                                onClick={onContinueToPayment}
-                                disabled={loading || plansLoading || !selectedPlanId}
-                            >
-                                Continue to Payment
-                            </button>
-
-                            <div className="sb-provider-hint">
-                                {isAndroidApp ? 'Payment will be processed by Google Play.' : 'Payment will be processed by Stripe.'}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <PlansModal
+                open={isModalOpen}
+                loading={plansLoading}
+                plans={plans}
+                selectedPlanId={selectedPlanId}
+                onSelect={setSelectedPlanId}
+                onClose={closeModal}
+                onContinue={onContinueToPayment}
+                continuing={loading}
+                isAndroidApp={isAndroidApp}
+            />
         </>
     );
 }

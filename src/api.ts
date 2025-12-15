@@ -57,16 +57,15 @@ interface RefreshResponse {
 
 /** ===== Google Play Billing: verify ===== */
 export interface VerifyPlayPurchaseRequest {
-    productId: string;
+    productId: string;     // productId в Play Console (subscriptionId), у тебя: flowqr_standard
     purchaseToken: string;
-    packageName: string;
+    packageName: string;   // applicationId из gradle, у тебя: com.flowqr.flowqr
 }
 export interface VerifyPlayPurchaseResponse {
     active: boolean;
     /** epoch millis (окончание текущего периода) */
     expiryTime: number;
 }
-
 
 export interface TeamUser {
     id: number;
@@ -97,7 +96,6 @@ export const updateUserRole = async (userId: number, role: 'ADMIN' | 'USER'): Pr
         await api.put(`/admin/users/${userId}`, { admin: role === 'ADMIN' });
     }
 };
-
 
 /* ===================== Helpers ===================== */
 
@@ -164,14 +162,11 @@ export const fetchBillingStatus = async (): Promise<BillingStatusDto> => {
     return data;
 };
 
-/** ✅ Google Play Billing: верификация покупки из APK
- *  Вызывать после успешного `onPurchasesUpdated` в приложении:
- *    verifyPlayPurchase(purchaseToken, 'flowqr_standard', 'com.example.warehouseqrapp')
- */
+/** ✅ Google Play Billing: верификация покупки из APK */
 export const verifyPlayPurchase = async (
     purchaseToken: string,
     productId = 'flowqr_standard',
-    packageName = 'com.example.warehouseqrapp'
+    packageName = 'com.flowqr.flowqr' // ✅ FIX: твой реальный packageName из gradle
 ): Promise<VerifyPlayPurchaseResponse> => {
     const payload: VerifyPlayPurchaseRequest = { productId, purchaseToken, packageName };
     const { data } = await api.post<VerifyPlayPurchaseResponse>('/billing/play/verify', payload);
@@ -183,25 +178,26 @@ export interface BillingPlanDto {
     id: string;               // internal plan id in your backend
     title: string;            // "1 Month", "3 Months", "12 Months"
     subtitle?: string;        // "Best for trying out", "Save 15%", ...
-    priceText: string;        // "€29", "€74", "€244"
+    priceText: string;        // "€29", "€74", "€244" (просто текст с бэка)
     oldPriceText?: string;    // optional strike-through
     badge?: string;           // "Best Value"
-    provider: 'STRIPE' | 'PLAY';
-    externalId?: string;      // for Android bridge (e.g. basePlanId or productId+offer)
+
+    provider?: 'STRIPE' | 'PLAY'; // ✅ FIX: сделаем optional, чтобы бэк мог не присылать
+    externalId?: string;          // ✅ IMPORTANT: для Android = basePlanId (basic-monthly/basic-3months/basic-year)
 }
 
 // GET /billing/plans
 export const fetchBillingPlans = async (): Promise<BillingPlanDto[]> => {
     const { data } = await api.get<BillingPlanDto[]>('/billing/plans');
-    return data;
+    return data ?? [];
 };
 
-// POST /billing/checkout?planId=...
+// ✅ FIX: единый правильный endpoint + body
+// POST /billing/checkout-by-plan { planId }
 export const createCheckoutByPlan = async (planId: string): Promise<CheckoutResponse> => {
-    const { data } = await api.post<CheckoutResponse>(`/billing/checkout?planId=${encodeURIComponent(planId)}`);
+    const { data } = await api.post<CheckoutResponse>('/billing/checkout-by-plan', { planId });
     return data;
 };
-
 
 /* ===================== Профиль / Админ ===================== */
 
@@ -224,7 +220,10 @@ export async function deleteAccount(): Promise<void> {
     // 🔹 добавили Accept-Language также для fetch-вызова
     const lang = (i18n?.language || localStorage.getItem('i18nLng') || navigator.language || 'en');
 
-    const res = await fetch(`/users/me`, {
+    // ✅ FIX: baseURL учтём, иначе если фронт не на том домене — будет не /api
+    const url = `${BASE_URL}/users/me`;
+
+    const res = await fetch(url, {
         method: 'DELETE',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -238,6 +237,7 @@ export async function deleteAccount(): Promise<void> {
 
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('accessToken'); // ✅ NEW: чистим тоже
 }
 
 /* ===================== Интерцепторы ===================== */
@@ -264,7 +264,7 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// response: обновление accessToken по 401 + мягкий редирект по 402
+// response: обновление accessToken по 401
 api.interceptors.response.use(
     (response: AxiosResponse) => response,
     async (error: AxiosError) => {
@@ -286,6 +286,7 @@ api.interceptors.response.use(
                 const refreshToken = localStorage.getItem('refreshToken');
                 if (!refreshToken) throw new Error('No refresh token');
 
+                // ✅ FIX: refresh вызываем без риска рекурсии (через api можно, но лучше отдельный)
                 const { data } = await api.post<RefreshResponse>('/auth/refresh', { refreshToken });
 
                 localStorage.setItem('accessToken', data.accessToken);
@@ -300,6 +301,7 @@ api.interceptors.response.use(
             } catch (refreshError) {
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
+                localStorage.removeItem('token');
                 if (window.location.pathname !== '/login') {
                     window.dispatchEvent(new Event('auth:logout'));
                 }
@@ -329,8 +331,10 @@ api.interceptors.response.use(
             dataObj['error'] === 'payment_required';
 
         const onAccountPage = window.location.pathname.startsWith('/app/account');
+
+        // ✅ FIX: корректно исключаем любые billing вызовы (и /billing, и /api/billing, и абсолютные)
         const isBillingCall =
-            url.startsWith('/billing/') || url.startsWith('/api/billing/');
+            url.includes('/billing/');
 
         if (status === 402 && expired) {
             if (!onAccountPage && !isBillingCall && !subscriptionRedirectScheduled) {
