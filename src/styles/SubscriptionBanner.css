@@ -89,8 +89,6 @@
     border-color: rgba(34,197,94,.35);                /* рамка */
     background: rgba(34,197,94,.12);                  /* фон */
 }
-
-/* (необязательно) маленькая зелёная точка слева */
 .sub-pill.active::before{
     content:"";
     width:6px; height:6px;
@@ -231,4 +229,192 @@
     .subscription-banner .sub-actions {
         justify-content: space-between;
     }
+}
+
+/* =========================================================
+   ✅ ДОБАВЛЕНО: МОДАЛКА (Google Play plan picker)
+   ========================================================= */
+
+.sb-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    z-index: 9999;
+}
+
+.sb-modal {
+    width: min(560px, 100%);
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 18px 60px rgba(0,0,0,.25);
+    border: 1px solid #e5e7eb;
+    padding: 18px;
+    position: relative;
+}
+
+.sb-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+}
+.sb-modal-close:hover {
+    background: #f8fafc;
+}
+
+.sb-modal-title {
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: #0f172a;
+    margin-bottom: 4px;
+}
+
+.sb-modal-subtitle {
+    color: #64748b;
+    font-size: .95rem;
+    margin-bottom: 14px;
+}
+
+.sb-modal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.sb-modal-loading {
+    padding: 14px;
+    border: 1px dashed #e5e7eb;
+    border-radius: 14px;
+    color: #64748b;
+}
+
+/* карточка плана */
+.sb-plan {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+
+.sb-plan:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 22px rgba(0,0,0,.06);
+}
+
+.sb-plan.selected {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 10px 24px rgba(37,99,235,.12);
+}
+
+.sb-plan-radio {
+    margin-top: 4px;
+    accent-color: #2563eb;
+}
+
+.sb-plan-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.sb-plan-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.sb-plan-title {
+    font-weight: 800;
+    color: #0f172a;
+    font-size: 1rem;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.sb-plan-badge {
+    font-size: .75rem;
+    font-weight: 800;
+    background: #2563eb;
+    color: #fff;
+    border-radius: 999px;
+    padding: 4px 10px;
+}
+
+.sb-plan-price {
+    font-weight: 900;
+    color: #0f172a;
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    white-space: nowrap;
+}
+
+.sb-plan-original {
+    color: #94a3b8;
+    text-decoration: line-through;
+    font-weight: 700;
+    font-size: .9rem;
+}
+
+.sb-plan-bottom {
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.sb-plan-sub {
+    color: #64748b;
+    font-size: .92rem;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sb-plan-save {
+    color: #2563eb;
+    font-weight: 800;
+    font-size: .9rem;
+    white-space: nowrap;
+}
+
+/* CTA */
+.sb-modal-cta {
+    width: 100%;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background: #0b1220;
+    color: #fff;
+    font-weight: 800;
+    cursor: pointer;
+}
+.sb-modal-cta:hover {
+    background: #0f172a;
+}
+.sb-modal-cta:disabled {
+    opacity: .6;
+    cursor: not-allowed;
 }
