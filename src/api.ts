@@ -171,7 +171,7 @@ export const fetchBillingStatus = async (): Promise<BillingStatusDto> => {
 export const verifyPlayPurchase = async (
     purchaseToken: string,
     productId = 'flowqr_standard',
-    packageName = 'com.example.warehouseqrapp'
+    packageName = 'com.flowqr.flowqr'
 ): Promise<VerifyPlayPurchaseResponse> => {
     const payload: VerifyPlayPurchaseRequest = { productId, purchaseToken, packageName };
     const { data } = await api.post<VerifyPlayPurchaseResponse>('/billing/play/verify', payload);
