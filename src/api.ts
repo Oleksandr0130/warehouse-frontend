@@ -199,7 +199,7 @@ export async function deleteAccount(): Promise<void> {
     // 🔹 добавили Accept-Language также для fetch-вызова
     const lang = (i18n?.language || localStorage.getItem('i18nLng') || navigator.language || 'en');
 
-    const res = await fetch(`/users/me`, {
+    const res = await fetch(`${BASE_URL}/users/me`, {
         method: 'DELETE',
         headers: {
             'Authorization': `Bearer ${token}`,
